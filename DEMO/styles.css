@@ -1,0 +1,131 @@
+body{
+    margin: 0px;
+    padding: 0;
+}
+header{
+    width: 100%;
+    height: 100px;
+    background-color: #759A7B;
+    display: flex;
+    color: #F2F2F2;
+    position: fixed;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+}
+a{
+    text-decoration: none;
+
+}
+.logo{
+    display: flex;
+    align-items: center;
+    margin-left: 35px;
+}
+
+.logo h2{
+    font-weight: 200;
+    margin-left: 15px;
+    color: #F2F2F2;
+    margin-right: 23%;
+}
+.perfil{
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    margin-right: 35px;
+}
+.menu a{
+    color: #F2F2F2;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0 10px;
+    transition: 0.4s;
+    display: flex;
+    align-items: start;
+}
+.mostrar-menu, .esconder-menu{
+    font-size: 30px;
+    cursor: pointer;
+    /* display: none; */
+    transition: 0.4s;
+}
+
+.esconder-menu{
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px;
+}
+ a:hover, .mostrar-menu:hover, .esconder-menu:hover{
+    color: #324759;
+}
+#check{
+    display: none;
+}
+aside {
+    position: fixed;
+    z-index: 2;
+    left: 0;
+    top: 100px;
+    width: 20%;
+    height: 80vh;
+    overflow: hidden;
+    background-color: #131F31;
+    transform: translateX(0%); /* Inicialmente oculto */
+    color: #FFFFFF;
+    transition: transform 0.4s ease-in-out, width 0.4s ease-in-out;
+}
+
+aside.hidden {
+    transform: translateX(-100%);
+    width: 0;
+}
+
+ .aside summary{
+    margin-left: 10px;
+    width: 100%;
+    height: max-content;
+    margin-top: 20px;
+    font-weight: bold;
+ }
+ .aside ul {
+    margin: 0; 
+    padding: 0; 
+    width: 100%;
+}
+
+.aside ul li {
+    margin: 0; 
+    padding: 5px 0px;
+    width: 100%;
+    height: 25px;
+    box-sizing: border-box; 
+}
+ .aside ul li a{
+    display: block;
+    color: #FFFFFF;
+    width: 100%;
+    height: max-content;
+    padding-left: 30px;
+ }
+ .aside ul li a:hover{
+    background-color: #759A7B;
+    width: 100%;
+    height: max-content;
+ }
+ main{
+     position: absolute;
+    width: 80%; /* Por defecto ocupa el 100% */
+    height: auto;
+    margin-top: 100px;
+    padding: 30px;
+    margin-left: 20%; /* Ajustado para que no tenga margen al inicio */
+    transition: width 0.4s ease-in-out, margin-left 0.4s ease-in-out;
+ }
+ main.expanded {
+    width: 100%;
+    margin-left: 0;
+}
+
+
+ 
