@@ -123,14 +123,30 @@ class D_RolUsuario {
             return null;
         }
     }
+
+    // public function obtenerRolesPorUsuario() {
+    //     $sql = "CALL ObtenerRolUsuario()";
+    //     try {
+    //         $ps = $this->con->prepare($sql);
+    //         $ps->execute();
+    //         return $ps->fetchAll(PDO::FETCH_ASSOC);
+    //     } catch (PDOException $ex) {
+    //         echo "Error al buscar: " . $ex->getMessage();
+    //         return null;
+    //     }
+    // }
+
         // D_RolUsuario.php
     public function obtenerRolesPorUsuario($id_usuario) {
-        $sql = "SELECT r.r_nombre FROM rol_usuario ru
-                INNER JOIN rol r ON ru.id_rol = r.id_rol
-                WHERE ru.id_usuario = ?";
-        $ps = $this->con->prepare($sql);
-        $ps->execute([$id_usuario]);
-        return $ps->fetchAll(PDO::FETCH_COLUMN); // Devuelve un array de nombres de roles
-    }
+    $sql = "SELECT r.r_nombre, f.f_nombre, f.f_apellido
+            FROM rol_usuario ru
+            INNER JOIN usuario u ON ru.id_usuario = u.id_usuario
+            INNER JOIN funcionario f ON u.id_funcionario = f.id_funcionario
+            INNER JOIN rol r ON ru.id_rol = r.id_rol
+            WHERE ru.id_usuario = ?";
+    $ps = $this->con->prepare($sql);
+    $ps->execute([$id_usuario]);
+    return $ps->fetchAll(PDO::FETCH_ASSOC);
+}
 }
 ?>

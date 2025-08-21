@@ -5,9 +5,9 @@ require_once __DIR__ . '/../DATOS/D_Conepcion.php';
 class N_Funcionario {
 
     // Método para adicionar funcionario
-    public function adicionar($f_nombre, $f_apellido, $f_correo, $area , $id_cargo) {
+    public function adicionar($f_nombre, $f_apellido, $f_correo, $area , $id_cargo, $CI, $complemento) {
         $Nfuncionario = new D_Funcionario(); 
-        $Nfuncionario->Adicionar($f_nombre, $f_apellido, $f_correo, $area , $id_cargo);  // Llamar al método de D_Funcionario
+        $Nfuncionario->Adicionar($f_nombre, $f_apellido, $f_correo, $area , $id_cargo, $CI, $complemento);  // Llamar al método de D_Funcionario
     }
     
 
@@ -30,10 +30,10 @@ class N_Funcionario {
     }
 
     // Método para modificar un funcionario
-    public function modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $f_estado) {
+    public function modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento) {
         $Dfuncionario = new D_Funcionario();
         $funcionarioExistente = $Dfuncionario->buscarPorId($id_funcionario);
-        $Dfuncionario->modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area,$id_cargo, $f_estado);
+        $Dfuncionario->modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area,$id_cargo, $CI, $complemento);
     }
 
     // Método para buscar un funcionario por ID

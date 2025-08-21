@@ -28,28 +28,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $f_nombre = trim(filter_input(INPUT_POST, 'f_nombre', FILTER_SANITIZE_STRING));
     $f_apellido = trim(filter_input(INPUT_POST, 'f_apellido', FILTER_SANITIZE_STRING));
     $f_correo = trim(filter_input(INPUT_POST, 'f_correo', FILTER_SANITIZE_EMAIL));
-    $area = trim(filter_input(INPUT_POST, 'area', FILTER_SANITIZE_STRING));
-    $id_cargo = trim(filter_input(INPUT_POST, 'id_cargo', FILTER_SANITIZE_STRING));
-    $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_STRING);       
-       
+    $area = filter_input(INPUT_POST, 'area', FILTER_VALIDATE_INT);
+    $id_cargo = filter_input(INPUT_POST, 'id_cargo', FILTER_VALIDATE_INT);
+    $CI = trim(filter_input(INPUT_POST, 'CI', FILTER_VALIDATE_INT));
+    $complemento = trim(filter_input(INPUT_POST, 'complemento', FILTER_SANITIZE_STRING));
+    $complemento = $complemento !== "" ? $complemento : null;
+    $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_STRING);
 
+    // Validar campos básicos
+    if ($f_nombre && $f_apellido && $f_correo && $area && $id_cargo && $CI && $accion) {
+        $existingFuncionario = $funcionarioService->buscarPorId($id_funcionario);
 
         if ($accion === 'crear') {
-            if ($f_nombre && $f_apellido && $f_correo  && $area && $id_cargo) {
-                $funcionarioService->adicionar($f_nombre, $f_apellido, $f_correo, $area, $id_cargo);
+            if ($existingFuncionario) {
+                echo "Error: El funcionario con el ID $id_funcionario ya existe. No se puede crear.";
+            } else {
+                $funcionarioService->adicionar($f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento);
                 header('Location: ADM_Funcionario.php');
                 exit();
-            } else {
-                echo "Error: Todos los campos son obligatorios para crear un nuevo funcionario.";
             }
         } elseif ($accion === 'guardar') {
-            if ($f_nombre && $f_apellido && $f_correo  && $area && $id_cargo) {
-                $existingFuncio = $funcionarioService->buscarPorId($id_funcionario);
-                if ($existingFuncio) {
-                    $funcionarioService->modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, 1);
-                    header('Location: ADM_Funcionario.php');
-                    exit();
-               
+            if ($existingFuncionario) {
+                $funcionarioService->modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento);
+                header('Location: ADM_Funcionario.php');
+                exit();
             } else {
                 echo "Error: El funcionario con el ID $id_funcionario no existe. No se puede modificar.";
             }
@@ -59,8 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo "Error: Todos los campos son necesarios y deben ser válidos.";
     }
-
 }
+
+
 $funcionarios = $funcionarioService->obtenerFuncionarios();
 // Llama al método para obtener las áreas
 $areas = $funcionarioService->obtenerAreas();  // Obtienes todas las áreas de la base de datos
@@ -162,6 +165,20 @@ if ($searchTerm) {
                     ?>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="CI">Cédula de Identidad</label>
+                <input type="number" class="form-control" id="CI" name="CI" value="<?php echo isset($funcionario) ? htmlspecialchars($funcionario['ci']) : ''; ?>" required>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="toggleComplemento">
+                <label for="toggleComplemento">Añadir complemento</label>
+            </div>
+
+            <div class="form-group" id="complementoGroup" style="display:none;">
+                <label for="complemento">Complemento</label>
+                <input type="text" class="form-control" id="complemento" name="complemento" 
+                    value="<?php echo isset($funcionario) ? htmlspecialchars($funcionario['complemento_ci']) : ''; ?>">
+            </div>
             <!-- Botones dentro del modal -->
             <div class="mt-3">
                 <button type="submit" name="accion" value="crear" class="btn btn-primary">Crear Funcionario</button>
@@ -199,6 +216,7 @@ if ($searchTerm) {
                     <th>Estado</th>
                     <th>Area</th>
                     <th>Cargo</th>
+                    <th>Cédula de Identidad</th>
                     <th>Fecha Registro</th>
                 </tr>
             </thead>
@@ -209,9 +227,16 @@ if ($searchTerm) {
                         <td><?php echo htmlspecialchars($Nfuncionarios['f_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($Nfuncionarios['f_apellido']); ?></td>
                         <td><?php echo htmlspecialchars($Nfuncionarios['f_correo']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['f_estado']); ?></td>
+                        <td>
+                            <?php if ($Nfuncionarios['f_estado'] == 1): ?>
+                                <span style="color: green; font-weight: bold;">Activo</span>
+                            <?php else: ?>
+                                <span style="color: red; font-weight: bold;">Inactivo</span>
+                            <?php endif; ?>
+                        </td>
                         <td><?php echo htmlspecialchars($Nfuncionarios['a_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($Nfuncionarios['nombre_c']); ?></td>
+                        <td><?php echo htmlspecialchars($Nfuncionarios['ci'] . ' ' . $Nfuncionarios['complemento_ci']); ?></td>
                         <td><?php echo htmlspecialchars($Nfuncionarios['f_fecha_registro']); ?></td>
                         <td>
                             <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>" class="btn btn-warning">Editar</a>
@@ -253,6 +278,10 @@ if ($searchTerm) {
         const btnCrear = form.querySelector('button[name="accion"][value="crear"]');
         if (btnCrear) btnCrear.disabled = false;
     });
+    document.getElementById('toggleComplemento').addEventListener('change', function () {
+    let complementoGroup = document.getElementById('complementoGroup');
+    complementoGroup.style.display = this.checked ? 'block' : 'none';
+});
 </script>
 
 

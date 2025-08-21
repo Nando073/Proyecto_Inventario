@@ -183,7 +183,7 @@ if ($searchTerm) {
             <tr>
                 <td><?php echo htmlspecialchars($ROL_U['id_rol_usuario']); ?></td>
                 <td><?php echo htmlspecialchars($ROL_U['r_nombre']); ?></td>
-                <td><?php echo htmlspecialchars($ROL_U['nombre']); ?></td>
+                <td><?php echo htmlspecialchars($ROL_U['f_nombre'] . ' ' . $ROL_U['f_apellido']); ?></td>
                 <td><?php echo htmlspecialchars($ROL_U['fecha_registro']); ?></td>
                 <td>
                     <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>" class="btn btn-warning">Editar</a>

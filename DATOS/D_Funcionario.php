@@ -7,10 +7,12 @@ class D_Funcionario {
     private $area;
     private $id_cargo;
     private $f_estado;
+    private $CI;
+    private $complemento;
     private $con;
 
     // Constructor
-    public function __construct($id_funcionario = 0, $f_nombre = "Default Name", $f_apellido = "Default LastName", $f_correo = "Default Email", $area = "Default Area",$id_cargo="default cargo", $f_estado = "Default Estado") {
+    public function __construct($id_funcionario = 0, $f_nombre = "Default Name", $f_apellido = "Default LastName", $f_correo = "Default Email", $area = "Default Area",$id_cargo="default cargo", $f_estado = "Default Estado", $CI = "Default CI", $complemento = "Default Complemento") {
         $this->id_funcionario = $id_funcionario;
         $this->f_nombre = $f_nombre;
         $this->f_apellido = $f_apellido;
@@ -18,6 +20,8 @@ class D_Funcionario {
         $this->area = $area;
         $this->id_cargo = $id_cargo;
         $this->f_estado = $f_estado;
+        $this->CI = $CI;
+        $this->complemento = $complemento;
         $this->con = (new D_coneccion())->Conectar();
     }
 
@@ -43,12 +47,18 @@ class D_Funcionario {
     public function getEstado() { return $this->f_estado; }
     public function setEstado($f_estado) { $this->f_estado = $f_estado; }
 
+    public function getCI() { return $this->CI; }
+    public function setCI($CI) { $this->CI = $CI; }
+
+    public function getComplemento() { return $this->complemento; }
+    public function setComplemento($complemento) { $this->complemento = $complemento; }
+
     // Método para adicionar un funcionario
-    public function Adicionar($f_nombre, $f_apellido, $f_correo, $area, $id_cargo) {
-        $sql = "CALL AdicionarFuncionario(?, ?, ?, ? , ?)";
+    public function Adicionar($f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento) {
+        $sql = "CALL AdicionarFuncionario(?, ?, ?, ? , ?, ?, ?)";
         try {
             $ps = $this->con->prepare($sql);
-            $ps->execute([$f_nombre, $f_apellido, $f_correo, $area, $id_cargo]);
+            $ps->execute([$f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento]);
             echo "Funcionario registrado correctamente.";
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
@@ -95,11 +105,11 @@ class D_Funcionario {
     }
 
     // Método para modificar funcionario
-    public function modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $f_estado) {
-        $sql = "CALL CargarFuncionario(?, ?, ?, ?, ?, ? , ?)";
+    public function modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento) {
+        $sql = "CALL CargarFuncionario(?, ?, ?, ?, ?, ? , ?, ?)";
         try {
             $ps = $this->con->prepare($sql);
-            $ps->execute([$id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $f_estado]);
+            $ps->execute([$id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento]);
             echo "Funcionario actualizado correctamente.";
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();

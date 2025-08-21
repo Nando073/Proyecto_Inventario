@@ -27,25 +27,23 @@ if (isset($_GET['id_usuario'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_usuario = filter_input(INPUT_POST, 'id_usuario', FILTER_VALIDATE_INT);
-    $nombre = trim(filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_STRING));
-    $apellido = trim(filter_input(INPUT_POST, 'apellido', FILTER_SANITIZE_STRING));
     $usuarioNombre = trim(filter_input(INPUT_POST, 'usuario', FILTER_SANITIZE_STRING));
     $clave = trim($_POST['clave']); // No sanitizar, para mantener formato de hash
-    $correo = trim(filter_input(INPUT_POST, 'correo', FILTER_SANITIZE_STRING));
+    $id_funcionario =filter_input(INPUT_POST, 'id_funcionario', FILTER_VALIDATE_INT);
     $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_STRING);
 
     if ($accion === 'crear') {
-        if ($nombre && $apellido && $usuarioNombre && $clave && $correo) {
+        if ($usuarioNombre && $clave && $id_funcionario) {
             $clave = trim($_POST['clave']);
             $clave = password_hash($clave, PASSWORD_DEFAULT); // Nueva clave
-            $usuarioService->adicionar($nombre, $apellido, $usuarioNombre, $clave, $correo);
+            $usuarioService->adicionar($usuarioNombre, $clave, $id_funcionario);
             header('Location: ADM_Usuario.php');
             exit();
         } else {
             echo "Error: Todos los campos son obligatorios para crear un nuevo usuario.";
         }
     } elseif ($accion === 'guardar') {
-        if ($nombre && $apellido && $usuarioNombre && $correo) {
+        if ($usuarioNombre && $id_funcionario) {
             $existingUser = $usuarioService->buscarPorId($id_usuario);
             if ($existingUser) {
                 if (empty($clave)) {
@@ -54,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $clave = password_hash($clave, PASSWORD_DEFAULT); // Nueva clave
                 }
 
-                $usuarioService->modificar($id_usuario, $nombre, $apellido, $usuarioNombre, $clave, $correo, 1);
+                $usuarioService->modificar($id_usuario, $usuarioNombre, $clave, $id_funcionario, 1);
                 header('Location: ADM_Usuario.php');
                 exit();
             } else {
@@ -70,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Obtener la lista de usuarios
 $usuarios = $usuarioService->buscarTodo();
-
+$funcionarios = $usuarioService->obtenerFuncionarios();
 // Buscar por término
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 if ($searchTerm) {
@@ -126,26 +124,31 @@ if ($searchTerm) {
                 <div class="form-group">
                     <input type="hidden" class="form-control" id="id_usuario" name="id_usuario" value="<?php echo isset($usuario) ? $usuario['id_usuario'] : ''; ?>"required>
                 </div>
-           
-            <div class="form-group">
-                <label for="nombre">Nombre</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" value="<?php echo isset($usuario) ? htmlspecialchars($usuario['nombre']) : ''; ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="apellido">Apellido</label>
-                <input type="text" class="form-control" id="apellido" name="apellido" value="<?php echo isset($usuario) ? htmlspecialchars($usuario['apellido']) : ''; ?>" required>
-            </div>
+
             <div class="form-group">
                 <label for="usuario">Nombre de usuario</label>
                 <input type="text" class="form-control" id="usuario" name="usuario" value="<?php echo isset($usuario) ? htmlspecialchars($usuario['usuario']) : ''; ?>" required>
             </div>
-            <div class="form-group">
-                <label for="clave">Contraseña</label>
+            <label for="clave">Contraseña</label>
+            <div class="input-group">
                 <input type="password" class="form-control" id="clave" name="clave" value="">
+                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                    👁
+                </button>
             </div>
-            <div class="form-group">
-                <label for="correo">Correo</label>
-                <input type="email" class="form-control" id="correo" name="correo" value="<?php echo isset($usuario) ? htmlspecialchars($usuario['correo']) : ''; ?>" required>
+             <div class="form-group">
+                <label for="funcionario">Funcionario</label>
+                <select name="funcionario" id="funcionario" class="form-control" required>
+                    <option value="">Seleccione un funcionario</option>
+                    <?php
+                        // Asegúrate de que $funcionarios contiene los datos de los funcionarios
+                        foreach ($funcionarios as $funcionario) {
+                            // Si estamos editando un funcionario, seleccionamos el funcionario previamente asignado
+                            $selected = (isset($usuario) && $usuario['id_funcionario'] == $funcionario['id_funcionario']) ? 'selected' : '';
+                            echo "<option value='" . htmlspecialchars($funcionario['id_funcionario']) . "' $selected>" . htmlspecialchars($funcionario['f_nombre']) . "</option>";
+                        }
+                    ?>
+                </select>
             </div>
             <!-- Botones dentro del modal -->
             <div class="mt-3">
@@ -178,12 +181,10 @@ if ($searchTerm) {
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
                     <th>Usuario</th>
                     <th>Clave (Encriptada)</th>
-                    <th>Correo</th>
-                    <!-- <th>Estado</th> -->
+                    <th>Funcionario</th>
+                    <th>Estado</th>
                     <th>Fecha Registro</th>
                 </tr>
             </thead>
@@ -191,12 +192,16 @@ if ($searchTerm) {
                 <?php foreach ($usuarios as $Nusuario): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($Nusuario['id_usuario']); ?></td>
-                        <td><?php echo htmlspecialchars($Nusuario['nombre']); ?></td>
-                        <td><?php echo htmlspecialchars($Nusuario['apellido']); ?></td>
                         <td><?php echo htmlspecialchars($Nusuario['usuario']); ?></td>
                         <td>********</td>
-                        <td><?php echo htmlspecialchars($Nusuario['correo']); ?></td>
-                        
+                        <td><?php echo htmlspecialchars($Nusuario['f_nombre'] . ' ' . $Nusuario['f_apellido']); ?></td>
+                        <td>
+                            <?php if ($Nusuario['estado'] == 1): ?>
+                                <span style="color: green; font-weight: bold;">Activo</span>
+                            <?php else: ?>
+                                <span style="color: red; font-weight: bold;">Inactivo</span>
+                            <?php endif; ?>
+                        </td>
                         <td><?php echo htmlspecialchars($Nusuario['fecha_registro']); ?></td>
                         <td>
                             <a href="ADM_Usuario.php?id_usuario=<?php echo $Nusuario['id_usuario']; ?>" class="btn btn-warning">Editar</a>
@@ -218,29 +223,41 @@ if ($searchTerm) {
                 </script>
                 <?php endif; ?>
 <script>
-    document.getElementById("btnCrearUsuario").addEventListener("click", function () {
-        const form = document.getElementById("formUsuario");
+document.addEventListener("DOMContentLoaded", function () {
+    // Referencias a los elementos
+    const btnCrearUsuario = document.getElementById("btnCrearUsuario");
+    const togglePasswordBtn = document.getElementById("togglePassword");
+    const form = document.getElementById("formUsuario");
+    const passwordInput = document.getElementById('clave');
+    const idInput = document.getElementById("id_usuario");
+    const btnGuardar = form.querySelector('button[name="accion"][value="guardar"]');
+    const btnCrear = form.querySelector('button[name="accion"][value="crear"]');
 
-        // Limpia todos los inputs manualmente
-        form.querySelectorAll("input").forEach(input => {
-            input.value = "";
-        });
+    // Función para limpiar formulario
+    btnCrearUsuario.addEventListener("click", function () {
+        // Limpia valores de todos los inputs
+        form.querySelectorAll("input").forEach(input => input.value = "");
 
-        // Si existe el campo oculto id_usuario, lo eliminamos del DOM directamente
-        const idInput = document.getElementById("id_usuario");
-        if (idInput) idInput.remove();
+        // Limpia id_usuario (no lo elimina, solo lo vacía)
+        if (idInput) idInput.value = "";
 
-        // Desactiva el botón "Guardar Cambios"
-        const btnGuardar = form.querySelector('button[name="accion"][value="guardar"]');
+        // Desactiva "Guardar Cambios"
         if (btnGuardar) btnGuardar.disabled = true;
 
-        // Activa el botón "Crear Usuario"
-        const btnCrear = form.querySelector('button[name="accion"][value="crear"]');
+        // Activa "Crear Usuario"
         if (btnCrear) btnCrear.disabled = false;
     });
+
+    // Función para mostrar/ocultar contraseña
+    togglePasswordBtn.addEventListener('click', function () {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+
+        // Cambia el icono del botón según el estado
+        togglePasswordBtn.textContent = type === 'password' ? '👁' : '🙈';
+    });
+});
 </script>
-
-
 
 </body>
 </html>

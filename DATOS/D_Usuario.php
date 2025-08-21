@@ -1,23 +1,19 @@
 <?php
 class D_Usuario {
     private $id_usuario;
-    private $nombre;
-    private $apellido;
     private $usuario;
     private $clave;
-    private $correo;
+    private $id_funcionario;
     private $estado;
     private $fecha_registro;
     private $con;
 
     // Constructor
-    public function __construct($id_usuario = 0, $nombre = "Default Name", $apellido = "Default LastName", $usuario = "Default User", $clave = "Default Password", $correo = "Default Email", $estado = "Default Stado",$fecha_registro="Default fecha") {
+    public function __construct($id_usuario = 0, $usuario = "Default User", $clave = "Default Password", $id_funcionario = 0, $estado = "Default Estado", $fecha_registro = "Default fecha") {
         $this->id_usuario = $id_usuario;
-        $this->nombre = $nombre;
-        $this->apellido = $apellido;
         $this->usuario = $usuario;
         $this->clave = $clave;
-        $this->correo = $correo;
+        $this->id_funcionario = $id_funcionario;
         $this->estado = $estado;
         $this->fecha_registro = $fecha_registro;
         $this->con = (new D_coneccion())->Conectar(); // Inicializar conexión
@@ -27,20 +23,14 @@ class D_Usuario {
     public function getId_usuario() { return $this->id_usuario; }
     public function setId($id_usuario) { $this->id = $id_usuario; }
 
-    public function getNombre() { return $this->nombre; }
-    public function setNombre($nombre) { $this->nombre = $nombre; }
-
-    public function getApellido() { return $this->apellido; }
-    public function setApellido($apellido) { $this->apellido = $apellido; }
-
     public function getUsuario() { return $this->usuario; }
     public function setUsuario($usuario) { $this->usuario = $usuario; }
 
     public function getClave() { return $this->clave; }
     public function setClave($clave) { $this->clave = $clave; }
 
-    public function getCorreo() { return $this->correo; }
-    public function setCorreo($correo) { $this->correo = $correo; }
+    public function getId_funcionario() { return $this->id_funcionario; }
+    public function setId_funcionario($id_funcionario) { $this->id_funcionario = $id_funcionario; }
 
     public function getEstado() { return $this->estado; }
     public function setEstado($estado) { $this->estado = $estado; }
@@ -51,11 +41,11 @@ class D_Usuario {
 
     
     // Método para adicionar un usuario
-    public function Adicionar( $nombre,$apellido, $usuario, $clave, $correo) {
-        $sql = "CALL AdicionarUsuario( ?, ?, ?, ?,?)";
+    public function Adicionar($usuario, $clave, $id_funcionario) {
+        $sql = "CALL AdicionarUsuario(?, ?, ?)";
         try {
             $ps = $this->con->prepare($sql);
-            $ps->execute([ $nombre, $apellido, $usuario, $clave, $correo]);
+            $ps->execute([$usuario, $clave, $id_funcionario]);
             echo "Usuario registrado correctamente.";
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
@@ -100,11 +90,11 @@ class D_Usuario {
         }
     }
    // Método para modificar
-public function modificar($id_usuario, $nombre, $apellido, $usuario, $clave, $correo, $estado) {
-    $sql = "CALL CargarUsuario(?, ?, ?, ?, ?, ?, ?)";
+public function modificar($id_usuario, $usuario, $clave, $id_funcionario, $estado) {
+    $sql = "CALL CargarUsuario(?, ?, ?, ?, ?)";
     try {
         $ps = $this->con->prepare($sql);
-        $ps->execute([$id_usuario, $nombre, $apellido, $usuario, $clave, $correo, $estado]);
+        $ps->execute([$id_usuario, $usuario, $clave, $id_funcionario, $estado]);
         echo "Usuario actualizado correctamente.";
     } catch (PDOException $ex) {
         echo "Error al actualizar: " . $ex->getMessage();
@@ -135,7 +125,17 @@ public function modificar($id_usuario, $nombre, $apellido, $usuario, $clave, $co
             return null;
         }
     }
-    
+    public function obtenerFuncionario() {
+        $sql = "CALL ObtenerFuncionariosConArea_Cargo()";
+       try {
+            $ps = $this->con->prepare($sql);
+            $ps->execute();
+            return $ps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex) {
+            echo "Error al buscar: " . $ex->getMessage();
+            return null;
+        }
+    }
     
     
 }

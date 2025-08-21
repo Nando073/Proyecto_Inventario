@@ -5,9 +5,9 @@ require_once __DIR__ . '/../DATOS/D_Conepcion.php';
 class N_Usuario {
 
     // Método para adicionar usuario
-    public function adicionar($nombre, $apellido, $usuario, $clave, $correo) {
-        $Nusuario = new D_Usuario(); 
-        $Nusuario->Adicionar($nombre, $apellido, $usuario, $clave, $correo);
+    public function adicionar($usuario, $clave, $id_funcionario) {
+        $Nusuario = new D_Usuario();
+        $Nusuario->Adicionar($usuario, $clave, $id_funcionario);
     }
 
     // Método para buscar todos los usuarios
@@ -29,9 +29,9 @@ class N_Usuario {
     }
 
     // Método para modificar un usuario
-    public function modificar($id_usuario, $nombre, $apellido, $usuario, $clave, $correo, $estado) {
+    public function modificar($id_usuario, $usuario, $clave, $id_funcionario, $estado) {
         $Dusuario = new D_Usuario();
-        $Dusuario->modificar($id_usuario, $nombre, $apellido, $usuario, $clave, $correo, $estado);
+        $Dusuario->modificar($id_usuario, $usuario, $clave, $id_funcionario, $estado);
     }
 
     // Método para buscar un usuario por ID
@@ -39,6 +39,12 @@ class N_Usuario {
         $Nusuario = new D_Usuario();
         return $Nusuario->buscarPorId($id_usuario);
     }
+
+    public function obtenerFuncionarios() {
+        $Nusuario = new D_Usuario();
+        return $Nusuario->obtenerFuncionario();
+    }
+
     // Método para buscar un usuario por nombre
 public function loguear($usuario, $clave) {
     $d = new D_Usuario();
