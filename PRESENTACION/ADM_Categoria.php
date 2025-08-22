@@ -1,4 +1,5 @@
 <?php
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Categoria.php';
 $categoriaService = new N_Categoria();
 

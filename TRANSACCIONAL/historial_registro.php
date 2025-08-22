@@ -1,4 +1,5 @@
 <?php 
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Ingreso.php';
 
 if (isset($_GET['msg'])) {

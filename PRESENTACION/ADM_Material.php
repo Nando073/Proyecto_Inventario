@@ -1,4 +1,5 @@
 <?php
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Material.php';
 $materialService = new N_Material();
 

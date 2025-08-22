@@ -1,19 +1,11 @@
 
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL); verificar errores
 
 
-session_start();
-$rolesPermitidos = ['Administrador','Consulta','Supervisor','Operador'];
-if (!isset($_SESSION['roles']) || count(array_intersect($rolesPermitidos, $_SESSION['roles'])) === 0) {
-    header('Location: ../acceso_denegado.php');
-    exit();
-}
-$nombreUsuario = isset($_SESSION['nombre_usuario']) ? $_SESSION['nombre_usuario'] : 'PERFIL';
-$id_funcionario = isset($_SESSION['id_funcionario']) ? $_SESSION['id_funcionario'] : null;
-
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Egreso.php';
 // Instanciar el servicio de egreso
 $egresoService = new N_Egreso();

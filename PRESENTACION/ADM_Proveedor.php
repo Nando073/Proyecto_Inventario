@@ -1,4 +1,5 @@
 <?php
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Proveedor.php';
 $proveedorService = new N_Proveedor();
 
@@ -36,10 +37,12 @@ $accion = $_POST['accion'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($accion === 'crear') {
         $p_nombre = trim(strip_tags($_POST['p_nombre'] ?? ''));
+        $nit = trim(strip_tags($_POST['nit'] ?? ''));
+        $departamento = trim(strip_tags($_POST['departamento'] ?? ''));
         $p_direccion = trim(strip_tags($_POST['p_direccion'] ?? ''));
         $p_celular = trim(strip_tags($_POST['p_celular'] ?? ''));
-        if ($p_nombre && $p_direccion && $p_celular !== false) {
-            $proveedorService->adicionar($p_nombre, $p_direccion, $p_celular);
+        if ($p_nombre && $nit && $departamento && $p_direccion && $p_celular !== false) {
+            $proveedorService->adicionar($p_nombre, $nit, $departamento, $p_direccion, $p_celular);
             header('Location: ADM_Proveedor.php');
             exit();
         } else {
@@ -48,12 +51,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($accion === 'guardar') {
         $id_proveedor = filter_input(INPUT_POST, 'id_proveedor', FILTER_VALIDATE_INT);
         $p_nombre = trim(strip_tags($_POST['p_nombre'] ?? ''));
+        $nit = trim(strip_tags($_POST['nit'] ?? ''));
+        $departamento = trim(strip_tags($_POST['departamento'] ?? ''));
         $p_direccion = trim(strip_tags($_POST['p_direccion'] ?? ''));
         $p_celular = trim(strip_tags($_POST['p_celular'] ?? ''));
-        if ($id_proveedor && $p_nombre && $p_direccion && $p_celular !== false) {
+        if ($id_proveedor && $p_nombre && $nit && $departamento && $p_direccion && $p_celular !== false) {
             $existing = $proveedorService->buscarPorId($id_proveedor);
             if ($existing) {
-                $proveedorService->modificar($id_proveedor, $p_nombre, $p_direccion, $p_celular);
+                $proveedorService->modificar($id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular);
                 header('Location: ADM_Proveedor.php');
                 exit();
             } else {
@@ -121,6 +126,28 @@ if ($searchTerm) {
                         </div>
 
                         <div class="form-group">
+                            <label for="nit">NIT</label>
+                            <input type="text" class="form-control" id="nit" name="nit" value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['nit']) : ''; ?>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="departamento">Departamento</label>
+                            <select class="form-control" id="departamento" name="departamento" required>
+                                <option value="">Seleccione un departamento</option>
+                                <option value="La Paz"      <?php echo (isset($proveedor) && $proveedor['departamento'] == 'La Paz') ? 'selected' : ''; ?>>La Paz</option>
+                                <option value="Cochabamba"  <?php echo (isset($proveedor) && $proveedor['departamento'] == 'Cochabamba') ? 'selected' : ''; ?>>Cochabamba</option>
+                                <option value="Santa Cruz"  <?php echo (isset($proveedor) && $proveedor['departamento'] == 'Santa Cruz') ? 'selected' : ''; ?>>Santa Cruz</option>
+                                <option value="Oruro"       <?php echo (isset($proveedor) && $proveedor['departamento'] == 'Oruro') ? 'selected' : ''; ?>>Oruro</option>
+                                <option value="Potosí"      <?php echo (isset($proveedor) && $proveedor['departamento'] == 'Potosí') ? 'selected' : ''; ?>>Potosí</option>
+                                <option value="Chuquisaca"  <?php echo (isset($proveedor) && $proveedor['departamento'] == 'Chuquisaca') ? 'selected' : ''; ?>>Chuquisaca</option>
+                                <option value="Tarija"      <?php echo (isset($proveedor) && $proveedor['departamento'] == 'Tarija') ? 'selected' : ''; ?>>Tarija</option>
+                                <option value="Beni"        <?php echo (isset($proveedor) && $proveedor['departamento'] == 'Beni') ? 'selected' : ''; ?>>Beni</option>
+                                <option value="Pando"       <?php echo (isset($proveedor) && $proveedor['departamento'] == 'Pando') ? 'selected' : ''; ?>>Pando</option>
+                            </select>
+                        </div>
+
+
+                        <div class="form-group">
                             <label for="p_direccion">Dirección</label>
                             <textarea class="form-control" id="p_direccion" name="p_direccion" required><?php echo isset($proveedor) ? htmlspecialchars($proveedor['p_direccion']) : ''; ?></textarea>
                         </div>
@@ -154,22 +181,32 @@ if ($searchTerm) {
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Nombre</th>
-                <th>Descripción</th>
+                <th>NIT</th>
+                <th>Departamento</th>
+                <th>Dirección</th>
                 <th>Celular</th>
                 <th>Fecha de Registro</th>
+                <th>Estado</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($areas as $are): ?>
             <tr>
-                <td><?php echo htmlspecialchars($are['id_proveedor']); ?></td>
                 <td><?php echo htmlspecialchars($are['p_nombre']); ?></td>
+                <td><?php echo htmlspecialchars($are['nit']); ?></td>
+                <td><?php echo htmlspecialchars($are['departamento']); ?></td>
                 <td><?php echo htmlspecialchars($are['p_direccion']); ?></td>
                 <td><?php echo htmlspecialchars($are['p_celular']); ?></td>
                 <td><?php echo htmlspecialchars($are['p_fecha']); ?></td>
+                <td>
+                     <?php if ($are['p_estado'] == 1): ?>
+                        <span style="color: green; font-weight: bold;">Activo</span>
+                    <?php else: ?>
+                        <span style="color: red; font-weight: bold;">Inactivo</span>
+                    <?php endif; ?>
+                </td>
                 <td>
                     <a href="ADM_Proveedor.php?id_proveedor=<?php echo $are['id_proveedor']; ?>" class="btn btn-warning">Editar</a>
                     <a href="ADM_Proveedor.php?id_proveedor=<?php echo $are['id_proveedor']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta proveedor?');">Eliminar</a>

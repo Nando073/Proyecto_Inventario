@@ -29,9 +29,9 @@ class N_Usuario {
     }
 
     // Método para modificar un usuario
-    public function modificar($id_usuario, $usuario, $clave, $id_funcionario, $estado) {
+    public function modificar($id_usuario, $usuario, $clave, $id_funcionario) {
         $Dusuario = new D_Usuario();
-        $Dusuario->modificar($id_usuario, $usuario, $clave, $id_funcionario, $estado);
+        $Dusuario->modificar($id_usuario, $usuario, $clave, $id_funcionario);
     }
 
     // Método para buscar un usuario por ID

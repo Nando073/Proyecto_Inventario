@@ -1,6 +1,7 @@
 <?php
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Ingreso.php';
 
 // echo '<pre>';

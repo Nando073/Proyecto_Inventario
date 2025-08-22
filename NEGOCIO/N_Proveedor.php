@@ -4,9 +4,9 @@ require_once __DIR__ . '/../DATOS/D_Conepcion.php';
 class N_Proveedor {
 
     // Método para adicionar un proveedor
-    public function adicionar( $p_nombre, $p_direccion, $p_celular) {
+    public function adicionar( $p_nombre, $nit, $departamento, $p_direccion, $p_celular) {
         $NProveedor = new D_Proveedor(); 
-        $NProveedor->Adicionar( $p_nombre, $p_direccion, $p_celular);  // Llamar al método de D_Proveedor
+        $NProveedor->Adicionar( $p_nombre, $nit, $departamento, $p_direccion, $p_celular);  // Llamar al método de D_Proveedor
     }
 
     // Método para buscar todos los proveedores
@@ -28,9 +28,9 @@ class N_Proveedor {
     }
 
     // Método para modificar un proveedor
-    public function modificar($id_proveedor, $p_nombre, $p_direccion, $p_celular) {
+    public function modificar($id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular) {
         $NProveedor = new D_Proveedor();
-        $NProveedor->modificar($id_proveedor, $p_nombre, $p_direccion, $p_celular);  // Llamar al método modificar de D_Proveedor
+        $NProveedor->modificar($id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular);  // Llamar al método modificar de D_Proveedor
     }
 
     // Método para buscar un proveedor por ID

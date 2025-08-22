@@ -1,17 +1,5 @@
-<?php
-session_start();
-$rolesPermitidos = ['Administrador','Consulta','Supervisor','Operador'];
-if (!isset($_SESSION['roles']) || count(array_intersect($rolesPermitidos, $_SESSION['roles'])) === 0) {
-    header('Location: ../acceso_denegado.php');
-    exit();
-}
-if (!isset($_SESSION['nombre_usuario'])) {
-    // Si no hay sesión activa, redirige al login
-    header("Location: ../acceso.php");
-    exit();
-}
-$nombreUsuario = isset($_SESSION['nombre_usuario']) ? $_SESSION['nombre_usuario'] : 'PERFIL';
-?>
+<?php include '../Seguridad.php'; ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>

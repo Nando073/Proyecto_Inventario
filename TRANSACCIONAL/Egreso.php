@@ -1,5 +1,5 @@
 <?php
-//session_start();
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Egreso.php';
 
 $egresoService = new N_Egreso();

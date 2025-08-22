@@ -1,4 +1,5 @@
 <?php
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_U_Medida.php';
 $medidaService = new N_U_Medida();
 

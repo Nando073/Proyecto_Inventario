@@ -1,4 +1,5 @@
 <?php
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Funcionario.php';
 $funcionarioService = new N_Funcionario();
 
@@ -209,24 +210,28 @@ if ($searchTerm) {
         <table class="table table-bordered mt-3">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <!-- <th>ID</th> -->
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Correo</th>
-                    <th>Estado</th>
                     <th>Area</th>
                     <th>Cargo</th>
                     <th>Cédula de Identidad</th>
                     <th>Fecha Registro</th>
+                    <th>Estado</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($funcionarios as $Nfuncionarios): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['id_funcionario']); ?></td>
+                        
                         <td><?php echo htmlspecialchars($Nfuncionarios['f_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($Nfuncionarios['f_apellido']); ?></td>
                         <td><?php echo htmlspecialchars($Nfuncionarios['f_correo']); ?></td>
+                        <td><?php echo htmlspecialchars($Nfuncionarios['a_nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($Nfuncionarios['nombre_c']); ?></td>
+                        <td><?php echo htmlspecialchars($Nfuncionarios['ci'] . ' ' . $Nfuncionarios['complemento_ci']); ?></td>
+                        <td><?php echo htmlspecialchars($Nfuncionarios['f_fecha_registro']); ?></td>
                         <td>
                             <?php if ($Nfuncionarios['f_estado'] == 1): ?>
                                 <span style="color: green; font-weight: bold;">Activo</span>
@@ -234,10 +239,6 @@ if ($searchTerm) {
                                 <span style="color: red; font-weight: bold;">Inactivo</span>
                             <?php endif; ?>
                         </td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['a_nombre']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['nombre_c']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['ci'] . ' ' . $Nfuncionarios['complemento_ci']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['f_fecha_registro']); ?></td>
                         <td>
                             <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>" class="btn btn-warning">Editar</a>
                             <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este funcionario?');">Eliminar</a>

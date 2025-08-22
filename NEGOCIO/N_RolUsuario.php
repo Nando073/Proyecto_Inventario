@@ -47,9 +47,9 @@ class N_RolUsuario {
         return $NRolUsuario->obtenerRol();
     }
     // N_RolUsuario.php
-    public function obtenerRolesPorUsuario($id_usuario) {
+    public function obtenerRolesPorUsuario() {
         $NRolUsuario = new D_RolUsuario();
-        return $NRolUsuario->obtenerRolesPorUsuario($id_usuario);
+        return $NRolUsuario->obtenerRolesPorUsuario();
     }
 }
 ?>

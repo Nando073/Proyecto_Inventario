@@ -32,12 +32,6 @@ class D_Usuario {
     public function getId_funcionario() { return $this->id_funcionario; }
     public function setId_funcionario($id_funcionario) { $this->id_funcionario = $id_funcionario; }
 
-    public function getEstado() { return $this->estado; }
-    public function setEstado($estado) { $this->estado = $estado; }
-
-    public function getFecha() { return $this->fecha_registro; }
-    public function setFecha($fecha_registro) { $this->fecha_registro = $fecha_registro; }
-
 
     
     // Método para adicionar un usuario
@@ -90,11 +84,11 @@ class D_Usuario {
         }
     }
    // Método para modificar
-public function modificar($id_usuario, $usuario, $clave, $id_funcionario, $estado) {
-    $sql = "CALL CargarUsuario(?, ?, ?, ?, ?)";
+public function modificar($id_usuario, $usuario, $clave, $id_funcionario) {
+    $sql = "CALL CargarUsuario(?, ?, ?, ?)";
     try {
         $ps = $this->con->prepare($sql);
-        $ps->execute([$id_usuario, $usuario, $clave, $id_funcionario, $estado]);
+        $ps->execute([$id_usuario, $usuario, $clave, $id_funcionario]);
         echo "Usuario actualizado correctamente.";
     } catch (PDOException $ex) {
         echo "Error al actualizar: " . $ex->getMessage();

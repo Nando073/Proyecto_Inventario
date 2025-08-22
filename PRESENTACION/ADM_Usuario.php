@@ -1,14 +1,14 @@
 <?php
+require_once '../Seguridad.php';
 
 require_once '../NEGOCIO/N_Usuario.php';
 $usuarioService = new N_Usuario();
 
-// Verifica si se pasa un ID en la URL para editar o eliminar
 $usuario = null;
 
+// Verificar si llega un ID en la URL
 if (isset($_GET['id_usuario'])) {
     $usuario_id = filter_input(INPUT_GET, 'id_usuario', FILTER_VALIDATE_INT);
-
     if ($usuario_id) {
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
             $usuarioService->eliminar($usuario_id);
@@ -25,56 +25,64 @@ if (isset($_GET['id_usuario'])) {
     }
 }
 
+// Manejo de formularios
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_usuario = filter_input(INPUT_POST, 'id_usuario', FILTER_VALIDATE_INT);
     $usuarioNombre = trim(filter_input(INPUT_POST, 'usuario', FILTER_SANITIZE_STRING));
-    $clave = trim($_POST['clave']); // No sanitizar, para mantener formato de hash
-    $id_funcionario =filter_input(INPUT_POST, 'id_funcionario', FILTER_VALIDATE_INT);
+    $clave = trim($_POST['clave']); // no sanitizamos para mantener el hash
+    $id_funcionario = filter_input(INPUT_POST, 'id_funcionario', FILTER_VALIDATE_INT);
     $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_STRING);
 
-    if ($accion === 'crear') {
-        if ($usuarioNombre && $clave && $id_funcionario) {
-            $clave = trim($_POST['clave']);
-            $clave = password_hash($clave, PASSWORD_DEFAULT); // Nueva clave
-            $usuarioService->adicionar($usuarioNombre, $clave, $id_funcionario);
-            header('Location: ADM_Usuario.php');
-            exit();
-        } else {
-            echo "Error: Todos los campos son obligatorios para crear un nuevo usuario.";
-        }
-    } elseif ($accion === 'guardar') {
-        if ($usuarioNombre && $id_funcionario) {
-            $existingUser = $usuarioService->buscarPorId($id_usuario);
+    // Validar campos básicos
+    if ($usuarioNombre && $id_funcionario ) {
+        $existingUser = $usuarioService->buscarPorId($id_usuario);
+
+        if ($accion === 'crear') {
+            if ($existingUser) {
+                echo "Error: El usuario con el ID $id_usuario ya existe. No se puede crear.";
+            } else {
+                if ($clave) {
+                    $clave = password_hash($clave, PASSWORD_DEFAULT);
+                    $usuarioService->adicionar($usuarioNombre, $clave, $id_funcionario);
+                    header('Location: ADM_Usuario.php');
+                    exit();
+                } else {
+                    echo "Error: La clave es obligatoria para crear un nuevo usuario.";
+                }
+            }
+        } elseif ($accion === 'guardar') {
             if ($existingUser) {
                 if (empty($clave)) {
-                    $clave = $existingUser['clave']; // Mantiene la clave anterior si no se escribe nueva
+                    $clave = $existingUser['clave']; // mantiene clave actual
                 } else {
-                    $clave = password_hash($clave, PASSWORD_DEFAULT); // Nueva clave
+                    $clave = password_hash($clave, PASSWORD_DEFAULT);
                 }
 
-                $usuarioService->modificar($id_usuario, $usuarioNombre, $clave, $id_funcionario, 1);
+                $usuarioService->modificar($id_usuario, $usuarioNombre, $clave, $id_funcionario);
                 header('Location: ADM_Usuario.php');
                 exit();
             } else {
-                echo "Error: El usuario con el ID $id_usuario no existe.";
+                echo "Error: El usuario con el ID $id_usuario no existe. No se puede modificar.";
             }
         } else {
-            echo "Error: Todos los campos requeridos para modificar deben estar completos.";
+            echo "Error: Acción no válida.";
         }
     } else {
-        echo "Error: Acción no válida.";
+        echo "Error: Todos los campos requeridos deben estar completos.";
     }
 }
 
-// Obtener la lista de usuarios
+// Obtener listas
 $usuarios = $usuarioService->buscarTodo();
 $funcionarios = $usuarioService->obtenerFuncionarios();
-// Buscar por término
+
+// Búsqueda
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 if ($searchTerm) {
     $usuarios = $usuarioService->buscarPorSimilitud($searchTerm);
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -138,7 +146,7 @@ if ($searchTerm) {
             </div>
              <div class="form-group">
                 <label for="funcionario">Funcionario</label>
-                <select name="funcionario" id="funcionario" class="form-control" required>
+                <select name="id_funcionario" id="id_funcionario" class="form-control" required>
                     <option value="">Seleccione un funcionario</option>
                     <?php
                         // Asegúrate de que $funcionarios contiene los datos de los funcionarios
@@ -154,7 +162,7 @@ if ($searchTerm) {
             <div class="mt-3">
                 <button type="submit" name="accion" value="crear" class="btn btn-primary">Crear Usuario</button>
                 <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($usuario) ? '' : 'disabled'; ?>>Guardar Cambios</button>
-              </div>
+            </div>
         </form>
       </div>
     </div>

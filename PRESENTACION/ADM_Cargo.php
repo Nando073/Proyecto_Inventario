@@ -1,4 +1,5 @@
 <?php
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Cargo.php';
 $cargoService = new N_Cargo();
 

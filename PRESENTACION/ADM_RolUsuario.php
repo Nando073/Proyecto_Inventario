@@ -1,4 +1,5 @@
 <?php
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_RolUsuario.php';
 $rolUsuarioService = new N_RolUsuario();
 
@@ -140,7 +141,7 @@ if ($searchTerm) {
                                     foreach ($usuarios as $usuario) {
                                         // Si estamos editando un rolUsuario, seleccionamos el usuario previamente asignado
                                         $selected = (isset($rolUsuario) && $rolUsuario['id_usuario'] == $usuario['id_usuario']) ? 'selected' : '';
-                                        echo "<option value='" . htmlspecialchars($usuario['id_usuario']) . "' $selected>" . htmlspecialchars($usuario['nombre']) . "</option>";
+                                        echo "<option value='" . htmlspecialchars($usuario['id_usuario']) . "' $selected>" . htmlspecialchars($usuario['f_nombre']) . ' ' . htmlspecialchars($usuario['f_apellido']) . "</option>";
                                     }
                                 ?>
                             </select>                       

@@ -2,14 +2,18 @@
 class D_Proveedor {
     private $id_proveedor;
     private $p_nombre;
+    private $nit;
+    private $departamento;
     private $p_direccion;
     private $p_celular;
     private $con;
 
     // Constructor
-    public function __construct($id_proveedor = 0, $p_nombre = "Default nombre", $p_direccion = "Default descri", $p_celular = "Default funcionario") {
+    public function __construct($id_proveedor = 0, $p_nombre = "Default nombre", $nit = "Default NIT", $departamento = "Default departamento", $p_direccion = "Default descri", $p_celular = "Default funcionario") {
         $this->id_proveedor = $id_proveedor;
         $this->p_nombre = $p_nombre;
+        $this->nit = $nit;
+        $this->departamento = $departamento;
         $this->p_direccion = $p_direccion;
         $this->p_celular = $p_celular;
         $this->con = (new D_coneccion())->Conectar(); // Inicializar conexión
@@ -22,6 +26,12 @@ class D_Proveedor {
     public function getNombre() { return $this->p_nombre; }
     public function setNombre($p_nombre) { $this->p_nombre = $p_nombre; }
 
+    public function getNit() { return $this->nit; }
+    public function setNit($nit) { $this->nit = $nit; }
+
+    public function getDepartamento() { return $this->departamento; }
+    public function setDepartamento($departamento) { $this->departamento = $departamento; }
+
     public function getDireccion() { return $this->p_direccion; }
     public function setDireccion($p_direccion) { $this->p_direccion = $p_direccion; }
 
@@ -29,11 +39,11 @@ class D_Proveedor {
     public function setCelular($p_celular) { $this->p_celular = $p_celular; }
 
     //Método para adicionar un proveedor
-    public function Adicionar( $p_nombre,$p_direccion, $p_celular) {
-        $sql = "CALL AdicionarProveedor(?, ?, ?)";
+    public function Adicionar( $p_nombre, $nit, $departamento, $p_direccion, $p_celular) {
+        $sql = "CALL AdicionarProveedor(?, ?, ?, ?, ?)";
         try {
             $ps = $this->con->prepare($sql);
-            $ps->execute([ $p_nombre, $p_direccion, $p_celular]);
+            $ps->execute([ $p_nombre, $nit, $departamento, $p_direccion, $p_celular]);
             echo "material registrado correctamente.";
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
@@ -79,11 +89,11 @@ class D_Proveedor {
     }
 
     // Método para modificar un proveedor
-    public function modificar($id_proveedor, $p_nombre,$p_direccion, $p_celular) {
-        $sql = "CALL CargarProveedor(?, ?, ?, ?)";
+    public function modificar($id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular) {
+        $sql = "CALL CargarProveedor(?, ?, ?, ?, ?, ?)";
         try {
             $ps = $this->con->prepare($sql);
-            $ps->execute([$id_proveedor, $p_nombre, $p_direccion, $p_celular]);
+            $ps->execute([$id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular]);
             echo "Funcionario actualizado correctamente.";
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();

@@ -8,5 +8,5 @@ header("Cache-Control: no-cache, must-revalidate");
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 
 // Redirige al login
-header("Location: acceso.php");
+header("Location: Acceso.php");
 exit;

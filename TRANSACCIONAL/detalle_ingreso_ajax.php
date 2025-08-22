@@ -1,5 +1,6 @@
 <?php
 // filepath: c:\xampp\htdocs\DDE_INVENTARIO\TRANSACCIONAL\detalle_ingreso_ajax.php
+require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Ingreso.php';
 
 $id_ingreso = isset($_GET['id']) ? intval($_GET['id']) : 0;
