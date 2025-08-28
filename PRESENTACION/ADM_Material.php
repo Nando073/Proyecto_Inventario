@@ -10,18 +10,25 @@ if (isset($_GET['id_material'])) {
     $material_id = filter_input(INPUT_GET, 'id_material', FILTER_VALIDATE_INT);
 
     if ($material_id) {
-        // Crear una instancia del servicio de negocio
         $materialService = new N_Material();
-        
-        // Verifica si se ha solicitado eliminar
+
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            // Llamada al método de negocio para eliminar al material
-            $materialService->eliminar($material_id);
-            // Redirigir al listado después de eliminar
-            header('Location: ADM_Material.php');
-            exit();
+            try {
+                $resultado = $materialService->eliminar($material_id); // tu método que devuelve success y message
+
+                if ($resultado['success']) {
+                    header('Location: ADM_Material.php?msg=ok');
+                } else {
+                    header('Location: ADM_Material.php?msg=error&texto=' . urlencode($resultado['message']));
+                }
+                exit();
+
+            } catch (Exception $e) {
+                header('Location: ADM_Material.php?msg=error&texto=' . urlencode($e->getMessage()));
+                exit();
+            }
+
         } else {
-            // Llamada al método de negocio para obtener los datos de los materiales
             $material = $materialService->buscarPorId($material_id);
             if (!$material) {
                 echo "No se encontró el material.";
@@ -182,7 +189,15 @@ if ($searchTerm) {
             Registrar Material
         </button>
     </form>
-
+<?php
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] === 'ok') {
+        echo "<div class='alert alert-success'>Material eliminado correctamente.</div>";
+    } elseif ($_GET['msg'] === 'error' && isset($_GET['texto'])) {
+        echo "<div class='alert alert-danger'>" . htmlspecialchars($_GET['texto']) . "</div>";
+    }
+}
+?>
     <table class="table table-bordered mt-3">
         <thead>
             <tr>

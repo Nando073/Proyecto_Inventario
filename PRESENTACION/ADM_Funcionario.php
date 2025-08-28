@@ -3,26 +3,52 @@ require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Funcionario.php';
 $funcionarioService = new N_Funcionario();
 
-
+// Filtro por estado (activo/inactivo)
+$estadoFiltro = isset($_GET['estado']) ? $_GET['estado'] : 'activo'; // por defecto activos
 
 $funcionario = null;
 if (isset($_GET['id_funcionario'])) {
     $funcionario_id = filter_input(INPUT_GET, 'id_funcionario', FILTER_VALIDATE_INT);
     if ($funcionario_id) {
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
+            // Eliminado lógico
             $funcionarioService->eliminar($funcionario_id);
             header('Location: ADM_Funcionario.php');
             exit();
+
+        } elseif (isset($_GET['action']) && $_GET['action'] === 'activar') {
+            // Activar funcionario y capturar resultado
+            $resultado = $funcionarioService->activarFuncionario($funcionario_id);
+
+            if ($resultado) {
+                $mensaje = "Funcionario activado correctamente.";
+                $tipo_mensaje = "success";
+            } else {
+                $mensaje = "El funcionario no pudo ser activado. Verifique el área y cargo.";
+                $tipo_mensaje = "danger";
+            }
+
+            // Guardar mensaje en sesión para mostrar después del redirect
+            $_SESSION['mensaje'] = $mensaje;
+            $_SESSION['tipo_mensaje'] = $tipo_mensaje;
+
+            header('Location: ADM_Funcionario.php?estado=activo'); 
+            exit();
+
         } else {
+            // Cargar un funcionario para edición
             $funcionario = $funcionarioService->buscarPorId($funcionario_id);
             if (!$funcionario) {
-                echo "No se encontró el funcionario.";
+                echo "Funcionario no encontrado.";
+                exit();
             }
         }
     } else {
         echo "ID inválido.";
+        exit();
     }
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_funcionario = filter_input(INPUT_POST, 'id_funcionario', FILTER_VALIDATE_INT);
@@ -73,6 +99,21 @@ $cargos = $funcionarioService->obtenerCargos(); // Obtienes todos los cargos de 
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 if ($searchTerm) {
     $funcionarios = $funcionarioService->buscarPorSimilitud($searchTerm);
+}
+
+// Filtrar en PHP según estado
+if ($estadoFiltro === 'activo') {
+    $funcionarios = array_filter($funcionarios, function($f) {
+        return $f['f_estado'] == 1;
+    });
+} elseif ($estadoFiltro === 'inactivo') {
+    $funcionarios = array_filter($funcionarios, function($f) {
+        return $f['f_estado'] == 0;
+    });
+}
+// Opcional: para mostrar en la vista como "Activo" o "Inactivo"
+foreach ($funcionarios as &$funcionariO) {
+    $funcionariO['estado_texto'] = $funcionariO['f_estado'] == 1 ? 'Activo' : 'Inactivo';
 }
 ?>
 
@@ -200,12 +241,40 @@ if ($searchTerm) {
             <input type="text" name="search" placeholder="Buscar por f_nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
             <button type="submit" class="btn btn-info">Buscar</button>
             </div>
-                           <!-- Botón que activa el modal -->
-            <button type="button" class="btn btn-success m-3" id="btnCrearFunci" data-bs-toggle="modal" data-bs-target="#funcionarioModal">
-                Registrar Funcionario
-            </button>
-
+            <!-- Botones a la derecha -->
+            <div class="d-flex align-items-center ms-auto">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Todos los Funcionarios
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
+                            href="ADM_Funcionario.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                                Activos
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
+                            href="ADM_Funcionario.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                                Inactivos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Botón Registrar Funcionario -->
+                <button type="button" class="btn btn-success m-3" id="btnCrearFunci" data-bs-toggle="modal" data-bs-target="#funcionarioModal">
+                        Registrar Funcionario
+                    </button>
+            </div>
         </form>
+<!-- Mensaje -->
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+        <?= htmlspecialchars($_SESSION['mensaje']); ?>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+<?php endif; ?>
 
         <table class="table table-bordered mt-3">
             <thead>
@@ -219,9 +288,11 @@ if ($searchTerm) {
                     <th>Cédula de Identidad</th>
                     <th>Fecha Registro</th>
                     <th>Estado</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
+            <?php if (!empty($funcionarios)): ?>
                 <?php foreach ($funcionarios as $Nfuncionarios): ?>
                     <tr>
                         
@@ -238,13 +309,24 @@ if ($searchTerm) {
                             <?php else: ?>
                                 <span style="color: red; font-weight: bold;">Inactivo</span>
                             <?php endif; ?>
-                        </td>
+                         </td>
                         <td>
-                            <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>" class="btn btn-warning">Editar</a>
-                            <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este funcionario?');">Eliminar</a>
+                            <?php if ($Nfuncionarios['f_estado'] == 1): ?>
+                                <!-- Si es activo -->
+                                <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>" class="btn btn-warning">Editar</a>
+                                <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este funcionario?');">Eliminar</a>
+                            <?php else: ?>
+                                <!-- Si es inactivo -->
+                                <a href="ADM_Funcionario.php?id_funcionario=<?= $Nfuncionarios['id_funcionario']; ?>&action=activar" class="btn btn-primary" onclick="return confirm('¿Deseas activar este funcionario?');">Activar</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
+            <?php else: ?>
+                 <tr>
+                     <td colspan="10" class="text-center">No hay funcionarios para mostrar.</td>
+                </tr>
+            <?php endif; ?>
             </tbody>
         </table>
     </div>

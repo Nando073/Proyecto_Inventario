@@ -51,5 +51,9 @@ class N_Funcionario {
         return $Dfuncionario->obtenerCargos();
     }
     
+    public function activarFuncionario($id_funcionario) {
+        $Dfuncionario = new D_Funcionario();
+        return $Dfuncionario->activarFuncionario($id_funcionario);
+    }
 }
 ?>

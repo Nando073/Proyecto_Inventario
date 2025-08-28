@@ -11,9 +11,9 @@ class N_Usuario {
     }
 
     // Método para buscar todos los usuarios
-    public function buscarTodo() {
+    public function ObtenerUsuarios() {
         $Nusuario = new D_Usuario();
-        return $Nusuario->BuscarTodo();
+        return $Nusuario->ObtenerUsuarios();
     }
 
     // Método para eliminar un usuario por ID
@@ -43,6 +43,15 @@ class N_Usuario {
     public function obtenerFuncionarios() {
         $Nusuario = new D_Usuario();
         return $Nusuario->obtenerFuncionario();
+    }
+    public function activarUsuario($id_usuario) {
+        $Nusuario = new D_Usuario();
+        return $Nusuario->activarUsuario($id_usuario);
+    }
+
+    public function ObtenerFuncionariosDisponibles($id_funcionario = null) {
+        $d = new D_Usuario();
+        return $d->ObtenerFuncionariosDisponibles($id_funcionario);
     }
 
     // Método para buscar un usuario por nombre

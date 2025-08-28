@@ -151,6 +151,14 @@ class D_Funcionario {
             return null;
         }
     }
+
+    public function activarFuncionario($id_funcionario) {
+    $query = "CALL ActivarFuncionario(:id_funcionario)";
+    $stmt = $this->con->prepare($query);
+    $stmt->execute([':id_funcionario' => $id_funcionario]);
+    return $stmt->rowCount() > 0; // Retorna true si se actualizó al menos una fila
+}
+
     
 }
 ?>

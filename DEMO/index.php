@@ -75,6 +75,14 @@
     <?php endif; ?>
     </div>
    </aside>
-  
+  <script>
+// Detecta si el usuario viene del historial (flecha atrás)
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+        // Si vuelve con la flecha atrás, recargar forzadamente
+        window.location.reload();
+    }
+});
+</script>
 </body>
 </html>

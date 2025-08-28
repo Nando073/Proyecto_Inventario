@@ -1,53 +1,48 @@
 <?php
-session_start(); // <-- ¡IMPORTANTE!
-//require_once 'DATOS/D_Usuario.php';
+session_start();
 require_once 'NEGOCIO/N_Usuario.php';
 $usuarioService = new N_Usuario();
 
-//$error = ' ';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $usuario = trim(filter_input(INPUT_POST, 'usuario', FILTER_SANITIZE_STRING));
-    $clave = trim(filter_input(INPUT_POST, 'clave', FILTER_SANITIZE_STRING));
+    $clave   = trim(filter_input(INPUT_POST, 'clave', FILTER_SANITIZE_STRING));
 
-    // Suponiendo que loguear devuelve un array con los datos del usuario si es válido, o false/null si no lo es
     $usuarioValido = $usuarioService->loguear($usuario, $clave);
 
-   if ($usuarioValido && is_array($usuarioValido)) {
-    $_SESSION['nombre_usuario'] = $usuarioValido['usuario'];
-    $_SESSION['id_funcionario'] = $usuarioValido['id_funcionario'];
+    if ($usuarioValido && is_array($usuarioValido)) {
+        $_SESSION['id_usuario'] = $usuarioValido['id_usuario'];
+        $_SESSION['id_funcionario'] = $usuarioValido['id_funcionario'];
+        $_SESSION['nombre_usuario'] = $usuarioValido['usuario'];
 
-    require_once 'NEGOCIO/N_Funcionario.php';
-    $funcionarioService = new N_Funcionario();
-    $funcionario = $funcionarioService->buscarPorId($usuarioValido['id_funcionario']);
-    $_SESSION['nombre_completo'] = $funcionario['f_nombre'] . ' ' . $funcionario['f_apellido'];
+        // Traer nombre completo del funcionario
+        require_once 'NEGOCIO/N_Funcionario.php';
+        $funcionarioService = new N_Funcionario();
+        $funcionario = $funcionarioService->buscarPorId($usuarioValido['id_funcionario']);
+        $_SESSION['nombre_completo'] = $funcionario['f_nombre'] . ' ' . $funcionario['f_apellido'];
 
-    require_once 'NEGOCIO/N_RolUsuario.php';
-    $rolUsuarioService = new N_RolUsuario();
-    $rolesUsuario = $rolUsuarioService->obtenerRolesPorUsuario($usuarioValido['id_usuario']);
-    // Si retorna array asociativo:
-    $rolesUsuario = array_column($rolesUsuario, 'r_nombre');
-    $_SESSION['roles'] = $rolesUsuario;
+        // Traer roles
+        require_once 'NEGOCIO/N_RolUsuario.php';
+        $rolUsuarioService = new N_RolUsuario();
+        $rolesUsuario = $rolUsuarioService->obtenerRolesPorUsuario($usuarioValido['id_usuario']);
+        $rolesUsuario = array_column($rolesUsuario, 'r_nombre');
+        $_SESSION['roles'] = $rolesUsuario;
 
-    if (in_array('Administrador', $rolesUsuario)) {
-        header('Location: PRESENTACION/ADM_Usuario.php');
-        exit();
-    } elseif (in_array('Operador', $rolesUsuario)) {
-        header('Location: PRESENTACION/ADM_Material.php');
-        exit();
-    } elseif (in_array('Consulta', $rolesUsuario)) {
-        header('Location: TRANSACCIONAL/Stock.php');
-        exit();
+        // Redirigir según rol
+        if (in_array('Administrador', $rolesUsuario)) {
+            header('Location: PRESENTACION/ADM_Usuario.php'); exit();
+        } elseif (in_array('Operador', $rolesUsuario)) {
+            header('Location: PRESENTACION/ADM_Material.php'); exit();
+        } elseif (in_array('Consulta', $rolesUsuario)) {
+            header('Location: TRANSACCIONAL/Stock.php'); exit();
+        } else {
+            header('Location: acceso_denegado.php'); exit();
+        }
     } else {
-        header('Location: acceso_denegado.php');
-        exit();
+        $error = "Usuario o contraseña incorrectos";
     }
-   
 }
-
-}
-
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -75,11 +70,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 <h2>Iniciar Sesión</h2>
                 <form  method="post">
                 <div class="input-group">
-                    <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Usuario"  required>
+                    <input type="text" class="form-control" id="usuario" name="usuario" autocomplete="off" placeholder="Usuario"  required>
                     <span class="icon">📧</span>
                 </div>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="clave" name="clave" placeholder="Contraseña"  required>
+                    <input type="password" class="form-control" id="clave" name="clave" autocomplete="new-password" placeholder="Contraseña"  required>
                     <span class="icon">🔒</span>
                 </div>
                 <button type="submit"  name="login" class="login-btn">INICIAR SESION</button>
@@ -89,5 +84,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             </div>
         </div>
     </div>
+<script>
+    document.getElementById('usuario').value = '';
+    document.getElementById('clave').value = '';
+    function toggleMenu() {
+        const menu = document.getElementById('menuUsuario');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+            window.location.reload(true); // recarga completa desde el servidor
+        }
+});
+</script>
+
 </body>
 </html>

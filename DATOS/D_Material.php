@@ -118,18 +118,28 @@ class D_Material {
         }
     }
 
-//otener las categorias  y las unidades para mi formulario atrves del select
+//otener las categorias  y las unidades para mi formulario atrves del select ObtenerCategorias
     public function obtenerCategorias() {
-        $query = "SELECT id_categoria, c_nombre FROM categoria";
-        $stmt = $this->con->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $sql = "CALL ObtenerCategorias()";
+        try {
+            $ps = $this->con->prepare($sql);
+            $ps->execute();
+            return $ps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex) {
+            echo "Error al buscar: " . $ex->getMessage();
+            return [];
+        }
     }
     public function obtenerMedidas() {
-        $query = "SELECT id_medida, u_medida FROM u_medida";
-        $stmt = $this->con->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+       $sql = "CALL ObtenerMedidas()";
+        try {
+            $ps = $this->con->prepare($sql);
+            $ps->execute();
+            return $ps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex) {
+            echo "Error al buscar: " . $ex->getMessage();
+            return [];
+        }
     }
 }
 ?>

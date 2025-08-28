@@ -47,7 +47,7 @@ class D_Usuario {
     }
 
     // Método para buscar todos los usuarios
-    public function BuscarTodo() {
+    public function ObtenerUsuarios() {
         $sql = "CALL ObtenerUsuario()";
         try {
             $ps = $this->con->prepare($sql);
@@ -130,7 +130,25 @@ public function modificar($id_usuario, $usuario, $clave, $id_funcionario) {
             return null;
         }
     }
-    
-    
+public function activarUsuario($id_usuario) {
+    $query = "CALL ActivarUsuario(:id_usuario)";
+    $stmt = $this->con->prepare($query);
+    $stmt->execute([':id_usuario' => $id_usuario]);
+    return $stmt->rowCount() > 0; // Retorna true si se actualizó al menos una fila
+}
+
+public function ObtenerFuncionariosDisponibles($id_funcionario = null) {
+    $sql = "CALL ObtenerFuncionariosDisponibles(:id_funcionario)";
+    try {
+        $ps = $this->con->prepare($sql);
+        $ps->bindValue(':id_funcionario', $id_funcionario, PDO::PARAM_INT);
+        $ps->execute();
+        return $ps->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $ex) {
+        echo "Error al buscar: " . $ex->getMessage();
+        return null;
+    }
+}
+
 }
 ?>

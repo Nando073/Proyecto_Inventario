@@ -5,40 +5,62 @@ $rolUsuarioService = new N_RolUsuario();
 
 /// Verifica si se pasa un ID en la URL para editar o eliminar
 $rolUsuario = null;
+$id_Usuario_actual = null;
+
+//filtro por estado (activo/inactivo)
+$estadoFiltro = isset($_GET['estado']) ? $_GET['estado'] : 'activo'; // por defecto mostrar activos
 
 if (isset($_GET['id_RolUsuario'])) {
     $id_RolUsuario = filter_input(INPUT_GET, 'id_RolUsuario', FILTER_VALIDATE_INT);
 
     if ($id_RolUsuario) {
-        // Registrar una instancia del servicio de negocio
-        $rolUsuarioService = new N_RolUsuario();
-        
         // Verifica si se ha solicitado eliminar
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            // Llamada al método de negocio para eliminar al rolUsuario
             $rolUsuarioService->eliminar($id_RolUsuario);
-            // Redirigir al listado después de eliminar
             header('Location: ADM_RolUsuario.php');
             exit();
+
+        }elseif (isset($_GET['action']) && $_GET['action'] === 'activar') {
+            $resultado = $rolUsuarioService->activarRolUsuario($id_RolUsuario);
+
+            if ($resultado) {
+                $mensaje = "RolUsuario activado correctamente";
+                $tipo = "success";
+            } else {
+                $mensaje = "El Usuario o Rol está inactivo";
+                $tipo = "danger";
+            }
+
+            $_SESSION['mensaje'] = $mensaje;
+            $_SESSION['tipo_mensaje'] = $tipo;
+
+            header('Location: ADM_RolUsuario.php?estado=activo');
+            exit();
         } else {
-            // Llamada al método de negocio para obtener los datos de RolUsuario
+            // Obtener datos de RolUsuario
             $rolUsuario = $rolUsuarioService->buscarPorId($id_RolUsuario);
             if (!$rolUsuario) {
-                echo "No se encontró el rolUsuario.";
+                echo "No se encontró el RolUsuario.";
+                exit();
             }
+            $id_Usuario_actual = $rolUsuario['id_usuario'];
         }
     } else {
         echo "ID inválido.";
+        exit();
     }
 }
 
-// Manejo de creación/actualización vía POST
+// Obtener usuarios disponibles
+$UsuariosDisponibles = $rolUsuarioService->obtenerUsuarioDisponibles($id_Usuario_actual);
+
+// Manejo de creación/actualización vía POST (crear/editar)
 $accion = $_POST['accion'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($accion === 'Registrar') {
         $id_rol = trim(strip_tags($_POST['id_rol'] ?? ''));
         $id_usuario = trim(strip_tags($_POST['id_usuario'] ?? ''));
-        if ( $id_rol && $id_usuario ) {    
+        if ($id_rol && $id_usuario) {    
             $rolUsuarioService->adicionar($id_rol, $id_usuario);
             header('Location: ADM_RolUsuario.php');
             exit();
@@ -49,15 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id_RolUsuario = filter_input(INPUT_POST, 'id_RolUsuario', FILTER_VALIDATE_INT);
         $id_rol = trim(strip_tags($_POST['id_rol'] ?? ''));
         $id_usuario = trim(strip_tags($_POST['id_usuario'] ?? ''));
-        if ($id_RolUsuario &&  $id_rol && $id_usuario !== false) {
+        if ($id_RolUsuario && $id_rol && $id_usuario !== false) {
             $existing = $rolUsuarioService->buscarPorId($id_RolUsuario);
             if ($existing) {
                 $rolUsuarioService->modificar($id_RolUsuario, $id_rol, $id_usuario);
-                echo "";
                 header('Location: ADM_RolUsuario.php');
                 exit();
             } else {
-                echo "Error: No existe la categoría con ID $id_RolUsuario.";
+                echo "Error: No existe el RolUsuario con ID $id_RolUsuario.";
             }
         } else {
             echo "Error: Todos los campos son necesarios y válidos.";
@@ -65,17 +86,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Obtener la lista de los rolUsuario
-$rol_usuario = $rolUsuarioService->buscarTodo();
-//obtener la lista de usuarios y roles
+// Obtener la lista de rolUsuario
+//$rol_usuario = $rolUsuarioService->ObtenerRolUsuario();
+// Obtener roles y usuarios
 $roles = $rolUsuarioService->obtenerRol();
 $usuarios = $rolUsuarioService->obtenerUsuario();
+
 // Buscar por término
+// Obtener lista de RolUsuario (con o sin búsqueda)
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 if ($searchTerm) {
-    $rol_usuario = $rolUsuarioService->buscarPorSimilitud($searchTerm);
+    $rolUsuarios = $rolUsuarioService->buscarPorSimilitud($searchTerm);
+} else {
+    $rolUsuarios = $rolUsuarioService->ObtenerRolUsuario();
+}
+
+// Filtrar por estado
+if ($estadoFiltro === 'activo') {
+    $rolUsuarios = array_filter($rolUsuarios, fn($ru) => $ru['estado'] == 1);
+} elseif ($estadoFiltro === 'inactivo') {
+    $rolUsuarios = array_filter($rolUsuarios, fn($ru) => $ru['estado'] == 0);
+}
+
+// Texto de estado
+foreach ($rolUsuarios as &$ru) {
+    $ru['estado_texto'] = $ru['estado'] == 1 ? 'Activo' : 'Inactivo';
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -133,18 +171,19 @@ if ($searchTerm) {
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="id_usuario">ID Usuario</label>
+                            <label for="id_usuario">Usuario</label>
                             <select name="id_usuario" id="id_usuario" class="form-control" required>
-                                <option value="">Seleccione una usuario</option>
-                                <?php
-                                    // Llenar el select con los usuarios obtenidos
-                                    foreach ($usuarios as $usuario) {
-                                        // Si estamos editando un rolUsuario, seleccionamos el usuario previamente asignado
-                                        $selected = (isset($rolUsuario) && $rolUsuario['id_usuario'] == $usuario['id_usuario']) ? 'selected' : '';
-                                        echo "<option value='" . htmlspecialchars($usuario['id_usuario']) . "' $selected>" . htmlspecialchars($usuario['f_nombre']) . ' ' . htmlspecialchars($usuario['f_apellido']) . "</option>";
-                                    }
-                                ?>
-                            </select>                       
+                                <option value="">Seleccione un usuario</option>
+                                <?php foreach ($UsuariosDisponibles as $Usuario): ?>
+                                    <?php
+                                        // Si es edición, marcamos seleccionado el usuario actual
+                                        $selected = (isset($rolUsuario) && $rolUsuario['id_usuario'] == $Usuario['id_usuario']) ? 'selected' : '';
+                                    ?>
+                                    <option value="<?= htmlspecialchars($Usuario['id_usuario']); ?>" <?= $selected; ?>>
+                                        <?= htmlspecialchars($Usuario['f_nombre'] . ' ' . $Usuario['f_apellido']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
 
                         
@@ -164,34 +203,82 @@ if ($searchTerm) {
             <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
             <button type="submit" class="btn btn-info">Buscar</button>
         </div>
-        <button type="button" class="btn btn-success m-3" id="btnRegistrarRol" data-bs-toggle="modal" data-bs-target="#RolUModal">
-            Registrar Rol_Usuario
-        </button>
+        <!-- Botones de la derecha-->
+         <div class="d-flex align-items-center ms-auto">
+            <div class="btn-group me-2">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Todos los RolUsuario
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
+                       href="ADM_RolUsuario.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                        Activos
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
+                       href="ADM_RolUsuario.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                        Inactivos
+                    </a>
+                </li>
+            </ul>
+        </div>
+            <button type="button" class="btn btn-success m-3" id="btnRegistrarRol" data-bs-toggle="modal" data-bs-target="#RolUModal">
+                Registrar Rol_Usuario
+            </button>
+        </div>
     </form>
+
+    <!-- Mensajes -->
+    <?php if (isset($_SESSION['mensaje'])): ?>
+        <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+            <?= htmlspecialchars($_SESSION['mensaje']); ?>
+        </div>
+        <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+    <?php endif; ?>
 
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Rol</th>
                 <th>Usuario</th>
                 <th>Fecha de registro</th>
+                <th>Estado</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($rol_usuario as $ROL_U): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($ROL_U['id_rol_usuario']); ?></td>
-                <td><?php echo htmlspecialchars($ROL_U['r_nombre']); ?></td>
-                <td><?php echo htmlspecialchars($ROL_U['f_nombre'] . ' ' . $ROL_U['f_apellido']); ?></td>
-                <td><?php echo htmlspecialchars($ROL_U['fecha_registro']); ?></td>
-                <td>
-                    <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>" class="btn btn-warning">Editar</a>
-                    <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta rolUsuario?');">Eliminar</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
+            <?php if (!empty($rolUsuarios)): ?>
+                <?php foreach ($rolUsuarios as $ROL_U): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($ROL_U['r_nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($ROL_U['f_nombre'] . ' ' . $ROL_U['f_apellido']); ?></td>
+                        <td><?php echo htmlspecialchars($ROL_U['fecha_registro']); ?></td>
+                        <td>
+                            <?php if ($ROL_U['estado'] == 1): ?>
+                                <span style="color: green; font-weight: bold;">Activo</span>
+                            <?php else: ?>
+                                <span style="color: red; font-weight: bold;">Inactivo</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($ROL_U['estado'] == 1): ?>
+                                <!-- Si es activo -->
+                                <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>" class="btn btn-warning">Editar</a>
+                                <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este Rol_Usuario?');">Eliminar</a>
+                            <?php else: ?>
+                                <!-- Si es inactivo -->
+                                <a href="ADM_RolUsuario.php?id_RolUsuario=<?= $ROL_U['id_rol_usuario']; ?>&action=activar" class="btn btn-primary" onclick="return confirm('¿Deseas activar este Rol_Usuario?');">Activar</a>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="4" class="text-center">No hay resultados</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 </main>

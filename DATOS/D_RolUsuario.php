@@ -36,7 +36,7 @@ class D_RolUsuario {
     }
 
     // Método para buscar todos los RolUsuario
-    public function BuscarTodo() {
+    public function obtenerRolUsuario() {
         $sql = "CALL ObtenerRolUsuario()";
         try {
             $ps = $this->con->prepare($sql);
@@ -136,17 +136,23 @@ class D_RolUsuario {
         }
     }
 
-        // D_RolUsuario.php
-//     public function obtenerRolesPorUsuario($id_usuario) {
-//     $sql = "SELECT r.r_nombre, f.f_nombre, f.f_apellido
-//             FROM rol_usuario ru
-//             INNER JOIN usuario u ON ru.id_usuario = u.id_usuario
-//             INNER JOIN funcionario f ON u.id_funcionario = f.id_funcionario
-//             INNER JOIN rol r ON ru.id_rol = r.id_rol
-//             WHERE ru.id_usuario = ?";
-//     $ps = $this->con->prepare($sql);
-//     $ps->execute([$id_usuario]);
-//     return $ps->fetchAll(PDO::FETCH_ASSOC);
-// }
+       public function activarRolUsuario($id_RolUsuario) {
+    $query = "CALL ActivarRolUsuario(:id_RolUsuario)";
+    $stmt = $this->con->prepare($query);
+    $stmt->execute([':id_RolUsuario' => $id_RolUsuario]);
+    return $stmt->rowCount() > 0; // Retorna true si se actualizó al menos una fila
+}
+    public function obtenerUsuarioDisponibles($id_RolUsuario = null) {
+        $sql = "CALL ObtenerUsuarioDisponibles(:id_RolUsuario)";
+        try {
+            $ps = $this->con->prepare($sql);
+            $ps->bindValue(':id_RolUsuario', $id_RolUsuario, PDO::PARAM_INT);
+            $ps->execute();
+            return $ps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex) {
+            echo "Error al buscar: " . $ex->getMessage();
+            return null;
+        }
+    }
 }
 ?>

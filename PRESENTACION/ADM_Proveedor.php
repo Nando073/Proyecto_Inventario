@@ -127,7 +127,7 @@ if ($searchTerm) {
 
                         <div class="form-group">
                             <label for="nit">NIT</label>
-                            <input type="text" class="form-control" id="nit" name="nit" value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['nit']) : ''; ?>" required>
+                            <input type="number" class="form-control" id="nit" name="nit" value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['nit']) : ''; ?>" required>
                         </div>
 
                         <div class="form-group">
@@ -154,7 +154,7 @@ if ($searchTerm) {
 
                         <div class="form-group">
                             <label for="p_celular">Celular</label>
-                            <input type="text" class="form-control" id="p_celular" name="p_celular" value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['p_celular']) : ''; ?>" required>
+                            <input type="number" class="form-control" id="p_celular" name="p_celular" value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['p_celular']) : ''; ?>" required>
                         </div>
 
                         <div class="mt-3">
