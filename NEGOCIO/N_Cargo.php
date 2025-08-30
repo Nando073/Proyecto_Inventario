@@ -15,12 +15,16 @@ class N_Cargo {
         return $NCargo->BuscarTodo();
     }
 
-    // Método para eliminar un area por ID
+    // Método para eliminar un cargo por ID
     public function eliminar($id_cargo) {
-        $NCargo = new D_Cargo();
-        $NCargo->Eliminar($id_cargo);  // Llamar al método Eliminar de D_Cargo
+        try {
+            $NCargo = new D_Cargo();
+            $resultado = $NCargo->Eliminar($id_cargo);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
-
     // Método para buscar cargos por similitud de término
     public function buscarPorSimilitud($termino) {
         $NCargo = new D_Cargo();

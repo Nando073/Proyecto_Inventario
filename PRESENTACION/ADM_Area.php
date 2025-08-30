@@ -1,37 +1,50 @@
 <?php
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador']);
 require_once '../NEGOCIO/N_Area.php';
 $areaService = new N_Area();
 
 /// Verifica si se pasa un ID en la URL para editar o eliminar
 $area = null;
 
+// Manejo de editar/eliminar vía GET
 if (isset($_GET['id_area'])) {
     $id_area = filter_input(INPUT_GET, 'id_area', FILTER_VALIDATE_INT);
-
     if ($id_area) {
-        // Crear una instancia del servicio de negocio
-        $areaService = new N_Area();
-        
-        // Verifica si se ha solicitado eliminar
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            // Llamada al método de negocio para eliminar al area
-            $areaService->eliminar($id_area);
-            // Redirigir al listado después de eliminar
-            header('Location: ADM_Area.php');
-            exit();
+            try {
+                $resultado = $areaService->eliminar($id_area);
+
+                if ($resultado['success']) {
+                    $_SESSION['mensaje'] = "Área eliminada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se puede eliminar el área porque tiene funcionarios asociados.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+                
+                header('Location: ADM_Area.php');
+                exit();
+
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al eliminar área: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+                header('Location: ADM_Area.php');
+                exit();
+            }
         } else {
-            // Llamada al método de negocio para obtener los datos de los areas
+            // Modo edición
             $area = $areaService->buscarPorId($id_area);
             if (!$area) {
-                echo "No se encontró el area.";
+                $_SESSION['mensaje'] = "No se encontró el área.";
+                $_SESSION['tipo_mensaje'] = "warning";
             }
         }
     } else {
-        echo "ID inválido.";
+        $_SESSION['mensaje'] = "ID inválido.";
+        $_SESSION['tipo_mensaje'] = "danger";
     }
 }
-
 // Manejo de creación/actualización vía POST
 $accion = $_POST['accion'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -147,6 +160,14 @@ if ($searchTerm) {
             Registrar Area
         </button>
     </form>
+
+    <!-- Mensaje -->
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+        <?= htmlspecialchars($_SESSION['mensaje']); ?>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+<?php endif; ?>
 
     <table class="table table-bordered mt-3">
         <thead>

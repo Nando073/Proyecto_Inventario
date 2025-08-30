@@ -59,9 +59,11 @@ class D_Cargo {
         try {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_cargo]);
-            echo "cargo eliminado correctamente.";
+            // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
-            echo "Error al eliminar: " . $ex->getMessage();
+            throw new Exception("Error al eliminar cargo: " . $ex->getMessage());
         }
     }
 

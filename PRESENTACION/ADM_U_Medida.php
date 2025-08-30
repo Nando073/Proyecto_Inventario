@@ -1,5 +1,6 @@
 <?php
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador', 'Operador']);
 require_once '../NEGOCIO/N_U_Medida.php';
 $medidaService = new N_U_Medida();
 
@@ -11,20 +12,39 @@ if (isset($_GET['id_medida'])) {
     $id_medida = filter_input(INPUT_GET, 'id_medida', FILTER_VALIDATE_INT);
     if ($id_medida) {
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            $medidaService->eliminar($id_medida);
-            header('Location: ADM_U_Medida.php');
-            exit();
+            try {
+                $resultado = $medidaService->eliminar($id_medida);
+
+                if ($resultado['success']) {
+                    $_SESSION['mensaje'] = "Unidad de medida eliminada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se puede eliminar la unidad de medida porque tiene materiales asociados.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+                
+                header('Location: ADM_U_Medida.php');
+                exit();
+
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al eliminar unidad de medida: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+                header('Location: ADM_U_Medida.php');
+                exit();
+            }
         } else {
+            // Modo edición
             $medida = $medidaService->buscarPorId($id_medida);
             if (!$medida) {
-                echo "No se encontró la unidad de medida.";
+                $_SESSION['mensaje'] = "No se encontró la unidad de medida.";
+                $_SESSION['tipo_mensaje'] = "warning";
             }
         }
     } else {
-        echo "ID inválido.";
+        $_SESSION['mensaje'] = "ID inválido.";
+        $_SESSION['tipo_mensaje'] = "danger";
     }
 }
-
 // Manejo de creación/actualización vía POST
 $accion = $_POST['accion'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -135,7 +155,16 @@ if ($searchTerm) {
             Registrar Unidad de Medida
         </button>
     </form>
+    <!-- Mensajes de éxito o error -->
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?>">
+        <?= $_SESSION['mensaje']; ?>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+<?php endif; ?>
 
+                                                <!--Tabla -->
+                                                
     <table class="table table-bordered mt-3">
         <thead>
             <tr>

@@ -11,12 +11,12 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 // 👤 Verificar que haya sesión iniciada
 if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_usuario'])) {
-    header("Location: ../Acceso.php"); // redirige al login
+    header("Location: ../Acceso.php");
     exit();
 }
 
 // Roles permitidos en el sistema
-$rolesPermitidos = ['Administrador','Consulta','Supervisor','Operador'];
+$rolesPermitidos = ['Administrador','Funcionario','Supervisor','Operador'];
 
 // Verificar que tenga al menos un rol válido
 if (!isset($_SESSION['roles']) || count(array_intersect($rolesPermitidos, $_SESSION['roles'])) === 0) {
@@ -24,6 +24,28 @@ if (!isset($_SESSION['roles']) || count(array_intersect($rolesPermitidos, $_SESS
     exit();
 }
 
-// Para mostrar el nombre del usuario en la barra de navegación
+// ✅ FUNCIONES DE VERIFICACIÓN DE ROLES
+if (!function_exists('tieneRol')) {
+    function tieneRol($rolesRequeridos) {
+        if (!isset($_SESSION['roles'])) return false;
+        
+        if (is_string($rolesRequeridos)) {
+            $rolesRequeridos = [$rolesRequeridos];
+        }
+        
+        return count(array_intersect($rolesRequeridos, $_SESSION['roles'])) > 0;
+    }
+}
+
+if (!function_exists('verificarAcceso')) {
+    function verificarAcceso($rolesPermitidos) {
+        if (!tieneRol($rolesPermitidos)) {
+            header("Location: ../acceso_denegado.php");
+            exit();
+        }
+    }
+}
+
+// Para mostrar el nombre del usuario
 $nombreUsuario = $_SESSION['nombre_usuario'] ?? 'PERFIL';
 ?>

@@ -1,5 +1,6 @@
 <?php
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador', 'Operador', 'Supervisor']);
 require_once '../NEGOCIO/N_Funcionario.php';
 $funcionarioService = new N_Funcionario();
 

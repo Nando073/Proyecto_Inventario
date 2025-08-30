@@ -2,6 +2,7 @@
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador', 'Operador', 'Supervisor', 'Funcionario']);
 require_once '../NEGOCIO/N_Ingreso.php';
 
 // echo '<pre>';
@@ -150,6 +151,10 @@ if ($searchTerm) {
       border-radius: 10px;
       padding: 20px;
     }
+    .form-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
@@ -183,24 +188,51 @@ if ($searchTerm) {
           <button type="button" class="btn btn-add w-100" id="btnAgregar">AÑADIR MATERIAL</button>
         </div>
       </div>
+      
       <div id="materiales-container">
         <div class="parte-row row align-items-end mb-2">
+          <!-- Material -->
           <div class="col-md-3">
-            <select name="id_material[]" class="form-control" required>
+            <label class="form-label">Material</label>
+            <select name="id_material[]" class="form-control material-select" required>
               <option value="">Seleccione un material</option>
               <?php
                   foreach ($materiales as $material) {
-                      echo "<option value='" . htmlspecialchars($material['id_material']) . "'>" .
-                          htmlspecialchars($material['m_nombre']) . " (Stock: " . htmlspecialchars($material['stock']) . ")" .
+                      echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                                    data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                              htmlspecialchars($material['m_nombre']) . 
+                              " (Stock: " . htmlspecialchars($material['stock']) . ")" .
                           "</option>";
                   }
               ?>
             </select>
           </div>
-          <div class="col-md-2"><input name="precio[]" placeholder="Precio" class="form-control" required></div>
-          <div class="col-md-2"><input name="cantidad[]" placeholder="Cantidad" class="form-control" required></div>
-          <div class="col-md-3"><input name="sub_total[]" placeholder="Sub_total" class="form-control" required></div>
+          
+          <!-- Precio -->
+          <div class="col-md-2">
+            <label class="form-label">Precio</label>
+            <input type="number" name="precio[]" placeholder="Precio" class="form-control" required>
+          </div>
+          
+          <!-- Cantidad -->
+          <div class="col-md-3">
+            <label class="form-label">Cantidad</label>
+            <div class="input-group">
+              <input type="number" name="cantidad[]" placeholder="Cantidad" class="form-control cantidad-input" required>
+              <span class="input-group-text unidad-medida">--</span>
+            </div>
+          </div>
+
+          
+          <!-- Subtotal -->
+          <div class="col-md-3">
+            <label class="form-label">Subtotal</label>
+            <input name="sub_total[]" placeholder="Subtotal" class="form-control" required>
+          </div>
+          
+          <!-- Botón Eliminar -->
           <div class="col-md-1 text-center">
+            <label class="form-label" style="visibility: hidden;">Eliminar</label>
             <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
           </div>
         </div>
@@ -217,7 +249,7 @@ if ($searchTerm) {
       <!-- Botón Registrar -->
       <div class="row mt-4">
         <div class="col-md-3 offset-md-9">
-          <button type="submit" name="accion" value="crear" class="btn btn-register w-100" >REGISTRAR</button>
+          <button type="submit" name="accion" value="crear" class="btn btn-register w-100">REGISTRAR</button>
         </div>
       </div>
     </form>
@@ -274,21 +306,26 @@ if ($searchTerm) {
   <div class="col-md-3">
     <select name="id_material[]" class="form-control" required>
       <option value="">Seleccione un material</option>
-      <?php
-          foreach ($materiales as $material) {
-              echo "<option value='" . htmlspecialchars($material['id_material']) . "'>" .
-                  htmlspecialchars($material['m_nombre']) . " (Stock: " . htmlspecialchars($material['stock']) . ")" .
-                  "</option>";
-          }
-      ?>
+      <?php foreach ($materiales as $material) {
+          echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                        data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                  htmlspecialchars($material['m_nombre']) .
+                  " (Stock: " . htmlspecialchars($material['stock']) . ")" .
+              "</option>";
+      } ?>
     </select>
   </div>
-  <div class="col-md-2"><input name="precio[]" placeholder="Precio" class="form-control" required></div>
-  <div class="col-md-2"><input name="cantidad[]" placeholder="Cantidad" class="form-control" required></div>
-  <div class="col-md-3"><input name="sub_total[]" placeholder="Sub_total" class="form-control" required></div>
-  <div class="col-md-1 text-center">
-    <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
-  </div>
+    <div class="col-md-2"><input name="precio[]" placeholder="Precio" class="form-control" required></div>
+    <div class="col-md-3">
+      <div class="input-group">
+        <input name="cantidad[]" placeholder="Cantidad" class="form-control cantidad-input" required>
+        <span class="input-group-text unidad-medida">--</span>
+      </div>
+    </div>
+    <div class="col-md-3"><input name="sub_total[]" placeholder="Sub_total" class="form-control" required></div>
+    <div class="col-md-1 text-center">
+      <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
+    </div>
 </div>        
 <a href="historial_registro.php"><button type="button"class="btn btn-info">Historial de Registro</button></a>
 </main>
@@ -312,43 +349,37 @@ if ($searchTerm) {
 
 
 <script>
-
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.btn-ver-ingreso').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const idIngreso = this.getAttribute('data-id');
-            const modalBody = document.getElementById('detalleIngresoBody');
-            modalBody.innerHTML = "<div class='text-center'><span class='spinner-border'></span> Cargando...</div>";
-            const modal = new bootstrap.Modal(document.getElementById('detalleIngresoModal'));
-            modal.show();
+  // ----------- Modal Ver Detalle de Ingreso -----------
+  document.querySelectorAll('.btn-ver-ingreso').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const idIngreso = this.getAttribute('data-id');
+      const modalBody = document.getElementById('detalleIngresoBody');
+      modalBody.innerHTML = "<div class='text-center'><span class='spinner-border'></span> Cargando...</div>";
+      const modal = new bootstrap.Modal(document.getElementById('detalleIngresoModal'));
+      modal.show();
 
-            fetch('detalle_ingreso_ajax.php?id=' + idIngreso)
-                .then(response => response.text())
-                .then(html => {
-                    modalBody.innerHTML = html;
-                })
-                .catch(() => {
-                    modalBody.innerHTML = "<div class='alert alert-danger'>Error al cargar el detalle.</div>";
-                });
+      fetch('detalle_ingreso_ajax.php?id=' + idIngreso)
+        .then(response => response.text())
+        .then(html => {
+          modalBody.innerHTML = html;
+        })
+        .catch(() => {
+          modalBody.innerHTML = "<div class='alert alert-danger'>Error al cargar el detalle.</div>";
         });
     });
-});
-// abrira el modal
-document.getElementById("btnCrearIngreso").addEventListener("click", function () {
+  });
+
+  // ----------- Modal Crear Ingreso (limpieza de formulario) -----------
+  document.getElementById("btnCrearIngreso").addEventListener("click", function () {
     const form = document.getElementById("formIngreso");
-
-    // Limpiar todos los inputs
-    form.querySelectorAll("input, textarea").forEach(input => {
-        input.value = "";
-    });
-
-    // Eliminar campo oculto de id si existe
+    form.querySelectorAll("input, textarea").forEach(input => input.value = "");
     const idInput = document.getElementById("id_material");
     if (idInput) idInput.remove();
-});
+  });
 
-document.addEventListener('DOMContentLoaded', () => {
+  // ----------- Lógica de materiales dinámicos -----------
   const btnAgregar = document.getElementById('btnAgregar');
   const partesContainer = document.getElementById('materiales-container');
   const totalInput = document.getElementById('totalGeneral');
@@ -380,18 +411,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function agregarFila() {
     const template = document.getElementById('parte-template').cloneNode(true);
-    template.classList.remove('d-none'); // Mostrar la fila
-    template.removeAttribute('id'); // Eliminar el ID para evitar duplicados
+    template.classList.remove('d-none');
+    template.removeAttribute('id');
     template.querySelectorAll('input').forEach(input => input.value = '');
     template.querySelector('select').value = '';
+    template.querySelector('.unidad-medida').textContent = '--';
+
     template.querySelector('.remove-parte').addEventListener('click', () => {
-        template.remove();
-        calcularTotal();
+      template.remove();
+      calcularTotal();
     });
+
     actualizarSubtotal(template);
     partesContainer.appendChild(template);
-}
+  }
 
+  // Inicializar filas existentes
   document.querySelectorAll('.parte-row').forEach(row => {
     actualizarSubtotal(row);
     row.querySelector('.remove-parte').addEventListener('click', () => {
@@ -401,7 +436,17 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnAgregar.addEventListener('click', agregarFila);
+
+  // ----------- Evento de cambio para materiales (unidad de medida) -----------
+  document.addEventListener("change", function (e) {
+    if (e.target.classList.contains("material-select")) {
+      const unidad = e.target.selectedOptions[0].getAttribute("data-unidad") || "--";
+      const row = e.target.closest(".parte-row");
+      row.querySelector(".unidad-medida").textContent = unidad;
+    }
+  });
 });
 </script>
+
 </body>
 </html>

@@ -67,7 +67,7 @@
     <?php endif; ?>
     <?php if (in_array('Consulta', $_SESSION['roles'])): ?>
     <details>
-        <summary>Solicitar Materiales</summary>
+        <summary>SOLICITAR MATERIALES</summary>
             <ul>
                 <li><a href="../TRANSACCIONAL/Stock.php">STOCK</a></li>
             </ul>

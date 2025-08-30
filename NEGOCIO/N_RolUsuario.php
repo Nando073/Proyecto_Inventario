@@ -56,9 +56,9 @@ class N_RolUsuario {
         return $RolUsuario->activarRolUsuario($id_RolUsuario);
     }
 
-    public function obtenerUsuarioDisponibles($id_RolUsuario = null) {
+    public function obtenerUsuarioDisponibles($id_usuario = null) {
         $RolUsuario = new D_RolUsuario();
-        return $RolUsuario->obtenerUsuarioDisponibles($id_RolUsuario);
+        return $RolUsuario->obtenerUsuarioDisponibles($id_usuario);
     }
 }
 ?>

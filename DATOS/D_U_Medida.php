@@ -53,17 +53,22 @@ class D_U_Medida {
         }
     }
 
-    // Método para eliminar una medida
-    public function Eliminar($id_medida) {
-        $sql = "CALL EliminarMedida(?)";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute([$id_medida]);
-            echo "Categoría eliminada correctamente.";
-        } catch (PDOException $ex) {
-            echo "Error al eliminar: " . $ex->getMessage();
-        }
+   // Método para eliminar una unidad de medida
+public function Eliminar($id_medida) {
+    $sql = "CALL EliminarMedida(?)";
+    try {
+        $ps = $this->con->prepare($sql);
+        $ps->execute([$id_medida]);
+        
+        // Obtener el resultado del procedimiento
+        $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+        
+        return $resultado['success']; // Devuelve 1 o 0
+        
+    } catch (PDOException $ex) {
+        throw new Exception("Error al eliminar unidad de medida: " . $ex->getMessage());
     }
+}
 
     // Método para buscar medida por similitud
     public function buscarPorSimilitud($termino) {

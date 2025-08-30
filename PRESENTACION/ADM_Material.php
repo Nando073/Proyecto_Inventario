@@ -1,41 +1,51 @@
 <?php
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador', 'Operador', 'Supervisor']);
 require_once '../NEGOCIO/N_Material.php';
 $materialService = new N_Material();
 
 /// Verifica si se pasa un ID en la URL para editar o eliminar
 $material = null;
 
+// Verifica si se pasa un ID en la URL para editar o eliminar
 if (isset($_GET['id_material'])) {
     $material_id = filter_input(INPUT_GET, 'id_material', FILTER_VALIDATE_INT);
 
     if ($material_id) {
-        $materialService = new N_Material();
-
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
             try {
-                $resultado = $materialService->eliminar($material_id); // tu método que devuelve success y message
+                $resultado = $materialService->eliminar($material_id);
 
                 if ($resultado['success']) {
-                    header('Location: ADM_Material.php?msg=ok');
+                    $_SESSION['mensaje'] = "Material eliminado correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
                 } else {
-                    header('Location: ADM_Material.php?msg=error&texto=' . urlencode($resultado['message']));
+                    $_SESSION['mensaje'] = "No se puede eliminar el material porque cuenta con stock disponible.";
+                    $_SESSION['tipo_mensaje'] = "danger";
                 }
+                
+                // Redirige a la lista
+                header('Location: ADM_Material.php');
                 exit();
 
             } catch (Exception $e) {
-                header('Location: ADM_Material.php?msg=error&texto=' . urlencode($e->getMessage()));
+                $_SESSION['mensaje'] = "Error al eliminar material: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+                header('Location: ADM_Material.php');
                 exit();
             }
 
         } else {
+            // Modo edición
             $material = $materialService->buscarPorId($material_id);
             if (!$material) {
-                echo "No se encontró el material.";
+                $_SESSION['mensaje'] = "No se encontró el material.";
+                $_SESSION['tipo_mensaje'] = "warning";
             }
         }
     } else {
-        echo "ID inválido.";
+        $_SESSION['mensaje'] = "ID inválido.";
+        $_SESSION['tipo_mensaje'] = "danger";
     }
 }
 
@@ -189,15 +199,13 @@ if ($searchTerm) {
             Registrar Material
         </button>
     </form>
-<?php
-if (isset($_GET['msg'])) {
-    if ($_GET['msg'] === 'ok') {
-        echo "<div class='alert alert-success'>Material eliminado correctamente.</div>";
-    } elseif ($_GET['msg'] === 'error' && isset($_GET['texto'])) {
-        echo "<div class='alert alert-danger'>" . htmlspecialchars($_GET['texto']) . "</div>";
-    }
-}
-?>
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+        <?= htmlspecialchars($_SESSION['mensaje']); ?>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+<?php endif; ?>
+
     <table class="table table-bordered mt-3">
         <thead>
             <tr>

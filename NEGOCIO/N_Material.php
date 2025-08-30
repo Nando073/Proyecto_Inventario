@@ -16,10 +16,15 @@ class N_Material {
     }
 
     // Método para eliminar un material por ID
-    public function eliminar($id_material) {
+public function eliminar($id_material) {
+    try {
         $NMaterial = new D_Material();
-        $NMaterial->Eliminar($id_material);  // Llamar al método Eliminar de D_Material
+        $resultado = $NMaterial->Eliminar($id_material);  // Capturar el resultado     
+        return ['success' => (bool)$resultado]; // Convertir 1/0 a true/false
+    } catch (Exception $e) {
+        throw $e;
     }
+}
 
     // Método para buscar materiales por similitud de término
     public function buscarPorSimilitud($termino) {

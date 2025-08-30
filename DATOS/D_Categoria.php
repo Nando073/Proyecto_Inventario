@@ -53,15 +53,17 @@ class D_Categoria {
         }
     }
 
-    // Método para eliminar una categoría
+     // Método para eliminar una categoría
     public function Eliminar($id_categoria) {
         $sql = "CALL EliminarCategoria(?)";
         try {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_categoria]);
-            echo "Categoría eliminada correctamente.";
+            // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
-            echo "Error al eliminar: " . $ex->getMessage();
+            throw new Exception("Error al eliminar categoría: " . $ex->getMessage());
         }
     }
 

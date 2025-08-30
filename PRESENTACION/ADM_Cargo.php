@@ -1,5 +1,6 @@
 <?php
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador']);
 require_once '../NEGOCIO/N_Cargo.php';
 $cargoService = new N_Cargo();
 
@@ -8,29 +9,42 @@ $cargoService = new N_Cargo();
 /// Verifica si se pasa un ID en la URL para editar o eliminar
 $cargo = null;
 
+// Manejo de editar/eliminar vía GET
 if (isset($_GET['id_cargo'])) {
     $id_cargo = filter_input(INPUT_GET, 'id_cargo', FILTER_VALIDATE_INT);
-
     if ($id_cargo) {
-        // Crear una instancia del servicio de negocio
-        $cargoService = new N_Cargo();
-        
-        // Verifica si se ha solicitado eliminar
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            // Llamada al método de negocio para eliminar al cargo
-            $cargoService->eliminar($id_cargo);
-            // Redirigir al listado después de eliminar
-            header('Location: ADM_Cargo.php');
-            exit();
+            try {
+                $resultado = $cargoService->eliminar($id_cargo);
+
+                if ($resultado['success']) {
+                    $_SESSION['mensaje'] = "Cargo eliminado correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se puede eliminar el cargo porque tiene funcionarios asociados.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+                
+                header('Location: ADM_Cargo.php');
+                exit();
+
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al eliminar cargo: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+                header('Location: ADM_Cargo.php');
+                exit();
+            }
         } else {
-            // Llamada al método de negocio para obtener los datos de los cargos
+            // Modo edición
             $cargo = $cargoService->buscarPorId($id_cargo);
             if (!$cargo) {
-                echo "No se encontró el cargo.";
+                $_SESSION['mensaje'] = "No se encontró el cargo.";
+                $_SESSION['tipo_mensaje'] = "warning";
             }
         }
     } else {
-        echo "ID inválido.";
+        $_SESSION['mensaje'] = "ID inválido.";
+        $_SESSION['tipo_mensaje'] = "danger";
     }
 }
 
@@ -146,6 +160,14 @@ if ($searchTerm) {
             Registrar Cargo
         </button>
     </form>
+
+    <!-- Mensaje -->
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+        <?= htmlspecialchars($_SESSION['mensaje']); ?>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+<?php endif; ?>
 
     <table class="table table-bordered mt-3">
         <thead>

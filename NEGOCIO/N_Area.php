@@ -15,13 +15,18 @@ class N_Area {
         return $NArea->BuscarTodo();
     }
 
-    // Método para eliminar un area por ID
+    // Método para eliminar un área por ID
     public function eliminar($id_area) {
-        $NArea = new D_Area();
-        $NArea->Eliminar($id_area);  // Llamar al método Eliminar de D_Area
+        try {
+            $NArea = new D_Area();
+            $resultado = $NArea->Eliminar($id_area);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
-    // Método para buscar ares por similitud de término
+    // Método para buscar áreas por similitud de término
     public function buscarPorSimilitud($termino) {
         $NArea = new D_Area();
         return $NArea->buscarPorSimilitud($termino);  // Llamar al método buscarPorSimilitud de D_Area

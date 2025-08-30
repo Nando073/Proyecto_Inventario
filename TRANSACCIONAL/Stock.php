@@ -6,6 +6,7 @@
 
 
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador', 'Operador', 'Supervisor', 'Funcionario']);
 require_once '../NEGOCIO/N_Egreso.php';
 // Instanciar el servicio de egreso
 $egresoService = new N_Egreso();

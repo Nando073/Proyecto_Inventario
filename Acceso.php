@@ -27,16 +27,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         $rolesUsuario = array_column($rolesUsuario, 'r_nombre');
         $_SESSION['roles'] = $rolesUsuario;
 
-        // Redirigir según rol
+        // ✅ REDIRECCIÓN MEJORADA - Prioridad de roles (4 ROLES)
+        $paginaInicio = 'PRESENTACION/Inicio.php'; // Página por defecto
+        
+        // Definir prioridad de redirección (de mayor a menor privilegio)
         if (in_array('Administrador', $rolesUsuario)) {
-            header('Location: PRESENTACION/ADM_Usuario.php'); exit();
-        } elseif (in_array('Operador', $rolesUsuario)) {
-            header('Location: PRESENTACION/ADM_Material.php'); exit();
-        } elseif (in_array('Consulta', $rolesUsuario)) {
-            header('Location: TRANSACCIONAL/Stock.php'); exit();
-        } else {
-            header('Location: acceso_denegado.php'); exit();
+            $paginaInicio = 'PRESENTACION/ADM_Usuario.php';
+        } 
+        elseif (in_array('Operador', $rolesUsuario)) {
+            $paginaInicio = 'PRESENTACION/ADM_Material.php';
+        } 
+        elseif (in_array('Supervisor', $rolesUsuario)) {
+            $paginaInicio = 'TRANSACCIONAL/Stock.php';
         }
+        elseif (in_array('Funcionario', $rolesUsuario)) {
+            $paginaInicio = 'TRANSACCIONAL/Stock.php';
+        }
+
+        header("Location: $paginaInicio");
+        exit();
+
     } else {
         $error = "Usuario o contraseña incorrectos";
     }

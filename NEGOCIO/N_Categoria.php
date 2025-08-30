@@ -16,11 +16,16 @@ class N_Categoria {
         return $NCategoria->BuscarTodo();
     }
 
-    // Método para eliminar una categoría por ID
-    public function eliminar($id_categoria) {
+   // Método para eliminar una categoría por ID
+public function eliminar($id_categoria) {
+    try {
         $NCategoria = new D_Categoria();
-        $NCategoria->Eliminar($id_categoria);
+        $resultado = $NCategoria->Eliminar($id_categoria);
+        return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false  
+    } catch (Exception $e) {
+        throw $e;
     }
+}
 
     // Método para buscar categorías por similitud de término
     public function buscarPorSimilitud($termino) {

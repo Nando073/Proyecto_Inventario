@@ -136,17 +136,17 @@ class D_RolUsuario {
         }
     }
 
-       public function activarRolUsuario($id_RolUsuario) {
-    $query = "CALL ActivarRolUsuario(:id_RolUsuario)";
-    $stmt = $this->con->prepare($query);
-    $stmt->execute([':id_RolUsuario' => $id_RolUsuario]);
-    return $stmt->rowCount() > 0; // Retorna true si se actualizó al menos una fila
-}
-    public function obtenerUsuarioDisponibles($id_RolUsuario = null) {
-        $sql = "CALL ObtenerUsuarioDisponibles(:id_RolUsuario)";
+    public function activarRolUsuario($id_RolUsuario) {
+        $query = "CALL ActivarRolUsuario(:id_RolUsuario)";
+        $stmt = $this->con->prepare($query);
+        $stmt->execute([':id_RolUsuario' => $id_RolUsuario]);
+        return $stmt->rowCount() > 0; // Retorna true si se actualizó al menos una fila
+    }
+    public function obtenerUsuarioDisponibles($id_usuario = null) {
+        $sql = "CALL ObtenerUsuarioDisponibles(:id_usuario)";
         try {
             $ps = $this->con->prepare($sql);
-            $ps->bindValue(':id_RolUsuario', $id_RolUsuario, PDO::PARAM_INT);
+            $ps->bindValue(':id_usuario', $id_usuario, PDO::PARAM_INT);
             $ps->execute();
             return $ps->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $ex) {

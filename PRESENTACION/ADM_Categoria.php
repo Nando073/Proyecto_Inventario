@@ -1,5 +1,6 @@
 <?php
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador']);
 require_once '../NEGOCIO/N_Categoria.php';
 $categoriaService = new N_Categoria();
 
@@ -11,17 +12,37 @@ if (isset($_GET['id_categoria'])) {
     $id_categoria = filter_input(INPUT_GET, 'id_categoria', FILTER_VALIDATE_INT);
     if ($id_categoria) {
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            $categoriaService->eliminar($id_categoria);
-            header('Location: ADM_Categoria.php');
-            exit();
+            try {
+                $resultado = $categoriaService->eliminar($id_categoria);
+
+                if ($resultado['success']) {
+                    $_SESSION['mensaje'] = "Categoría eliminada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se puede eliminar la categoría porque tiene materiales asociados.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+                
+                header('Location: ADM_Categoria.php');
+                exit();
+
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al eliminar categoría: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+                header('Location: ADM_Categoria.php');
+                exit();
+            }
         } else {
+            // Modo edición
             $categoria = $categoriaService->buscarPorId($id_categoria);
             if (!$categoria) {
-                echo "No se encontró la categoría.";
+                $_SESSION['mensaje'] = "No se encontró la categoría.";
+                $_SESSION['tipo_mensaje'] = "warning";
             }
         }
     } else {
-        echo "ID inválido.";
+        $_SESSION['mensaje'] = "ID inválido.";
+        $_SESSION['tipo_mensaje'] = "danger";
     }
 }
 
@@ -139,10 +160,17 @@ if ($searchTerm) {
         </button>
     </form>
 
+<!-- Mensaje -->
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+        <?= htmlspecialchars($_SESSION['mensaje']); ?>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+<?php endif; ?>
+
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Cantidad de materiales</th>
@@ -152,7 +180,6 @@ if ($searchTerm) {
         <tbody>
             <?php foreach ($categorias as $cate): ?>
             <tr>
-                <td><?php echo htmlspecialchars($cate['id_categoria']); ?></td>
                 <td><?php echo htmlspecialchars($cate['c_nombre']); ?></td>
                 <td><?php echo htmlspecialchars($cate['c_descripcion']); ?></td>
                 <td><?php echo htmlspecialchars($cate['c_materiales']); ?></td>

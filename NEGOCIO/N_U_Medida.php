@@ -16,11 +16,16 @@ class N_U_Medida {
         return $NMedida->BuscarTodo();
     }
 
-    // Método para eliminar una unidad de medida por ID
-    public function eliminar($id_medida) {
+   // Método para eliminar una unidad de medida por ID
+public function eliminar($id_medida) {
+    try {
         $NMedida = new D_U_Medida();
-        $NMedida->Eliminar($id_medida);
+        $resultado = $NMedida->Eliminar($id_medida);
+        return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+    } catch (Exception $e) {
+        throw $e;
     }
+}
 
     // Método para buscar unidades de medida por similitud de término
     public function buscarPorSimilitud($termino) {

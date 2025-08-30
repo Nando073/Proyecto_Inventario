@@ -37,7 +37,7 @@ class D_Rol {
 
     // Método para buscar todos los roles
     public function BuscarTodo() {
-        $sql = "CALL ObtenerRol()";
+        $sql = "CALL ObtenerRoles()";
         try {
             $ps = $this->con->prepare($sql);
             $ps->execute();
@@ -49,16 +49,18 @@ class D_Rol {
     }
 
     // Método para eliminar un rol
-    public function Eliminar($id_rol) {
-        $sql = "CALL EliminarRol(?)";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute([$id_rol]);
-            echo "rol eliminado correctamente.";
-        } catch (PDOException $ex) {
-            echo "Error al eliminar: " . $ex->getMessage();
-        }
+public function Eliminar($id_rol) {
+    $sql = "CALL EliminarRol(?)";
+    try {
+        $ps = $this->con->prepare($sql);
+        $ps->execute([$id_rol]);
+        // Obtener el resultado del procedimiento
+        $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+        return $resultado; // Devuelve array con 'success' y 'cantidad_usuarios'
+    } catch (PDOException $ex) {
+        throw new Exception("Error al eliminar rol: " . $ex->getMessage());
     }
+}
 
     // Método para buscar rol por similitud
     public function buscarPorSimilitud($termino) {

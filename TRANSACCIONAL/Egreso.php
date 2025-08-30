@@ -1,5 +1,6 @@
 <?php
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador', 'Operador', 'Supervisor', 'Funcionario']);
 require_once '../NEGOCIO/N_Egreso.php';
 
 $egresoService = new N_Egreso();
@@ -173,6 +174,10 @@ if ($searchTerm) {
     .btn-delete { background-color: #c0392b; color: white; }
     .btn-register { background-color: #8e44ad; color: white; }
     .card { border-radius: 10px; padding: 20px; }
+    .form-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
@@ -213,6 +218,7 @@ if ($searchTerm) {
                     <div id="materiales-container">
                         <div class="parte-row row align-items-end mb-2">
                             <div class="col-md-3">
+                                <label class="form-label">Categoría</label>
                                 <select name="categoria[]" class="form-control select-categoria" required>
                                     <option value="">Seleccione una categoría</option>
                                     <?php foreach (array_keys($materialesPorCategoria) as $categoria): ?>
@@ -221,11 +227,13 @@ if ($searchTerm) {
                                 </select>
                             </div>
                             <div class="col-md-4">
+                                <label class="form-label">Material</label>
                                 <select name="id_material[]" class="form-control select-material" required disabled>
                                     <option value="">Seleccione un material</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
+                                <label class="form-label">Cantidad</label>
                                 <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
                             </div>
                             <div class="col-md-1 text-center">

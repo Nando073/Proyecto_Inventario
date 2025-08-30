@@ -15,10 +15,15 @@ class N_Rol {
         return $NRol->BuscarTodo();
     }
 
-    // Método para eliminar un rol por ID
+   // Método para eliminar un rol por ID
     public function eliminar($id_rol) {
-        $NRol = new D_Rol();
-        $NRol->Eliminar($id_rol);  // Llamar al método Eliminar de D_Rol
+        try {
+            $NRol = new D_Rol();
+            $resultado = $NRol->Eliminar($id_rol);
+            return $resultado; // Devuelve el array completo
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar areas por similitud de término

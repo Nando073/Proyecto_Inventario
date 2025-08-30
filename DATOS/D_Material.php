@@ -69,16 +69,19 @@ class D_Material {
     }
 
     // Método para eliminar un material
-    public function Eliminar($id_material) {
-        $sql = "CALL EliminarMaterial(?)";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute([$id_material]);
-            echo "material eliminado correctamente.";
-        } catch (PDOException $ex) {
-            echo "Error al eliminar: " . $ex->getMessage();
-        }
+public function Eliminar($id_material) {
+    $sql = "CALL EliminarMaterial(?)";
+    try {
+        $ps = $this->con->prepare($sql);
+        $ps->execute([$id_material]);
+        // Obtener el resultado del procedimiento almacenado
+        $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+        // Devolver el resultado (1 = éxito, 0 = fallo)
+        return $resultado['success'];
+    } catch (PDOException $ex) {
+        throw new Exception("Error al eliminar: " . $ex->getMessage());
     }
+}
 
     // Método para buscar material por similitud
     public function buscarPorSimilitud($termino) {

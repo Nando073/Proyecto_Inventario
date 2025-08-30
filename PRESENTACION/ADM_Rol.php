@@ -1,37 +1,52 @@
 <?php
 require_once '../Seguridad.php';
+verificarAcceso(['Administrador']);
 require_once '../NEGOCIO/N_Rol.php';
 $rolService = new N_Rol();
 
 /// Verifica si se pasa un ID en la URL para editar o eliminar
 $rol = null;
 
+// Manejo de editar/eliminar vía GET
 if (isset($_GET['id_rol'])) {
     $id_rol = filter_input(INPUT_GET, 'id_rol', FILTER_VALIDATE_INT);
-
     if ($id_rol) {
-        // Registrar una instancia del servicio de negocio
-        $rolService = new N_Rol();
-        
-        // Verifica si se ha solicitado eliminar
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            // Llamada al método de negocio para eliminar al rol
-            $rolService->eliminar($id_rol);
-            // Redirigir al listado después de eliminar
-            header('Location: ADM_Rol.php');
-            exit();
+            try {
+                $resultado = $rolService->eliminar($id_rol);
+
+                if ($resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Rol eliminado correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se puede eliminar el rol porque tiene " 
+                                         . $resultado['cantidad_usuarios'] 
+                                         . " usuario(s) asignado(s).";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+                
+                header('Location: ADM_Rol.php');
+                exit();
+
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al eliminar rol: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+                header('Location: ADM_Rol.php');
+                exit();
+            }
         } else {
-            // Llamada al método de negocio para obtener los datos de los areas
+            // Modo edición
             $rol = $rolService->buscarPorId($id_rol);
             if (!$rol) {
-                echo "No se encontró el rol.";
+                $_SESSION['mensaje'] = "No se encontró el rol.";
+                $_SESSION['tipo_mensaje'] = "warning";
             }
         }
     } else {
-        echo "ID inválido.";
+        $_SESSION['mensaje'] = "ID inválido.";
+        $_SESSION['tipo_mensaje'] = "danger";
     }
 }
-
 // Manejo de creación/actualización vía POST
 $accion = $_POST['accion'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -146,6 +161,14 @@ if ($searchTerm) {
             Registrar Rol
         </button>
     </form>
+    
+<!-- Mensaje -->
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+        <?= htmlspecialchars($_SESSION['mensaje']); ?>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+<?php endif; ?>
 
     <table class="table table-bordered mt-3">
         <thead>
