@@ -38,5 +38,9 @@ class N_Proveedor {
         $NProveedor = new D_Proveedor();
         return $NProveedor->buscarPorId($id_proveedor);
     }
+    public function activarProveedor($id_proveedor) {
+        $DProveedor = new D_Proveedor();
+        return $DProveedor->activarProveedor($id_proveedor);
+    }
 }
 ?>

@@ -4,25 +4,45 @@ verificarAcceso(['Administrador', 'Operador', 'Supervisor']);
 require_once '../NEGOCIO/N_Proveedor.php';
 $proveedorService = new N_Proveedor();
 
-/// Verifica si se pasa un ID en la URL para editar o eliminar
+// Filtro por estado (activo/inactivo)
+$estadoFiltro = isset($_GET['estado']) ? $_GET['estado'] : 'activo'; // por defecto activos
+
+/// Verifica si se pasa un ID en la URL para editar, eliminar o activar
 $proveedor = null;
 
 if (isset($_GET['id_proveedor'])) {
     $id_proveedor = filter_input(INPUT_GET, 'id_proveedor', FILTER_VALIDATE_INT);
 
     if ($id_proveedor) {
-        // Crear una instancia del servicio de negocio
-        $proveedorService = new N_Proveedor();
-        
-        // Verifica si se ha solicitado eliminar
+        // Verifica si se ha solicitado eliminar (desactivar)
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            // Llamada al método de negocio para eliminar al proveedor
+            // Llamada al método de negocio para eliminar/desactivar al proveedor
             $proveedorService->eliminar($id_proveedor);
             // Redirigir al listado después de eliminar
             header('Location: ADM_Proveedor.php');
             exit();
+            
+        } elseif (isset($_GET['action']) && $_GET['action'] === 'activar') {
+            // Activar proveedor y capturar resultado
+            $resultado = $proveedorService->activarProveedor($id_proveedor);
+
+            if ($resultado) {
+                $mensaje = "Proveedor activado correctamente.";
+                $tipo_mensaje = "success";
+            } else {
+                $mensaje = "El proveedor no pudo ser activado.";
+                $tipo_mensaje = "danger";
+            }
+
+            // Guardar mensaje en sesión para mostrar después del redirect
+            $_SESSION['mensaje'] = $mensaje;
+            $_SESSION['tipo_mensaje'] = $tipo_mensaje;
+
+            header('Location: ADM_Proveedor.php?estado=activo'); 
+            exit();
+            
         } else {
-            // Llamada al método de negocio para obtener los datos de los areas
+            // Llamada al método de negocio para obtener los datos del proveedor
             $proveedor = $proveedorService->buscarPorId($id_proveedor);
             if (!$proveedor) {
                 echo "No se encontró el proveedor.";
@@ -63,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ADM_Proveedor.php');
                 exit();
             } else {
-                echo "Error: No existe la categoría con ID $id_proveedor.";
+                echo "Error: No existe el proveedor con ID $id_proveedor.";
             }
         } else {
             echo "Error: Todos los campos son necesarios y válidos.";
@@ -71,12 +91,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Obtener la lista de areas
-$areas = $proveedorService->buscarTodo();
+// Obtener la lista de proveedores
+$proveedores = $proveedorService->buscarTodo();
+
 // Buscar por término
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 if ($searchTerm) {
-    $areas = $proveedorService->buscarPorSimilitud($searchTerm);
+    $proveedores = $proveedorService->buscarPorSimilitud($searchTerm);
+}
+
+// Filtrar en PHP según estado
+if ($estadoFiltro === 'activo') {
+    $proveedores = array_filter($proveedores, function($p) {
+        return $p['p_estado'] == 1; // Ajusta según el nombre del campo en tu base de datos
+    });
+} elseif ($estadoFiltro === 'inactivo') {
+    $proveedores = array_filter($proveedores, function($p) {
+        return $p['p_estado'] == 0; // Ajusta según el nombre del campo en tu base de datos
+    });
+}
+
+// Opcional: para mostrar en la vista como "Activo" o "Inactivo"
+foreach ($proveedores as &$proveedorItem) {
+    $proveedorItem['estado_texto'] = $proveedorItem['p_estado'] == 1 ? 'Activo' : 'Inactivo';
 }
 ?>
 
@@ -174,10 +211,41 @@ if ($searchTerm) {
             <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
             <button type="submit" class="btn btn-info">Buscar</button>
         </div>
-        <button type="button" class="btn btn-success m-3" id="btnCrearProveedor" data-bs-toggle="modal" data-bs-target="#proveedorModal">
-            Registrar Proveedor
-        </button>
+        <!-- Botones a la derecha -->
+            <div class="d-flex align-items-center ms-auto">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Todos los Proveedores
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
+                            href="ADM_Proveedor.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                                Activos
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
+                            href="ADM_Proveedor.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                                Inactivos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Botón Registrar Proveedor -->
+                <button type="button" class="btn btn-success m-3" id="btnCrearProveedor" data-bs-toggle="modal" data-bs-target="#proveedorModal">
+                    Registrar Proveedor
+                </button>
+            </div>
     </form>
+
+    <!-- Mensaje -->
+    <?php if (isset($_SESSION['mensaje'])): ?>
+        <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+            <?= htmlspecialchars($_SESSION['mensaje']); ?>
+        </div>
+        <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+    <?php endif; ?>
 
     <table class="table table-bordered mt-3">
         <thead>
@@ -193,27 +261,39 @@ if ($searchTerm) {
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($areas as $are): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($are['p_nombre']); ?></td>
-                <td><?php echo htmlspecialchars($are['nit']); ?></td>
-                <td><?php echo htmlspecialchars($are['departamento']); ?></td>
-                <td><?php echo htmlspecialchars($are['p_direccion']); ?></td>
-                <td><?php echo htmlspecialchars($are['p_celular']); ?></td>
-                <td><?php echo htmlspecialchars($are['p_fecha']); ?></td>
-                <td>
-                     <?php if ($are['p_estado'] == 1): ?>
-                        <span style="color: green; font-weight: bold;">Activo</span>
-                    <?php else: ?>
-                        <span style="color: red; font-weight: bold;">Inactivo</span>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <a href="ADM_Proveedor.php?id_proveedor=<?php echo $are['id_proveedor']; ?>" class="btn btn-warning">Editar</a>
-                    <a href="ADM_Proveedor.php?id_proveedor=<?php echo $are['id_proveedor']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta proveedor?');">Eliminar</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
+            <?php if (!empty($proveedores)): ?>
+                <?php foreach ($proveedores as $Proveedor): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($Proveedor['p_nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($Proveedor['nit']); ?></td>
+                        <td><?php echo htmlspecialchars($Proveedor['departamento']); ?></td>
+                        <td><?php echo htmlspecialchars($Proveedor['p_direccion']); ?></td>
+                        <td><?php echo htmlspecialchars($Proveedor['p_celular']); ?></td>
+                        <td><?php echo htmlspecialchars($Proveedor['p_fecha']); ?></td>
+                        <td>
+                            <?php if ($Proveedor['p_estado'] == 1): ?>
+                                <span style="color: green; font-weight: bold;">Activo</span>
+                            <?php else: ?>
+                                <span style="color: red; font-weight: bold;">Inactivo</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($Proveedor['p_estado'] == 1): ?>
+                                <!-- Si es activo -->
+                                <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>" class="btn btn-warning">Editar</a>
+                                <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta proveedor?');">Eliminar</a>
+                            <?php else: ?>
+                                <!-- Si es inactivo -->
+                                <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>&action=activar" class="btn btn-success">Activar</a>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                 <tr>
+                     <td colspan="10" class="text-center">No hay proveedores para mostrar.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 </main>

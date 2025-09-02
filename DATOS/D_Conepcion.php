@@ -9,7 +9,7 @@ class D_coneccion {
     private $con = null;
 
     public function __construct() {
-        $this->bdnombre = "dde";
+        $this->bdnombre = "salve";
         $this->servidor = "localhost";
         $this->puerto = "3310";
         $this->usuario = "root";

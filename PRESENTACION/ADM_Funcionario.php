@@ -239,8 +239,8 @@ foreach ($funcionarios as &$funcionariO) {
         <h3 class="mt-5">Administrar Funcionarios</h3>
         <form class="d-flex justify-content-between align-items-center mt-3" action="ADM_Funcionario.php" method="get">
             <div>
-            <input type="text" name="search" placeholder="Buscar por f_nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-            <button type="submit" class="btn btn-info">Buscar</button>
+                <input type="text" name="search" placeholder="Buscar por f_nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
+                <button type="submit" class="btn btn-info">Buscar</button>
             </div>
             <!-- Botones a la derecha -->
             <div class="d-flex align-items-center ms-auto">
@@ -266,7 +266,7 @@ foreach ($funcionarios as &$funcionariO) {
                 <!-- Botón Registrar Funcionario -->
                 <button type="button" class="btn btn-success m-3" id="btnCrearFunci" data-bs-toggle="modal" data-bs-target="#funcionarioModal">
                         Registrar Funcionario
-                    </button>
+                </button>
             </div>
         </form>
 <!-- Mensaje -->

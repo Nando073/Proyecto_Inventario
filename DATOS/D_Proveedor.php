@@ -112,6 +112,12 @@ class D_Proveedor {
             return null;
         }
     }
+    public function activarProveedor($id_proveedor) {
+    $query = "CALL ActivarProveedor(:id_proveedor)";
+    $stmt = $this->con->prepare($query);
+    $stmt->execute([':id_proveedor' => $id_proveedor]);
+    return $stmt->rowCount() > 0; // Retorna true si se actualizó al menos una fila
+}
 
 }
 ?>
