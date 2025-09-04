@@ -11,9 +11,9 @@ class N_U_Medida {
     }
 
     // Método para buscar todas las unidades de medida
-    public function buscarTodo() {
+    public function obtenerMedidas() {
         $NMedida = new D_U_Medida();
-        return $NMedida->BuscarTodo();
+        return $NMedida->ObtenerMedidas();
     }
 
    // Método para eliminar una unidad de medida por ID
@@ -45,10 +45,5 @@ public function eliminar($id_medida) {
         return $NMedida->buscarPorId($id_medida);
     }
 
-    // Método para actualizar la cantidad de unidades de medida
-    public function actualizarCantidadMedidas() {
-        $NMedida = new D_U_Medida();
-        $NMedida->actualizarCantidadMedidas();
-    }
 }
 ?>

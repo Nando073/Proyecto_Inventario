@@ -129,28 +129,6 @@ class D_Funcionario {
         }
     }
 
-    public function obtenerAreas() {
-        $sql = "CALL obtenerAreas()";
-       try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return null;
-        }
-    }
-    public function obtenerCargos() {
-         $sql = "CALL obtenerCargos()";
-       try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return null;
-        }
-    }
 
     public function activarFuncionario($id_funcionario) {
     $query = "CALL ActivarFuncionario(:id_funcionario)";

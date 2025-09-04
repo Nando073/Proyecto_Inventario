@@ -41,7 +41,7 @@ class D_U_Medida {
     }
 
     // Método para buscar todas las unidades de medida
-    public function BuscarTodo() {
+    public function ObtenerMedidas() {
         $sql = "CALL ObtenerMedidas()";
         try {
             $ps = $this->con->prepare($sql);
@@ -108,16 +108,5 @@ public function Eliminar($id_medida) {
         }
     }
 
-
-     // Actualizar la cantidad de medidas por material
-     public function actualizarCantidadMedidas() {
-        try {
-            $stmt = $this->con->prepare("CALL ActualizarCantidadMedidas()");
-            $stmt->execute();
-            echo "Cantidad de medidas actualizada correctamente.";
-        } catch (PDOException $ex) {
-            echo "Error al actualizar cantidad de medidas: " . $ex->getMessage();
-        }
-    }
 }
 ?>

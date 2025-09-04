@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Listado y búsqueda
-$medidas = $medidaService->buscarTodo();
+$medidas = $medidaService->obtenerMedidas();
 $searchTerm = $_GET['search'] ?? '';
 if ($searchTerm) {
     $medidas = $medidaService->buscarPorSimilitud($searchTerm);
@@ -168,7 +168,6 @@ if ($searchTerm) {
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Unidad de Medida</th>
                 <th>Descripción</th>
                 <th>Cantidad de Materiales</th>
@@ -178,7 +177,6 @@ if ($searchTerm) {
         <tbody>
             <?php foreach ($medidas as $u_medida): ?>
             <tr>
-                <td><?php echo htmlspecialchars($u_medida['id_medida']); ?></td>
                 <td><?php echo htmlspecialchars($u_medida['u_medida']); ?></td>
                 <td><?php echo htmlspecialchars($u_medida['u_descripcion']); ?></td>
                 <td><?php echo htmlspecialchars($u_medida['u_materiales']); ?></td>

@@ -146,34 +146,6 @@ class D_Ingreso {
                 return [];
             }
         }
-        //otener a los proveedores  y los materiales para mi formulario atrves del select
-        public function obtenerProveedores() {
-           $sql = "CALL ObtenerProveedores()"; 
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return [];
-        }
-        }
-
-       
-    //--------------------      detalle     ------------------
-        //otener a los materiales para mi formulario atrves del select
-        
-        public function obtenerMateriales() {
-            $sql = "CALL ObtenerMateriales()"; 
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return [];
-        }
-        }
 
 }
 

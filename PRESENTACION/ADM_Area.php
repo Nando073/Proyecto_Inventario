@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Obtener la lista de areas
-$areas = $areaService->buscarTodo();
+$areas = $areaService->obtenerAreas();
 // Buscar por término
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 if ($searchTerm) {

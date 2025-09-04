@@ -41,16 +41,7 @@ class N_Funcionario {
         $Nfuncionario = new D_Funcionario();
         return $Nfuncionario->buscarPorId($id_funcionario);
     }
-    
-    public function obtenerAreas() {
-        $Dfuncionario = new D_Funcionario();
-        return $Dfuncionario->obtenerAreas();
-    }
-    public function obtenerCargos() {
-        $Dfuncionario = new D_Funcionario();
-        return $Dfuncionario->obtenerCargos();
-    }
-    
+    // Método para activar un funcionario por ID
     public function activarFuncionario($id_funcionario) {
         $Dfuncionario = new D_Funcionario();
         return $Dfuncionario->activarFuncionario($id_funcionario);

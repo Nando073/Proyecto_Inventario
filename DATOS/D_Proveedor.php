@@ -51,7 +51,7 @@ class D_Proveedor {
     }
 
     // Método para buscar todos los proveedores
-    public function BuscarTodo() {
+    public function ObtenerProveedores() {
         $sql = "CALL ObtenerProveedores()";
         try {
             $ps = $this->con->prepare($sql);

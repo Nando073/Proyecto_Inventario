@@ -11,9 +11,9 @@ class N_Categoria {
     }
 
     // Método para buscar todas las categorías
-    public function buscarTodo() {
+    public function obtenerCategorias() {
         $NCategoria = new D_Categoria();
-        return $NCategoria->BuscarTodo();
+        return $NCategoria->ObtenerCategorias();
     }
 
    // Método para eliminar una categoría por ID
@@ -45,10 +45,6 @@ public function eliminar($id_categoria) {
         return $NCategoria->buscarPorId($id_categoria);
     }
 
-    // Método para actualizar la cantidad de categorías
-    public function actualizarCantidadCategorias() {
-        $NCategoria = new D_Categoria();
-        $NCategoria->actualizarCantidadCategorias();
-    }
+  
 }
 ?>

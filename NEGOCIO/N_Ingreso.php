@@ -32,22 +32,6 @@ class N_Ingreso {
         $NIngreso = new D_Ingreso();
         $NIngreso->eliminarIngreso($id_ingreso);
     }
-
-  
-    public function obtenerProveedores() {
-        $NIngreso = new D_Ingreso();
-        return $NIngreso->obtenerProveedores();
-    }
-
-
-    public function obtenerMateriales() {
-        $NIngreso = new D_Ingreso();
-        return $NIngreso->obtenerMateriales();
-    }
-
-    
-    
-    
     
 }
 ?>

@@ -142,43 +142,8 @@ class D_Egreso {
                 return [];
             }
         }
-     
-       
-    //--------------------      detalle     ------------------
-        //otener a los materiales para mi formulario atrves del select
+   
         
-        public function obtenerMateriales() {
-            $query = "SELECT 
-                m.id_material, 
-                m.m_nombre, 
-                m.stock, 
-                c.id_categoria, 
-                c.c_nombre AS categoria_nombre
-            FROM material m
-            JOIN categoria c ON m.id_categoria = c.id_categoria
-            WHERE m.m_estado = 1
-            AND m.stock > 0
-            ORDER BY c.c_nombre, m.m_nombre;";
-            $stmt = $this->con->prepare($query);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-         //otener a los funcionario  y los materiales para mi formulario atrves del select
-        public function obtenerFuncionarios() {
-            $query = "SELECT 
-                f.id_funcionario, 
-                f.f_nombre, 
-                a.id_area,
-                a.a_nombre AS area_nombre
-            FROM funcionario f
-            JOIN area a ON f.area = a.id_area
-            WHERE f.f_estado = 1
-            AND a.a_funcionarios > 0
-            ORDER BY a.a_nombre, f.f_nombre;";
-            $stmt = $this->con->prepare($query);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
 }
 
 ?>

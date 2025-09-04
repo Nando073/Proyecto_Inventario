@@ -56,7 +56,7 @@ class D_Material {
     }
 
     // Método para buscar todos los material
-    public function BuscarTodo() {
+    public function ObtenerMateriales() {
         $sql = "CALL ObtenerMateriales()";
         try {
             $ps = $this->con->prepare($sql);
@@ -121,28 +121,5 @@ public function Eliminar($id_material) {
         }
     }
 
-//otener las categorias  y las unidades para mi formulario atrves del select ObtenerCategorias
-    public function obtenerCategorias() {
-        $sql = "CALL ObtenerCategorias()";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return [];
-        }
-    }
-    public function obtenerMedidas() {
-       $sql = "CALL ObtenerMedidas()";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return [];
-        }
-    }
 }
 ?>

@@ -2,15 +2,20 @@
 require_once '../Seguridad.php';
 verificarAcceso(['Administrador', 'Operador', 'Supervisor', 'Funcionario']);
 require_once '../NEGOCIO/N_Egreso.php';
+require_once '../NEGOCIO/N_Material.php';
+require_once '../NEGOCIO/N_Funcionario.php';
 
 $egresoService = new N_Egreso();
-$detalleService = new N_Egreso();
+//$detalleService = new N_Egreso();
+
+$materialService = new N_Material();
+$funcionarioService = new N_Funcionario();
 
 // Obtener funcionarios y áreas para el select
-$funcionarios = $egresoService->obtenerFuncionarios();
+$funcionarios = $funcionarioService->obtenerFuncionarios();
 $areas = [];
 foreach ($funcionarios as $f) {
-    $areas[$f['id_area']] = $f['area_nombre'];
+    $areas[$f['area']] = $f['a_nombre'];
 }
 
 // Eliminar egreso por id
@@ -71,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $detallesValidos = [];
 
     // Obtener stocks actuales
-    $materiales = $detalleService->obtenerMateriales();
+    $materiales = $materialService->obtenerMaterialesConStock();
     $stockPorMaterial = [];
     foreach ($materiales as $mat) {
         $stockPorMaterial[$mat['id_material']] = $mat['stock'];
@@ -125,12 +130,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Carga inicial de datos
-$materiales = $detalleService->obtenerMateriales();
+$materiales = $materialService->obtenerMaterialesConStock();
 
 // Agrupar materiales por categoría para el JS
 $materialesPorCategoria = [];
 foreach ($materiales as $mat) {
-    $cat = $mat['categoria_nombre'];
+    $cat = $mat['c_nombre'];
     if (!isset($materialesPorCategoria[$cat])) {
         $materialesPorCategoria[$cat] = [];
     }
@@ -140,9 +145,9 @@ foreach ($materiales as $mat) {
 // Agrupar funcionarios por área para el JS
 $funcionariosPorArea = [];
 foreach ($funcionarios as $f) {
-    $funcionariosPorArea[$f['id_area']][] = [
+    $funcionariosPorArea[$f['area']][] = [
         'id_funcionario' => $f['id_funcionario'],
-        'f_nombre' => $f['f_nombre']
+        'f_nombre' => $f['f_nombre'] . ' ' . $f['f_apellido']
     ];
 }
 
@@ -199,8 +204,8 @@ if ($searchTerm) {
                             <label class="form-label fw-bold">Área:</label>
                             <select name="area" id="selectArea" class="form-control" required>
                                 <option value="">Seleccione un área</option>
-                                <?php foreach ($areas as $id_area => $area_nombre): ?>
-                                    <option value="<?php echo htmlspecialchars($id_area); ?>"><?php echo htmlspecialchars($area_nombre); ?></option>
+                                <?php foreach ($areas as $area => $area_nombre): ?>
+                                    <option value="<?php echo htmlspecialchars($area); ?>"><?php echo htmlspecialchars($area_nombre); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -230,11 +235,23 @@ if ($searchTerm) {
                                 <label class="form-label">Material</label>
                                 <select name="id_material[]" class="form-control select-material" required disabled>
                                     <option value="">Seleccione un material</option>
+                                    <?php
+                                        foreach ($materiales as $material) {
+                                            echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                                                            data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                                                    htmlspecialchars($material['m_nombre']) . 
+                                                    " (Stock: " . htmlspecialchars($material['stock']) . ")" .
+                                                "</option>";
+                                        }
+                                    ?>
                                 </select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Cantidad</label>
-                                <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
+                                <div class="input-group">
+                                    <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
+                                    <span class="input-group-text unidad-medida">--</span>
+                                </div>
                             </div>
                             <div class="col-md-1 text-center">
                                 <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
@@ -309,27 +326,39 @@ if ($searchTerm) {
         </tbody>
     </table>
     <!-- Template oculto para duplicar -->
-    <div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
-        <div class="col-md-3">
-            <select name="categoria[]" class="form-control select-categoria" required>
-                <option value="">Seleccione una categoría</option>
-                <?php foreach (array_keys($materialesPorCategoria) as $categoria): ?>
-                    <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <select name="id_material[]" class="form-control select-material" required disabled>
-                <option value="">Seleccione un material</option>
-            </select>
-        </div>
-        <div class="col-md-3">
+<div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
+    <div class="col-md-3">
+        <select name="categoria[]" class="form-control select-categoria" required>
+            <option value="">Seleccione una categoría</option>
+            <?php foreach (array_keys($materialesPorCategoria) as $categoria): ?>
+                <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <select name="id_material[]" class="form-control select-material" required disabled>
+            <option value="">Seleccione un material</option>
+            <?php
+                foreach ($materiales as $material) {
+                    echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                                    data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                            htmlspecialchars($material['m_nombre']) . 
+                            " (Stock: " . htmlspecialchars($material['stock']) . ")" .
+                        "</option>";
+                }
+            ?>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <div class="input-group">
             <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
-        </div>
-        <div class="col-md-1 text-center">
-            <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
+            <span class="input-group-text unidad-medida">--</span>
         </div>
     </div>
+    <div class="col-md-1 text-center">
+        <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
+    </div>
+</div>
     <a href="historial_egreso.php"><button type="button" class="btn btn-info">Historial de Registro</button></a>
 </main>
 
@@ -352,9 +381,12 @@ if ($searchTerm) {
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-    // ...tu código existente...
+    // Mover las variables fuera de DOMContentLoaded
+const materialesPorCategoria = <?php echo json_encode($materialesPorCategoria); ?>;
+const funcionariosPorArea = <?php echo json_encode($funcionariosPorArea); ?>;
 
+// Un solo event listener DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
     // Botón "Ver" para mostrar el detalle en el modal
     document.querySelectorAll('.btn-ver-egreso').forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -375,11 +407,7 @@ if ($searchTerm) {
                 });
         });
     });
-});
-const materialesPorCategoria = <?php echo json_encode($materialesPorCategoria); ?>;
-const funcionariosPorArea = <?php echo json_encode($funcionariosPorArea); ?>;
 
-document.addEventListener('DOMContentLoaded', () => {
     const btnAgregar = document.getElementById('btnAgregar');
     const partesContainer = document.getElementById('materiales-container');
     const totalInput = document.getElementById('totalGeneral');
@@ -421,42 +449,77 @@ document.addEventListener('DOMContentLoaded', () => {
         totalInput.value = total;
     }
 
+    // Función para actualizar la unidad de medida
+    function actualizarUnidadMedida(selectMaterial) {
+        const unidad = selectMaterial.selectedOptions[0]?.getAttribute('data-unidad') || '--';
+        const row = selectMaterial.closest('.parte-row');
+        const unidadSpan = row.querySelector('.unidad-medida');
+        if (unidadSpan) {
+            unidadSpan.textContent = unidad;
+        }
+    }
+
     function actualizarMaterialesPorCategoria(row) {
         const selectCategoria = row.querySelector('.select-categoria');
         const selectMaterial = row.querySelector('.select-material');
+        
         selectCategoria.addEventListener('change', function() {
             const categoria = this.value;
             selectMaterial.innerHTML = '<option value="">Seleccione un material</option>';
             selectMaterial.disabled = true;
+            
+            // Resetear unidad de medida
+            const unidadSpan = row.querySelector('.unidad-medida');
+            if (unidadSpan) {
+                unidadSpan.textContent = '--';
+            }
+            
             if (categoria && materialesPorCategoria[categoria]) {
                 materialesPorCategoria[categoria].forEach(mat => {
                     const option = document.createElement('option');
                     option.value = mat.id_material;
                     option.textContent = `${mat.m_nombre} (Stock: ${mat.stock})`;
+                    option.setAttribute('data-unidad', mat.u_medida || '--');
                     selectMaterial.appendChild(option);
                 });
                 selectMaterial.disabled = false;
             }
         });
+
+        // Event listener para cambio de material (actualizar unidad)
+        selectMaterial.addEventListener('change', function() {
+            actualizarUnidadMedida(this);
+        });
+
+        // Inicializar unidad si ya hay un valor seleccionado
+        if (selectMaterial.value) {
+            actualizarUnidadMedida(selectMaterial);
+        }
     }
 
     function agregarFila() {
-        const template = document.getElementById('parte-template').cloneNode(true);
-        template.classList.remove('d-none');
-        template.removeAttribute('id');
-        template.querySelectorAll('input').forEach(input => input.value = '');
-        template.querySelector('.select-categoria').value = '';
-        template.querySelector('.select-material').innerHTML = '<option value="">Seleccione un material</option>';
-        template.querySelector('.select-material').disabled = true;
-        template.querySelector('.remove-parte').addEventListener('click', () => {
-            template.remove();
-            calcularTotal();
-        });
-        actualizarMaterialesPorCategoria(template);
-        template.querySelector('input[name="cantidad[]"]').addEventListener('input', calcularTotal);
-        partesContainer.appendChild(template);
-    }
+    const template = document.getElementById('parte-template').cloneNode(true);
+    template.classList.remove('d-none');
+    template.removeAttribute('id');
+    
+    // Limpiar los valores
+    template.querySelector('.select-categoria').value = '';
+    template.querySelector('.select-material').innerHTML = '<option value="">Seleccione un material</option>';
+    template.querySelector('.select-material').disabled = true;
+    template.querySelector('.input-cantidad').value = '';
+    template.querySelector('.unidad-medida').textContent = '--';
 
+    template.querySelector('.remove-parte').addEventListener('click', () => {
+        template.remove();
+        calcularTotal();
+    });
+    
+    actualizarMaterialesPorCategoria(template);
+    template.querySelector('input[name="cantidad[]"]').addEventListener('input', calcularTotal);
+    partesContainer.appendChild(template);
+}
+
+    // Inicializar filas existentes
     document.querySelectorAll('.parte-row').forEach(row => {
         actualizarMaterialesPorCategoria(row);
         row.querySelector('.remove-parte').addEventListener('click', () => {
@@ -464,6 +527,12 @@ document.addEventListener('DOMContentLoaded', () => {
             calcularTotal();
         });
         row.querySelector('input[name="cantidad[]"]').addEventListener('input', calcularTotal);
+        
+        // Inicializar unidad de medida para filas existentes
+        const selectMaterial = row.querySelector('.select-material');
+        if (selectMaterial && selectMaterial.value) {
+            actualizarUnidadMedida(selectMaterial);
+        }
     });
 
     btnAgregar.addEventListener('click', agregarFila);
@@ -480,9 +549,18 @@ document.addEventListener('DOMContentLoaded', () => {
             sel.disabled = true;
         });
         totalInput.value = '';
+        // Resetear unidades de medida
+        document.querySelectorAll('.unidad-medida').textContent = '--';
         // Limpiar funcionarios
         selectFuncionario.innerHTML = '<option value="">Seleccione un funcionario</option>';
         selectFuncionario.disabled = true;
+    });
+
+    // Evento global para cambio de materiales (por si acaso)
+    document.addEventListener("change", function (e) {
+        if (e.target.classList.contains("select-material")) {
+            actualizarUnidadMedida(e.target);
+        }
     });
 });
 </script>

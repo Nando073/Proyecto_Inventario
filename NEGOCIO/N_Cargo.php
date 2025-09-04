@@ -10,9 +10,9 @@ class N_Cargo {
     }
 
     // Método para buscar todos las cargos
-    public function buscarTodo() {
+    public function obtenerCargos() {
         $NCargo = new D_Cargo();
-        return $NCargo->BuscarTodo();
+        return $NCargo->ObtenerCargos();
     }
 
     // Método para eliminar un cargo por ID
@@ -43,10 +43,7 @@ class N_Cargo {
         return $NCargo->buscarPorId($id_cargo);
     }
     
-    public function actualizarCantidadFuncionarios() {
-        $NCargo = new D_Cargo();
-        $NCargo->actualizarCantidadFuncionarios();
-    }
+
     
    
     

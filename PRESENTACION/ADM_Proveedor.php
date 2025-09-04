@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Obtener la lista de proveedores
-$proveedores = $proveedorService->buscarTodo();
+$proveedores = $proveedorService->obtenerProveedores();
 
 // Buscar por término
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
@@ -284,7 +284,7 @@ foreach ($proveedores as &$proveedorItem) {
                                 <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta proveedor?');">Eliminar</a>
                             <?php else: ?>
                                 <!-- Si es inactivo -->
-                                <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>&action=activar" class="btn btn-success">Activar</a>
+                                <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>&action=activar" class="btn btn-primary">Activar</a>
                             <?php endif; ?>
                         </td>
                     </tr>

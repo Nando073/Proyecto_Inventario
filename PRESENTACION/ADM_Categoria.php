@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Listado y búsqueda
-$categorias = $categoriaService->buscarTodo();
+$categorias = $categoriaService->obtenerCategorias();
 $searchTerm = $_GET['search'] ?? '';
 if ($searchTerm) {
     $categorias = $categoriaService->buscarPorSimilitud($searchTerm);

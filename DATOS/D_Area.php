@@ -41,7 +41,7 @@ class D_Area {
     }
 
     // Método para buscar todos las areas
-    public function BuscarTodo() {
+    public function ObtenerAreas() {
         $sql = "CALL ObtenerAreas()";
         try {
             $ps = $this->con->prepare($sql);
@@ -106,15 +106,15 @@ class D_Area {
     }
 
     // Actualizar la cantidad de funcionarios por área
-    public function actualizarCantidadFuncionarios() {
-        try {
-            $stmt = $this->con->prepare("CALL ActualizarCantidadFuncionarios()");
-            $stmt->execute();
-            echo "Cantidad de funcionarios actualizada correctamente.";
-        } catch (PDOException $ex) {
-            echo "Error al actualizar cantidad de funcionarios: " . $ex->getMessage();
-        }
-    }
+    // public function actualizarCantidadFuncionarios() {
+    //     try {
+    //         $stmt = $this->con->prepare("CALL ActualizarCantidadFuncionarios()");
+    //         $stmt->execute();
+    //         echo "Cantidad de funcionarios actualizada correctamente.";
+    //     } catch (PDOException $ex) {
+    //         echo "Error al actualizar cantidad de funcionarios: " . $ex->getMessage();
+    //     }
+    // }
     
     
 

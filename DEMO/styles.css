@@ -68,7 +68,7 @@ aside {
     left: 0;
     top: 100px;
     width: 20%;
-    height: 80vh;
+    height: 90vh;
     overflow: hidden;
     background-color: #131F31;
     transform: translateX(0%); /* Inicialmente oculto */

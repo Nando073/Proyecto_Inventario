@@ -2,7 +2,11 @@
 require_once '../Seguridad.php';
 verificarAcceso(['Administrador', 'Operador', 'Supervisor']);
 require_once '../NEGOCIO/N_Material.php';
+require_once '../NEGOCIO/N_Categoria.php';
+require_once '../NEGOCIO/N_U_Medida.php';
 $materialService = new N_Material();
+$categoriaService = new N_Categoria();
+$medidaService = new N_U_Medida();
 
 /// Verifica si se pasa un ID en la URL para editar o eliminar
 $material = null;
@@ -87,10 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Obtener la lista de materiales
-$materiales = $materialService->buscarTodo();
+$materiales = $materialService->obtenerMateriales();
 //obtener la lista de categorías y medidas
-$categorias = $materialService->obtenerCategorias();
-$medidas = $materialService->obtenerMedidas();
+$categorias = $categoriaService->obtenerCategorias();
+$medidas = $medidaService->obtenerMedidas();
 // Buscar por término
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 if ($searchTerm) {

@@ -10,9 +10,9 @@ class N_Area {
     }
 
     // Método para buscar todos las areas
-    public function buscarTodo() {
+    public function obtenerAreas() {
         $NArea = new D_Area();
-        return $NArea->BuscarTodo();
+        return $NArea->ObtenerAreas();
     }
 
     // Método para eliminar un área por ID
@@ -44,10 +44,7 @@ class N_Area {
         return $NArea->buscarPorId($id_area);
     }
     
-    public function actualizarCantidadFuncionarios() {
-        $NArea = new D_Area();
-        $NArea->actualizarCantidadFuncionarios();
-    }
+    
     
    
     

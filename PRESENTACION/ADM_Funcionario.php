@@ -2,7 +2,11 @@
 require_once '../Seguridad.php';
 verificarAcceso(['Administrador', 'Operador', 'Supervisor']);
 require_once '../NEGOCIO/N_Funcionario.php';
+require_once '../NEGOCIO/N_Area.php';
+require_once '../NEGOCIO/N_Cargo.php';
 $funcionarioService = new N_Funcionario();
+$areaService = new N_Area();
+$cargoService = new N_Cargo();
 
 // Filtro por estado (activo/inactivo)
 $estadoFiltro = isset($_GET['estado']) ? $_GET['estado'] : 'activo'; // por defecto activos
@@ -94,8 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $funcionarios = $funcionarioService->obtenerFuncionarios();
 // Llama al método para obtener las áreas
-$areas = $funcionarioService->obtenerAreas();  // Obtienes todas las áreas de la base de datos
-$cargos = $funcionarioService->obtenerCargos(); // Obtienes todos los cargos de la base de datos
+$areas = $areaService->obtenerAreas();  // Obtienes todas las áreas de la base de datos
+$cargos = $cargoService->obtenerCargos(); // Obtienes todos los cargos de la base de datos
 // Buscar por término
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 if ($searchTerm) {

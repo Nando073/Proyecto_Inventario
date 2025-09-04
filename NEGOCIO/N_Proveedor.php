@@ -10,9 +10,9 @@ class N_Proveedor {
     }
 
     // Método para buscar todos los proveedores
-    public function buscarTodo() {
+    public function obtenerProveedores() {
         $NProveedor = new D_Proveedor();
-        return $NProveedor->BuscarTodo();
+        return $NProveedor->ObtenerProveedores();
     }
 
     // Método para eliminar un proveedor por ID

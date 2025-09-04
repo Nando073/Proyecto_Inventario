@@ -41,7 +41,7 @@ class D_Cargo {
     }
 
     // Método para buscar todos las cargos
-    public function BuscarTodo() {
+    public function ObtenerCargos() {
         $sql = "CALL ObtenerCargos()";
         try {
             $ps = $this->con->prepare($sql);
@@ -105,29 +105,16 @@ class D_Cargo {
         }
     }
 
-    // Método para buscar un cargo por nombre de cargo
-    // public function buscarPorCargo($nombre_c) {
-    //     $sql = "CALL ObtenerCargoPorNombre(?)";
+    // Actualizar la cantidad de funcionarios por cargo
+    // public function actualizarCantidadFuncionarios() {
     //     try {
-    //         $ps = $this->con->prepare($sql);
-    //         $ps->execute([$nombre_c]);
-    //         return $ps->fetch(PDO::FETCH_ASSOC);
+    //         $stmt = $this->con->prepare("CALL ActualizarCantidadFuncionarios()");
+    //         $stmt->execute();
+    //         echo "Cantidad de funcionarios actualizada correctamente.";
     //     } catch (PDOException $ex) {
-    //         echo "Error al buscar el cargo por nombre: " . $ex->getMessage();
-    //         return null;
+    //         echo "Error al actualizar cantidad de funcionarios: " . $ex->getMessage();
     //     }
     // }
-
-    // Actualizar la cantidad de funcionarios por cargo
-    public function actualizarCantidadFuncionarios() {
-        try {
-            $stmt = $this->con->prepare("CALL ActualizarCantidadFuncionarios()");
-            $stmt->execute();
-            echo "Cantidad de funcionarios actualizada correctamente.";
-        } catch (PDOException $ex) {
-            echo "Error al actualizar cantidad de funcionarios: " . $ex->getMessage();
-        }
-    }
     
     
 

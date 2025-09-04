@@ -41,7 +41,7 @@ class D_Categoria {
     }
 
     // Método para buscar todas las categorías
-    public function BuscarTodo() {
+    public function ObtenerCategorias() {
         $sql = "CALL ObtenerCategorias()";
         try {
             $ps = $this->con->prepare($sql);
@@ -105,16 +105,5 @@ class D_Categoria {
         }
     }
     
-    // Método para actualizar la cantidad de categorías
-    public function actualizarCantidadCategorias() {
-        $sql = "CALL ActualizarCantidadCategorias()";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            echo "Cantidad de categorías actualizada correctamente.";
-        } catch (PDOException $ex) {
-            echo "Error al actualizar la cantidad de categorías: " . $ex->getMessage();
-        }
-    }
 }
 ?>

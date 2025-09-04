@@ -4,6 +4,8 @@
 require_once '../Seguridad.php';
 verificarAcceso(['Administrador', 'Operador', 'Supervisor', 'Funcionario']);
 require_once '../NEGOCIO/N_Ingreso.php';
+require_once '../NEGOCIO/N_Material.php';
+require_once '../NEGOCIO/N_Proveedor.php';
 
 // echo '<pre>';
 // print_r($_POST);
@@ -12,6 +14,9 @@ require_once '../NEGOCIO/N_Ingreso.php';
 
 $ingresoService = new N_Ingreso();
 $detalleService = new N_Ingreso();
+
+$materialService = new N_Material();
+$provService = new N_Proveedor();
 
 $detalle = null;
 $ingreso = null;
@@ -99,8 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Carga inicial de datos
 
-$proveedores = $ingresoService->obtenerProveedores();
-$materiales = $detalleService->obtenerMateriales();
+$materiales = $materialService->obtenerMateriales();
+$proveedores = $provService->obtenerProveedores();
 
 // buscar
 $ingresoService = new N_Ingreso();
@@ -304,17 +309,19 @@ if ($searchTerm) {
   <!-- Template oculto para duplicar -->
 <div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
   <div class="col-md-3">
-    <select name="id_material[]" class="form-control" required>
-      <option value="">Seleccione un material</option>
-      <?php foreach ($materiales as $material) {
-          echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                        data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                  htmlspecialchars($material['m_nombre']) .
-                  " (Stock: " . htmlspecialchars($material['stock']) . ")" .
-              "</option>";
-      } ?>
-    </select>
-  </div>
+            <select name="id_material[]" class="form-control material-select" required>
+              <option value="">Seleccione un material</option>
+              <?php
+                  foreach ($materiales as $material) {
+                      echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                                    data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                              htmlspecialchars($material['m_nombre']) . 
+                              " (Stock: " . htmlspecialchars($material['stock']) . ")" .
+                          "</option>";
+                  }
+              ?>
+            </select>
+          </div>
     <div class="col-md-2"><input name="precio[]" placeholder="Precio" class="form-control" required></div>
     <div class="col-md-3">
       <div class="input-group">

@@ -77,7 +77,7 @@ if (isset($_GET['id_ingreso']) && $_GET['action'] === 'delete') {
                                 <td><?php echo htmlspecialchars($detalle['proveedor_nombre']); ?></td>
                                 <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
                                 <td><?php echo htmlspecialchars($detalle['precio']); ?> Bs.</td>
-                                <td><?php echo htmlspecialchars($detalle['cantidad']); ?></td>
+                                <td><?php echo htmlspecialchars($detalle['cantidad'] . " - " . $detalle['u_medida']); ?></td>
                                 <td><?php echo htmlspecialchars($detalle['sub_total']); ?> Bs.</td>
                             </tr>
                             <?php endforeach; ?>

@@ -9,10 +9,19 @@ class N_Material {
         $NMaterial->Adicionar( $m_nombre, $m_descripcion, $id_categoria, $id_medida);  // Llamar al método de D_Material
     }
 
-    // Método para buscar todos los funcionarios
-    public function buscarTodo() {
+    // Método para buscar todos los materiales
+    public function obtenerMateriales() {
         $NMaterial = new D_Material();
-        return $NMaterial->BuscarTodo();
+        return $NMaterial->ObtenerMateriales();
+    }
+     public function obtenerMaterialesConStock() {
+        // Llama al procedimiento original
+        $materiales = $this->ObtenerMateriales(); // Método que llama a ObtenerMateriales
+        // Filtrar solo los materiales con stock > 0
+        $materialesConStock = array_filter($materiales, function($material) {
+            return $material['stock'] > 0;
+        });
+        return array_values($materialesConStock); // Reindexar el array
     }
 
     // Método para eliminar un material por ID
@@ -44,13 +53,5 @@ public function eliminar($id_material) {
         return $NMaterial->buscarPorId($id_material);
     }
 
-    public function obtenerCategorias() {
-        $NMaterial = new D_Material();
-        return $NMaterial->obtenerCategorias();
-    }
-    public function obtenerMedidas() {
-        $NMaterial = new D_Material();
-        return $NMaterial->obtenerMedidas();
-    }
 }
 ?>
