@@ -12,7 +12,7 @@ class N_RolUsuario {
     // Método para buscar todos los rolUsuario
     public function ObtenerRolUsuario() {
         $NRolUsuario = new D_RolUsuario();
-        return $NRolUsuario->ObtenerRolUsuario();
+        return $NRolUsuario->obtenerRolUsuario();
     }
     // Método para eliminar un rolUsuario por ID
     public function eliminar($id_RolUsuario) {
@@ -38,27 +38,14 @@ class N_RolUsuario {
         return $NRolUsuario->buscarPorId($id_RolUsuario);
     }
 
-    public function obtenerUsuario() {
-        $NRolUsuario = new D_RolUsuario();
-        return $NRolUsuario->obtenerUsuario();
-    }
-    public function obtenerRol() {
-        $NRolUsuario = new D_RolUsuario();
-        return $NRolUsuario->obtenerRol();
-    }
-    // N_RolUsuario.php
-    public function obtenerRolesPorUsuario() {
-        $NRolUsuario = new D_RolUsuario();
-        return $NRolUsuario->obtenerRolesPorUsuario();
-    }
+  
     public function activarRolUsuario($id_RolUsuario) {
         $RolUsuario = new D_RolUsuario();
         return $RolUsuario->activarRolUsuario($id_RolUsuario);
     }
-
-    public function obtenerUsuarioDisponibles($id_usuario = null) {
-        $RolUsuario = new D_RolUsuario();
-        return $RolUsuario->obtenerUsuarioDisponibles($id_usuario);
+    public function obtenerRolUsuarioAsignado($id_usuario) {
+        $NRolUsuario = new D_RolUsuario();
+        return $NRolUsuario->ObtenerRolUsuarioPorUsuarioAsignado($id_usuario);
     }
 }
 ?>

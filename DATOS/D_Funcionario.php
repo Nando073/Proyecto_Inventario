@@ -137,6 +137,19 @@ class D_Funcionario {
     return $stmt->rowCount() > 0; // Retorna true si se actualizó al menos una fila
 }
 
+
+public function ObtenerFuncionariosDisponibles($id_funcionario = null) {
+    $sql = "CALL ObtenerFuncionariosDisponibles(:id_funcionario)";
+    try {
+        $ps = $this->con->prepare($sql);
+        $ps->bindValue(':id_funcionario', $id_funcionario, PDO::PARAM_INT);
+        $ps->execute();
+        return $ps->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $ex) {
+        echo "Error al buscar: " . $ex->getMessage();
+        return null;
+    }
+}
     
 }
 ?>

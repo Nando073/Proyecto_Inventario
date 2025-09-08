@@ -10,9 +10,9 @@ class N_Rol {
     }
 
     // Método para buscar todos las areas
-    public function buscarTodo() {
+    public function obtenerRoles() {
         $NRol = new D_Rol();
-        return $NRol->BuscarTodo();
+        return $NRol->ObtenerRoles();
     }
 
    // Método para eliminar un rol por ID

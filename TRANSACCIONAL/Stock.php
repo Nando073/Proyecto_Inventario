@@ -6,18 +6,20 @@
 
 
 require_once '../Seguridad.php';
-verificarAcceso(['Administrador', 'Operador', 'Supervisor', 'Funcionario']);
+verificarAcceso(['Administrador','Supervisor', 'Funcionario', 'Operador']);
 require_once '../NEGOCIO/N_Egreso.php';
+require_once '../NEGOCIO/N_Material.php';
 // Instanciar el servicio de egreso
 $egresoService = new N_Egreso();
+$materialService = new N_Material();
 
 // Obtener materiales agrupados por categoría
-$materiales = $egresoService->obtenerMateriales();
+$materiales = $materialService->obtenerMateriales();
 
 // Agrupar materiales por categoría
 $materialesPorCategoria = [];
 foreach ($materiales as $mat) {
-    $cat = $mat['categoria_nombre'];
+    $cat = $mat['c_nombre'];
     if (!isset($materialesPorCategoria[$cat])) {
         $materialesPorCategoria[$cat] = [];
     }

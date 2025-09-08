@@ -15,13 +15,22 @@ class N_Proveedor {
         return $NProveedor->ObtenerProveedores();
     }
 
+    // Método para obtener proveedores activos
+    public function obtenerProveedoresActivos() {
+        $proveedores = $this->ObtenerProveedores(); // Llama al método original
+        $proveedoresActivos = array_filter($proveedores, function($proveedor) {
+            return $proveedor['p_estado'] === 1;
+        });
+        return array_values($proveedoresActivos); // Reindexar el array
+    }
+
     // Método para eliminar un proveedor por ID
     public function eliminar($id_proveedor) {
         $NProveedor = new D_Proveedor();
         $NProveedor->Eliminar($id_proveedor);  // Llamar al método Eliminar de D_Proveedor
     }
 
-    // Método para buscar ares por similitud de término
+    // Método para buscar proveedores por similitud de término
     public function buscarPorSimilitud($termino) {
         $NProveedor = new D_Proveedor();
         return $NProveedor->buscarPorSimilitud($termino);  // Llamar al método buscarPorSimilitud de D_Proveedor

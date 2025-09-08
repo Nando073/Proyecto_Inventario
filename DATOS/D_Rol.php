@@ -36,7 +36,7 @@ class D_Rol {
     }
 
     // Método para buscar todos los roles
-    public function BuscarTodo() {
+    public function ObtenerRoles() {
         $sql = "CALL ObtenerRoles()";
         try {
             $ps = $this->con->prepare($sql);

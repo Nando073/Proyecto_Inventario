@@ -98,61 +98,21 @@ class D_RolUsuario {
         }
     }
     
-    
-    //otener las usuarios  y roles para mi formulario atrves del select
-    public function obtenerUsuario() {
-        $sql = "CALL obtenerUsuario()";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return null;
-        }
-    }
 
-    public function obtenerRol() {
-        $sql = "CALL obtenerRol()";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return null;
-        }
-    }
-
-    public function obtenerRolesPorUsuario() {
-        $sql = "CALL ObtenerRolUsuario()";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return null;
-        }
-    }
-
+   
     public function activarRolUsuario($id_RolUsuario) {
         $query = "CALL ActivarRolUsuario(:id_RolUsuario)";
         $stmt = $this->con->prepare($query);
         $stmt->execute([':id_RolUsuario' => $id_RolUsuario]);
         return $stmt->rowCount() > 0; // Retorna true si se actualizó al menos una fila
     }
-    public function obtenerUsuarioDisponibles($id_usuario = null) {
-        $sql = "CALL ObtenerUsuarioDisponibles(:id_usuario)";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->bindValue(':id_usuario', $id_usuario, PDO::PARAM_INT);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return null;
-        }
+
+    public function ObtenerRolUsuarioPorUsuarioAsignado($id_usuario) {
+        $sql = "CALL ObtenerRolUsuarioPorUsuarioAsignado(?)";
+        $ps = $this->con->prepare($sql);
+        $ps->execute([$id_usuario]);
+        return $ps->fetchAll(PDO::FETCH_ASSOC);
     }
+    
 }
 ?>

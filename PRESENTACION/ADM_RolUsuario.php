@@ -2,7 +2,11 @@
 require_once '../Seguridad.php';
 verificarAcceso(['Administrador']);
 require_once '../NEGOCIO/N_RolUsuario.php';
+require_once '../NEGOCIO/N_Usuario.php';
+require_once '../NEGOCIO/N_Rol.php';
 $rolUsuarioService = new N_RolUsuario();
+$usuarioService = new N_Usuario();
+$rolService = new N_Rol();
 
 /// Verifica si se pasa un ID en la URL para editar o eliminar
 $rolUsuario = null;
@@ -53,7 +57,7 @@ if (isset($_GET['id_RolUsuario'])) {
 }
 
 // Obtener usuarios disponibles
-$UsuariosDisponibles = $rolUsuarioService->obtenerUsuarioDisponibles($id_Usuario_actual);
+$UsuariosDisponibles = $usuarioService->obtenerUsuarioDisponibles($id_Usuario_actual);
 
 // Manejo de creación/actualización vía POST (crear/editar)
 $accion = $_POST['accion'] ?? '';
@@ -87,11 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Obtener la lista de rolUsuario
-//$rol_usuario = $rolUsuarioService->ObtenerRolUsuario();
+
 // Obtener roles y usuarios
-$roles = $rolUsuarioService->obtenerRol();
-$usuarios = $rolUsuarioService->obtenerUsuario();
+$roles = $rolService->obtenerRoles();
+$usuarios = $usuarioService->ObtenerUsuarios();
 
 // Buscar por término
 // Obtener lista de RolUsuario (con o sin búsqueda)
@@ -158,7 +161,7 @@ foreach ($rolUsuarios as &$ru) {
                         <input type="hidden" name="id_RolUsuario" id="id_RolUsuario" value="<?php echo isset($rolUsuario) ? $rolUsuario['id_rol_usuario'] : ''; ?>">
                         
                         <div class="form-group">
-                            <label for="id_rol">ID Rol</label>
+                            <label for="id_rol">Rol</label>
                             <select name="id_rol" id="id_rol" class="form-control" required>
                                 <option value="">Seleccione un rol</option>
                                 <?php

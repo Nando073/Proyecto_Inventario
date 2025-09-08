@@ -1,6 +1,6 @@
 <?php
 require_once '../Seguridad.php';
-verificarAcceso(['Administrador', 'Operador', 'Supervisor', 'Funcionario']);
+verificarAcceso(['Administrador', 'Operador']);
 require_once '../NEGOCIO/N_Egreso.php';
 require_once '../NEGOCIO/N_Material.php';
 require_once '../NEGOCIO/N_Funcionario.php';
@@ -308,7 +308,7 @@ if ($searchTerm) {
                 <?php foreach ($egresos as $egreso): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($egreso['id_egreso']); ?></td>
-                        <td><?php echo htmlspecialchars($egreso['funcionario_nombre'] ?? ''); ?></td>
+                        <td><?php echo htmlspecialchars($egreso['funcionario_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($egreso['e_solicitud']); ?></td>
                         <td><?php echo htmlspecialchars($egreso['e_total_cantidad']); ?></td>
                         <td><?php echo htmlspecialchars($egreso['e_fecha']); ?></td>
@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const modal = new bootstrap.Modal(document.getElementById('detalleEgresoModal'));
             modal.show();
 
-            fetch('detalle_egreso_ajax.php?id=' + idEgreso)
+            fetch('detalle_egreso.php?id=' + idEgreso)
                 .then(response => response.text())
                 .then(html => {
                     modalBody.innerHTML = html;

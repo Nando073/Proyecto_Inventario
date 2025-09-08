@@ -2,7 +2,7 @@
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 require_once '../Seguridad.php';
-verificarAcceso(['Administrador', 'Operador', 'Supervisor', 'Funcionario']);
+verificarAcceso(['Administrador', 'Operador']);
 require_once '../NEGOCIO/N_Ingreso.php';
 require_once '../NEGOCIO/N_Material.php';
 require_once '../NEGOCIO/N_Proveedor.php';
@@ -13,7 +13,6 @@ require_once '../NEGOCIO/N_Proveedor.php';
 // exit();
 
 $ingresoService = new N_Ingreso();
-$detalleService = new N_Ingreso();
 
 $materialService = new N_Material();
 $provService = new N_Proveedor();
@@ -22,7 +21,6 @@ $detalle = null;
 $ingreso = null;
 
 //eliminar ingreso por id
-$ingresoService = new N_Ingreso();
 $ingresos = $ingresoService->ObtenerIngresosRegistrado();
 
     // Verificar si se ha solicitado eliminar un ingreso
@@ -105,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Carga inicial de datos
 
 $materiales = $materialService->obtenerMateriales();
-$proveedores = $provService->obtenerProveedores();
+$proveedores = $provService->obtenerProveedoresActivos();
 
 // buscar
 $ingresoService = new N_Ingreso();
@@ -291,7 +289,7 @@ if ($searchTerm) {
                 <tr>
                     <td><?php echo htmlspecialchars($ingreso['id_ingreso']); ?></td>
                     <td><?php echo htmlspecialchars($ingreso['proveedor_nombre']); ?></td>
-                    <td><?php echo htmlspecialchars($ingreso['total_ingreso']); ?></td>
+                    <td><?php echo htmlspecialchars($ingreso['total_ingreso'] . " Bs"); ?></td>
                     <td><?php echo htmlspecialchars($ingreso['i_fecha']); ?></td>
                     <td>
                         <a href="#" class="btn btn-info btn-ver-ingreso" data-id="<?php echo $ingreso['id_ingreso']; ?>">Ver</a>
@@ -367,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const modal = new bootstrap.Modal(document.getElementById('detalleIngresoModal'));
       modal.show();
 
-      fetch('detalle_ingreso_ajax.php?id=' + idIngreso)
+      fetch('detalle_ingreso.php?id=' + idIngreso)
         .then(response => response.text())
         .then(html => {
           modalBody.innerHTML = html;

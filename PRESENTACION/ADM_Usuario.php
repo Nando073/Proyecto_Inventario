@@ -2,8 +2,10 @@
 require_once '../Seguridad.php';
 verificarAcceso(['Administrador']);
 require_once '../NEGOCIO/N_Usuario.php';
+require_once '../NEGOCIO/N_Funcionario.php';
 
 $usuarioService = new N_Usuario();
+$funcionarioService = new N_Funcionario();
 
 $usuario = null;
 $id_funcionario_actual = null;
@@ -52,7 +54,7 @@ if (isset($_GET['id_usuario'])) {
 }
 
 // obtenemos los funcionarios disponibles
-$Funcionarios = $usuarioService->ObtenerFuncionariosDisponibles($id_funcionario_actual);
+$Funcionarios = $funcionarioService->ObtenerFuncionariosDisponibles($id_funcionario_actual);
 
 // Manejo de formularios (crear/editar)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

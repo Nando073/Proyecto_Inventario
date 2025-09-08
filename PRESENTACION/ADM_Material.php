@@ -213,7 +213,6 @@ if ($searchTerm) {
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Categoría</th>
@@ -226,7 +225,6 @@ if ($searchTerm) {
         <tbody>
             <?php foreach ($materiales as $mat): ?>
             <tr>
-                <td><?php echo htmlspecialchars($mat['id_material']); ?></td>
                 <td><?php echo htmlspecialchars($mat['m_nombre']); ?></td>
                 <td><?php echo htmlspecialchars($mat['m_descripcion']); ?></td>
                 <td><?php echo htmlspecialchars($mat['c_nombre']); ?></td>

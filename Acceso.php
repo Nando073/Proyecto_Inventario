@@ -20,14 +20,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         $funcionario = $funcionarioService->buscarPorId($usuarioValido['id_funcionario']);
         $_SESSION['nombre_completo'] = $funcionario['f_nombre'] . ' ' . $funcionario['f_apellido'];
 
-        // Traer roles
+        // Traer rol_asignado
         require_once 'NEGOCIO/N_RolUsuario.php';
         $rolUsuarioService = new N_RolUsuario();
-        $rolesUsuario = $rolUsuarioService->obtenerRolesPorUsuario($usuarioValido['id_usuario']);
+        $rolesUsuario = $rolUsuarioService->obtenerRolUsuarioAsignado($usuarioValido['id_usuario']);
         $rolesUsuario = array_column($rolesUsuario, 'r_nombre');
-        $_SESSION['roles'] = $rolesUsuario;
+        //echo '<pre>'; print_r($rolesUsuario); echo '</pre>'; exit;
+        $_SESSION['rol_asignado'] = $rolesUsuario;
 
-        // ✅ REDIRECCIÓN MEJORADA - Prioridad de roles (4 ROLES)
+        //  REDIRECCIÓN MEJORADA - Prioridad de rol_asignado (4 ROLES)
         $paginaInicio = 'PRESENTACION/Inicio.php'; // Página por defecto
         
         // Definir prioridad de redirección (de mayor a menor privilegio)

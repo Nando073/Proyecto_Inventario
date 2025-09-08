@@ -32,7 +32,7 @@
         <input type="checkbox" id="check">
         <label for="check" class="esconder-menu">&#215</label>
     <div class="aside">
-        <?php if (in_array('Administrador', $_SESSION['roles'])): ?>
+        <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
         <details>
             <summary>ACCESO Y SEGURIDAD</summary>
             <ul>
@@ -42,12 +42,14 @@
             </ul>
         </details>
         <?php endif; ?>
-        <?php if (count(array_intersect(['Administrador', 'Operador'], $_SESSION['roles'])) > 0): ?>
+        <?php if (count(array_intersect(['Administrador', 'Operador'], $_SESSION['rol_asignado'])) > 0): ?>
         <details>
         <summary>ADMINISTRAR PARAMETRIZACION</summary>
             <ul>
-                <li><a href="../PRESENTACION/ADM_Area.php">Administrar Area</a></li>
-                <li><a href="../PRESENTACION/ADM_Cargo.php">Administrar Cargo</a></li>
+                <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
+                    <li><a href="../PRESENTACION/ADM_Area.php">Administrar Area</a></li>
+                    <li><a href="../PRESENTACION/ADM_Cargo.php">Administrar Cargo</a></li>
+                <?php endif; ?>
                 <li><a href="../PRESENTACION/ADM_Funcionario.php">Administrar Funcionario</a></li>
                 <li><a href="../PRESENTACION/ADM_Categoria.php">Administrar Categoria</a></li>
                 <li><a href="../PRESENTACION/ADM_U_Medida.php">Administrar Unidad de Medida</a></li>
@@ -56,7 +58,7 @@
             </ul>
     </details>
     <?php endif; ?>
-    <?php if (count(array_intersect(['Administrador', 'Operador'], $_SESSION['roles'])) > 0): ?>
+    <?php if (count(array_intersect(['Administrador', 'Operador'], $_SESSION['rol_asignado'])) > 0): ?>
     <details>
         <summary>TRANSACCIONAL</summary>
             <ul>
@@ -65,7 +67,7 @@
             </ul>
     </details>
     <?php endif; ?>
-    <?php if (in_array('Consulta', $_SESSION['roles'])): ?>
+    <?php if (count(array_intersect(['Administrador', 'Operador','Funcionario', 'Supervisor'], $_SESSION['rol_asignado'])) > 0): ?>
     <details>
         <summary>SOLICITAR MATERIALES</summary>
             <ul>
@@ -82,6 +84,16 @@ window.addEventListener("pageshow", function (event) {
         // Si vuelve con la flecha atrás, recargar forzadamente
         window.location.reload();
     }
+});
+// Guardar el estado de los details en localStorage
+document.querySelectorAll('details').forEach((detail, idx) => {
+    detail.addEventListener('toggle', function() {
+        localStorage.setItem('menuDetail' + idx, detail.open);
+    });
+    // Al cargar la página, restaurar el estado
+    const open = localStorage.getItem('menuDetail' + idx);
+    if (open === 'true') detail.open = true;
+    if (open === 'false') detail.open = false;
 });
 </script>
 </body>

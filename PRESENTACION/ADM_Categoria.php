@@ -1,6 +1,6 @@
 <?php
 require_once '../Seguridad.php';
-verificarAcceso(['Administrador']);
+verificarAcceso(['Administrador', 'Operador']);
 require_once '../NEGOCIO/N_Categoria.php';
 $categoriaService = new N_Categoria();
 

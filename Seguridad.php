@@ -19,21 +19,22 @@ if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_usuario'])) {
 $rolesPermitidos = ['Administrador','Funcionario','Supervisor','Operador'];
 
 // Verificar que tenga al menos un rol válido
-if (!isset($_SESSION['roles']) || count(array_intersect($rolesPermitidos, $_SESSION['roles'])) === 0) {
+if (!isset($_SESSION['rol_asignado']) || count(array_intersect($rolesPermitidos, $_SESSION['rol_asignado'])) === 0) {
     header("Location: ../acceso_denegado.php");
     exit();
 }
 
+
 // ✅ FUNCIONES DE VERIFICACIÓN DE ROLES
 if (!function_exists('tieneRol')) {
     function tieneRol($rolesRequeridos) {
-        if (!isset($_SESSION['roles'])) return false;
+        if (!isset($_SESSION['rol_asignado'])) return false;
         
         if (is_string($rolesRequeridos)) {
             $rolesRequeridos = [$rolesRequeridos];
         }
         
-        return count(array_intersect($rolesRequeridos, $_SESSION['roles'])) > 0;
+        return count(array_intersect($rolesRequeridos, $_SESSION['rol_asignado'])) > 0;
     }
 }
 

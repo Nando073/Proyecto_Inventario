@@ -50,7 +50,7 @@ $egreso = $egresoDetalles[0];
             <td><?php echo htmlspecialchars($detalle['id_e_detalle']); ?></td>
             <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
             <td><?php echo htmlspecialchars($detalle['categoria_nombre']); ?></td>
-            <td><?php echo htmlspecialchars($detalle['e_stock']); ?></td>
+            <td><?php echo htmlspecialchars($detalle['e_stock'] . " - " . $detalle['u_medida']); ?></td>
         </tr>
         <?php endforeach; ?>
     </tbody>

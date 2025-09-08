@@ -1,6 +1,6 @@
 <?php
 require_once '../Seguridad.php';
-verificarAcceso(['Administrador', 'Operador', 'Supervisor']);
+verificarAcceso(['Administrador', 'Operador']);
 require_once '../NEGOCIO/N_Proveedor.php';
 $proveedorService = new N_Proveedor();
 

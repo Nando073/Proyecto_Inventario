@@ -46,5 +46,10 @@ class N_Funcionario {
         $Dfuncionario = new D_Funcionario();
         return $Dfuncionario->activarFuncionario($id_funcionario);
     }
+
+    public function ObtenerFuncionariosDisponibles($id_funcionario = null) {
+        $d = new D_Funcionario();
+        return $d->ObtenerFuncionariosDisponibles($id_funcionario);
+    }
 }
 ?>

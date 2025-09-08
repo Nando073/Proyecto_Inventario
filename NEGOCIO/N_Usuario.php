@@ -49,10 +49,11 @@ class N_Usuario {
         return $Nusuario->activarUsuario($id_usuario);
     }
 
-    public function ObtenerFuncionariosDisponibles($id_funcionario = null) {
-        $d = new D_Usuario();
-        return $d->ObtenerFuncionariosDisponibles($id_funcionario);
+     public function obtenerUsuarioDisponibles($id_usuario = null) {
+        $Nusuario = new D_Usuario();
+        return $Nusuario->obtenerUsuarioDisponibles($id_usuario);
     }
+
 
     // Método para buscar un usuario por nombre
 public function loguear($usuario, $clave) {
