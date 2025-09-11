@@ -214,7 +214,7 @@ if ($searchTerm) {
           <!-- Precio -->
           <div class="col-md-2">
             <label class="form-label">Precio</label>
-            <input type="number" name="precio[]" placeholder="Precio" class="form-control" required>
+            <input type="number" step="0.01" name="precio[]" placeholder="Precio" class="form-control" required>
           </div>
           
           <!-- Cantidad -->

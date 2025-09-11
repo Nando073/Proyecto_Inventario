@@ -143,7 +143,17 @@ class D_Egreso {
             }
         }
    
-        
+        public function ObtenerStockPorLote() {
+        $sql = "CALL ObtenerStockPorLote()"; // Asegúrate de que el procedimiento devuelva el campo 'e_total_cantidad'
+        try {
+            $ps = $this->con->prepare($sql);
+            $ps->execute();
+            return $ps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex) {
+            echo "Error al buscar: " . $ex->getMessage();
+            return [];
+        }
+    }
 }
 
 ?>

@@ -28,7 +28,6 @@
         </nav>
    </header> 
    <aside>
-    
         <input type="checkbox" id="check">
         <label for="check" class="esconder-menu">&#215</label>
     <div class="aside">
@@ -71,30 +70,33 @@
     <details>
         <summary>SOLICITAR MATERIALES</summary>
             <ul>
-                <li><a href="../TRANSACCIONAL/Stock.php">STOCK</a></li>
+                <li><a href="../TRANSACCIONAL/Solicitud.php">Catalogo de materiales</a></li>
+                <?php if (count(array_intersect(['Administrador', 'Operador'], $_SESSION['rol_asignado'])) > 0): ?>
+                    <li><a href="../STOCK_MATERIALES/Stock.php">Stock de materiales</a></li>
+                <?php endif; ?>
             </ul>
     </details>
     <?php endif; ?>
     </div>
-   </aside>
-  <script>
-// Detecta si el usuario viene del historial (flecha atrás)
-window.addEventListener("pageshow", function (event) {
-    if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-        // Si vuelve con la flecha atrás, recargar forzadamente
-        window.location.reload();
-    }
-});
-// Guardar el estado de los details en localStorage
-document.querySelectorAll('details').forEach((detail, idx) => {
-    detail.addEventListener('toggle', function() {
-        localStorage.setItem('menuDetail' + idx, detail.open);
-    });
-    // Al cargar la página, restaurar el estado
-    const open = localStorage.getItem('menuDetail' + idx);
-    if (open === 'true') detail.open = true;
-    if (open === 'false') detail.open = false;
-});
-</script>
+    </aside>
+    <script>
+        // Detecta si el usuario viene del historial (flecha atrás)
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+                // Si vuelve con la flecha atrás, recargar forzadamente
+                window.location.reload();
+            }
+        });
+        // Guardar el estado de los details en localStorage
+        document.querySelectorAll('details').forEach((detail, idx) => {
+            detail.addEventListener('toggle', function() {
+                localStorage.setItem('menuDetail' + idx, detail.open);
+            });
+            // Al cargar la página, restaurar el estado
+            const open = localStorage.getItem('menuDetail' + idx);
+            if (open === 'true') detail.open = true;
+            if (open === 'false') detail.open = false;
+        });
+    </script>
 </body>
 </html>

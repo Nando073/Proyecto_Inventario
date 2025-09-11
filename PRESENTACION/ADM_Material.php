@@ -4,9 +4,12 @@ verificarAcceso(['Administrador', 'Operador', 'Supervisor']);
 require_once '../NEGOCIO/N_Material.php';
 require_once '../NEGOCIO/N_Categoria.php';
 require_once '../NEGOCIO/N_U_Medida.php';
+require_once '../NEGOCIO/N_Egreso.php';
+
 $materialService = new N_Material();
 $categoriaService = new N_Categoria();
 $medidaService = new N_U_Medida();
+$egresoService = new N_Egreso();
 
 /// Verifica si se pasa un ID en la URL para editar o eliminar
 $material = null;
@@ -92,6 +95,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Obtener la lista de materiales
 $materiales = $materialService->obtenerMateriales();
+
+$stockMaterial = $egresoService->obtenerStockPorLote();
+// Agrupa el stock por id_material
+$stockPorMaterial = [];
+foreach ($stockMaterial as $fila) {
+    $id_material = $fila['id_material'];
+    if (!isset($stockPorMaterial[$id_material])) {
+        $stockPorMaterial[$id_material] = 0;
+    }
+    $stockPorMaterial[$id_material] += $fila['stock_restante'];
+}
 //obtener la lista de categorías y medidas
 $categorias = $categoriaService->obtenerCategorias();
 $medidas = $medidaService->obtenerMedidas();
@@ -224,19 +238,25 @@ if ($searchTerm) {
         </thead>
         <tbody>
             <?php foreach ($materiales as $mat): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($mat['m_nombre']); ?></td>
-                <td><?php echo htmlspecialchars($mat['m_descripcion']); ?></td>
-                <td><?php echo htmlspecialchars($mat['c_nombre']); ?></td>
-                <td><?php echo htmlspecialchars($mat['u_medida']); ?></td>
-                <td><?php echo htmlspecialchars($mat['stock']); ?></td>
-                <td><?php echo htmlspecialchars($mat['m_fecha']); ?></td>
-                <td>
-                    <a href="ADM_Material.php?id_material=<?php echo $mat['id_material']; ?>" class="btn btn-warning">Editar</a>
-                    <a href="ADM_Material.php?id_material=<?php echo $mat['id_material']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este material?');">Eliminar</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($mat['m_nombre']); ?></td>
+                    <td><?php echo htmlspecialchars($mat['m_descripcion']); ?></td>
+                    <td><?php echo htmlspecialchars($mat['c_nombre']); ?></td>
+                    <td><?php echo htmlspecialchars($mat['u_medida']); ?></td>
+                    <td>
+                        <?php
+                            $id_material = $mat['id_material'];
+                            echo isset($stockPorMaterial[$id_material]) ? $stockPorMaterial[$id_material] : 0;
+                        ?>
+                    </td>
+                    <td><?php echo htmlspecialchars($mat['m_fecha']); ?></td>
+                    <td>
+                        <!-- Acciones -->
+                        <a href="ADM_Material.php?id_material=<?php echo $mat['id_material']; ?>" class="btn btn-warning">Editar</a>
+                        <a href="ADM_Material.php?id_material=<?php echo $mat['id_material']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este material?');">Eliminar</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>  
         </tbody>
     </table>
 </main>

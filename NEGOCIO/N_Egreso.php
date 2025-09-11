@@ -30,5 +30,9 @@ class N_Egreso {
         $NEgreso->eliminarEgreso($id_egreso);
     }  
     
+    public function obtenerStockPorLote() {
+        $NEgreso = new D_Egreso();
+        return $NEgreso->ObtenerStockPorLote();
+    }
 }
 ?>
