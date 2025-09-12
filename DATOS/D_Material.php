@@ -6,18 +6,16 @@ class D_Material {
     private $m_descripcion;
     private $id_categoria;
     private $id_medida;
-    private $stock;
     private $con;
 
     // Constructor
-    public function __construct($id_material = 0, $m_nombre = "Default Name", $m_fecha = "Default fecha", $m_descripcion = "Default Descripcion", $id_categoria = "Default Categoria", $id_medida = "Default id_medida", $stock = 0) {
+    public function __construct($id_material = 0, $m_nombre = "Default Name", $m_fecha = "Default fecha", $m_descripcion = "Default Descripcion", $id_categoria = "Default Categoria", $id_medida = "Default id_medida") {
         $this->id_material = $id_material;
         $this->m_nombre = $m_nombre;
         $this->m_fecha = $m_fecha;
         $this->m_descripcion = $m_descripcion;
         $this->id_categoria = $id_categoria;
         $this->id_medida = $id_medida;
-        $this->stock = $stock;
         $this->con = (new D_coneccion())->Conectar(); // Inicializar conexión
     }
 
@@ -39,9 +37,6 @@ class D_Material {
 
     public function getm_uMedida() { return $this->id_medida; }
     public function setm_uMedida($id_medida) { $this->id_medida = $id_medida; }
-
-    public function getStock() { return $this->stock; }
-    public function setStock($stock) { $this->stock = $stock; }
 
     // Método para adicionar un material
     public function Adicionar( $m_nombre,$m_descripcion, $id_categoria, $id_medida) {

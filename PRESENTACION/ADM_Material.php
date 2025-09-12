@@ -62,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $m_descripcion = trim(filter_input(INPUT_POST, 'm_descripcion', FILTER_SANITIZE_STRING));
     $id_categoria = trim(filter_input(INPUT_POST, 'id_categoria', FILTER_VALIDATE_INT));
     $id_medida = trim(filter_input(INPUT_POST, 'id_medida', FILTER_VALIDATE_INT));
-    //$stock = trim(filter_input(INPUT_POST, 'stock', FILTER_SANITIZE_STRING));
     $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_STRING);
 
     //var_dump($m_nombre, $m_descripcion, $id_categoria, $id_medida, $accion);

@@ -132,7 +132,7 @@ class D_Egreso {
         }
          // Método para buscar ingreso por similitud
         public function buscarPorSimilitud($termino) {
-            $sql = "CALL BuscarEngreso(?)";
+            $sql = "CALL BuscarEgreso(?)";
             try {
                 $ps = $this->con->prepare($sql);
                 $ps->execute([$termino]);
@@ -167,6 +167,17 @@ class D_Egreso {
         }
     }
 
+    public function BuscarStockPorLote($material, $proveedor, $fecha_inicio, $fecha_fin) {
+    $sql = "CALL BuscarStockPorLote(?, ?, ?, ?)";
+    try {
+        $ps = $this->con->prepare($sql);
+        $ps->execute([$material, $proveedor, $fecha_inicio, $fecha_fin]);
+        return $ps->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $ex) {
+        echo "Error al buscar: " . $ex->getMessage();
+        return [];
+    }
+}
     
 }
 
