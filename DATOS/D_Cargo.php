@@ -105,18 +105,5 @@ class D_Cargo {
         }
     }
 
-    // Actualizar la cantidad de funcionarios por cargo
-    // public function actualizarCantidadFuncionarios() {
-    //     try {
-    //         $stmt = $this->con->prepare("CALL ActualizarCantidadFuncionarios()");
-    //         $stmt->execute();
-    //         echo "Cantidad de funcionarios actualizada correctamente.";
-    //     } catch (PDOException $ex) {
-    //         echo "Error al actualizar cantidad de funcionarios: " . $ex->getMessage();
-    //     }
-    // }
-    
-    
-
 }
 ?>

@@ -11,10 +11,10 @@ require_once '../NEGOCIO/N_Egreso.php';
 require_once '../NEGOCIO/N_Material.php';
 // Instanciar el servicio de egreso
 $egresoService = new N_Egreso();
-$materialService = new N_Material();
+$materialService = new N_Egreso();
 
 // Obtener materiales agrupados por categoría
-$materiales = $materialService->obtenerMateriales();
+$materiales = $materialService->obtenerStockTotalPorMaterial();
 
 // Agrupar materiales por categoría
 $materialesPorCategoria = [];
@@ -165,10 +165,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
                             <div class="card material-card shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title"><?php echo htmlspecialchars($material['m_nombre']); ?></h5>
-                                    <p class="card-text">Stock: <?php echo htmlspecialchars($material['stock']); ?></p>
+                                    <p class="card-text">Stock: <?php echo htmlspecialchars($material['stock_total'] . ' ' . $material['u_medida'] ); ?></p>
                                     <div class="mb-2">
                                         <label for="cantidad_<?php echo $material['id_material']; ?>">Cantidad a egresar:</label>
-                                        <input type="number" min="1" max="<?php echo htmlspecialchars($material['stock']); ?>" 
+                                        <input type="number" min="1" max="<?php echo htmlspecialchars($material['stock_total']); ?>" 
                                             name="cantidad[<?php echo $material['id_material']; ?>]" 
                                             id="cantidad_<?php echo $material['id_material']; ?>" 
                                             class="form-control" placeholder="Cantidad">

@@ -34,5 +34,10 @@ class N_Egreso {
         $NEgreso = new D_Egreso();
         return $NEgreso->ObtenerStockPorLote();
     }
+    
+    public function obtenerStockTotalPorMaterial() {
+        $NEgreso = new D_Egreso();
+        return $NEgreso->ObtenerStockTotalPorMaterial();
+    }
 }
 ?>

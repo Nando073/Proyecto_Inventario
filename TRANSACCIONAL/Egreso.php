@@ -2,13 +2,11 @@
 require_once '../Seguridad.php';
 verificarAcceso(['Administrador', 'Operador']);
 require_once '../NEGOCIO/N_Egreso.php';
-require_once '../NEGOCIO/N_Material.php';
 require_once '../NEGOCIO/N_Funcionario.php';
 
 $egresoService = new N_Egreso();
 //$detalleService = new N_Egreso();
 
-$materialService = new N_Material();
 $funcionarioService = new N_Funcionario();
 
 // Obtener funcionarios y áreas para el select
@@ -76,10 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $detallesValidos = [];
 
     // Obtener stocks actuales
-    $materiales = $materialService->obtenerMaterialesConStock();
+    $materiales = $egresoService->ObtenerStockTotalPorMaterial();
     $stockPorMaterial = [];
     foreach ($materiales as $mat) {
-        $stockPorMaterial[$mat['id_material']] = $mat['stock'];
+        $stockPorMaterial[$mat['id_material']] = $mat['stock_total'];
     }
 
     // Validar stock antes de registrar el egreso
@@ -130,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Carga inicial de datos
-$materiales = $materialService->obtenerMaterialesConStock();
+$materiales = $egresoService->obtenerStockTotalPorMaterial();
 
 // Agrupar materiales por categoría para el JS
 $materialesPorCategoria = [];
@@ -240,7 +238,7 @@ if ($searchTerm) {
                                             echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
                                                             data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
                                                     htmlspecialchars($material['m_nombre']) . 
-                                                    " (Stock: " . htmlspecialchars($material['stock']) . ")" .
+                                                    " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
                                                 "</option>";
                                         }
                                     ?>
@@ -343,7 +341,7 @@ if ($searchTerm) {
                     echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
                                     data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
                             htmlspecialchars($material['m_nombre']) . 
-                            " (Stock: " . htmlspecialchars($material['stock']) . ")" .
+                            " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
                         "</option>";
                 }
             ?>
@@ -478,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 materialesPorCategoria[categoria].forEach(mat => {
                     const option = document.createElement('option');
                     option.value = mat.id_material;
-                    option.textContent = `${mat.m_nombre} (Stock: ${mat.stock})`;
+                    option.textContent = `${mat.m_nombre} (Stock: ${mat.stock_total})`;
                     option.setAttribute('data-unidad', mat.u_medida || '--');
                     selectMaterial.appendChild(option);
                 });
