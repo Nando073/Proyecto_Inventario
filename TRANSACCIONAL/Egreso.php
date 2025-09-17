@@ -284,9 +284,10 @@ if ($searchTerm) {
             <input type="text" name="search" placeholder="Buscar por nombre, ID o fecha" value="<?php echo htmlspecialchars($searchTerm); ?>" />
             <button type="submit" class="btn btn-info">Buscar</button>
         </div>
-        <button type="button" class="btn btn-success m-3" id="btnCrearEgreso" data-bs-toggle="modal" data-bs-target="#egresoModal">
-            Registrar Egreso de material
-        </button>
+
+            <button type="button" class="btn btn-success m-3" id="btnCrearEgreso" data-bs-toggle="modal" data-bs-target="#egresoModal">
+                Registrar Egreso de material
+            </button>
     </form>
 
     <!-- tabla -->
@@ -357,7 +358,6 @@ if ($searchTerm) {
         <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
     </div>
 </div>
-    <a href="historial_egreso.php"><button type="button" class="btn btn-info">Historial de Registro</button></a>
 </main>
 
 <!-- Modal Detalle Egreso -->

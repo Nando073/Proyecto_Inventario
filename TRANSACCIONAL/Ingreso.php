@@ -89,8 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($accion === 'crear') {
         try {
             $mensaje = $ingresoService->registrarIngresoCompleto($id_proveedor, $totalCalculado, $detallesValidos);
-            header('Location: historial_registro.php?msg=' . urlencode($mensaje));
-
+            echo "<script>
+                alert('¡Ingreso registrado correctamente!');
+                window.location.href='Ingreso.php';
+            </script>";
             exit();
         } catch (Exception $e) {
             echo "Error al registrar: " . htmlspecialchars($e->getMessage());
@@ -267,9 +269,9 @@ if ($searchTerm) {
         <input type="text" name="search" placeholder="Buscar por nombre, ID o fecha" value="<?php echo htmlspecialchars($searchTerm); ?>" />
         <button type="submit" class="btn btn-info">Buscar</button>
     </div>
-    <button type="button" class="btn btn-success m-3" id="btnCrearIngreso" data-bs-toggle="modal" data-bs-target="#ingresoModal">
-        Registrar Ingreso de material
-    </button>
+            <button type="button" class="btn btn-success m-3" id="btnCrearIngreso" data-bs-toggle="modal" data-bs-target="#ingresoModal">
+                Registrar Ingreso de material
+            </button>
 </form>
 
 <!-- tabla -->
@@ -332,7 +334,6 @@ if ($searchTerm) {
       <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
     </div>
 </div>        
-<a href="historial_registro.php"><button type="button"class="btn btn-info">Historial de Registro</button></a>
 </main>
 
 <!-- Modal Detalle Ingreso -->

@@ -63,16 +63,18 @@
             <ul>
                 <li><a href="../TRANSACCIONAL/Ingreso.php">INGRESO</a></li>
                 <li><a href="../TRANSACCIONAL/Egreso.php">EGRESO</a></li>
+                <li><a href="../TRANSACCIONAL/Solicitud.php">CATALOGO DE MATERIALES</a></li>
             </ul>
     </details>
     <?php endif; ?>
     <?php if (count(array_intersect(['Administrador', 'Operador','Funcionario', 'Supervisor'], $_SESSION['rol_asignado'])) > 0): ?>
     <details>
-        <summary>SOLICITAR MATERIALES</summary>
+        <summary>REPORTES</summary>
             <ul>
-                <li><a href="../TRANSACCIONAL/Solicitud.php">Catalogo de materiales</a></li>
                 <?php if (count(array_intersect(['Administrador', 'Operador'], $_SESSION['rol_asignado'])) > 0): ?>
-                    <li><a href="../STOCK_MATERIALES/Stock.php">Stock de materiales</a></li>
+                    <li><a href="../REPORTES/Stock.php">Stock de materiales</a></li>
+                    <li><a href="../REPORTES/historial_registro.php">Historial de ingresos</a></li>
+                    <li><a href="../REPORTES/historial_egreso.php">Historial de egresos</a></li>
                 <?php endif; ?>
             </ul>
     </details>
