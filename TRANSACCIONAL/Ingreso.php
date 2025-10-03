@@ -160,6 +160,19 @@ if ($searchTerm) {
       font-weight: bold;
       margin-bottom: 5px;
     }
+    /* Mejoras para responsividad */
+    .parte-row .col-md-1 {
+      padding-bottom: 10px;
+    }
+    @media (max-width: 768px) {
+      .btn-responsive {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+      }
+      .modal-dialog {
+        margin: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -167,7 +180,7 @@ if ($searchTerm) {
 <main>
    <!-- Modal -->
     <div class="modal fade" id="ingresoModal" tabindex="-1" aria-labelledby="ingresoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="ingresoModalLabel">Crear registro</h5>
@@ -175,170 +188,183 @@ if ($searchTerm) {
                 </div>
                 <div class="modal-body">
                   <form id="formIngreso" action="Ingreso.php" method="post">
-      <div class="row mb-3">
-        <div class="col-md-3">
-          <label for="id_proveedor" class="form-label fw-bold">Proveedor:</label>
-        </div>
-        <div class="col-md-6">
-          <select name="id_proveedor" id="id_proveedor" class="form-control" required>
-            <option value="">Seleccione un proveedor</option>
-            <?php
-                foreach ($proveedores as $proveedor) {
-                    echo "<option value='" . htmlspecialchars($proveedor['id_proveedor']) . "'>" . htmlspecialchars($proveedor['p_nombre']) . "</option>";
-                }
-            ?>
-          </select>  
-        </div>
-        <div class="col-md-3">
-          <button type="button" class="btn btn-add w-100" id="btnAgregar">AÑADIR MATERIAL</button>
-        </div>
-      </div>
-      
-      <div id="materiales-container">
-        <div class="parte-row row align-items-end mb-2">
-          <!-- Material -->
-          <div class="col-md-3">
-            <label class="form-label">Material</label>
-            <select name="id_material[]" class="form-control material-select" required>
-              <option value="">Seleccione un material</option>
-              <?php
-                  foreach ($materiales as $material) {
-                      echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                                    data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                              htmlspecialchars($material['m_nombre']) . 
-                              " (Stock: " . htmlspecialchars($material['stock']) . ")" .
-                          "</option>";
-                  }
-              ?>
-            </select>
-          </div>
-          
-          <!-- Precio -->
-          <div class="col-md-2">
-            <label class="form-label">Precio</label>
-            <input type="number" step="0.01" name="precio[]" placeholder="Precio" class="form-control" required>
-          </div>
-          
-          <!-- Cantidad -->
-          <div class="col-md-3">
-            <label class="form-label">Cantidad</label>
-            <div class="input-group">
-              <input type="number" name="cantidad[]" placeholder="Cantidad" class="form-control cantidad-input" required>
-              <span class="input-group-text unidad-medida">--</span>
-            </div>
-          </div>
+                    <div class="row mb-3">
+                      <div class="col-12 col-md-3 mb-2 mb-md-0 d-flex align-items-center">
+                        <label for="id_proveedor" class="form-label fw-bold mb-0">Proveedor:</label>
+                      </div>
+                      <div class="col-12 col-md-6 mb-2 mb-md-0">
+                        <select name="id_proveedor" id="id_proveedor" class="form-control" required>
+                          <option value="">Seleccione un proveedor</option>
+                          <?php
+                              foreach ($proveedores as $proveedor) {
+                                  echo "<option value='" . htmlspecialchars($proveedor['id_proveedor']) . "'>" . htmlspecialchars($proveedor['p_nombre']) . "</option>";
+                              }
+                          ?>
+                        </select>  
+                      </div>
+                      <div class="col-12 col-md-3">
+                        <button type="button" class="btn btn-add w-100 btn-responsive" id="btnAgregar">AÑADIR MATERIAL</button>
+                      </div>
+                    </div>
+                    
+                    <div id="materiales-container">
+                      <div class="parte-row row align-items-end mb-2">
+                        <!-- Material -->
+                        <div class="col-12 col-md-3 mb-2 mb-md-0">
+                          <label class="form-label">Material</label>
+                          <select name="id_material[]" class="form-control material-select" required>
+                            <option value="">Seleccione un material</option>
+                            <?php
+                                foreach ($materiales as $material) {
+                                    echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                                                  data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                                            htmlspecialchars($material['m_nombre']) . 
+                                            " (Stock: " . htmlspecialchars($material['stock']) . ")" .
+                                        "</option>";
+                                }
+                            ?>
+                          </select>
+                        </div>
+                        
+                        <!-- Precio -->
+                        <div class="col-12 col-md-2 mb-2 mb-md-0">
+                          <label class="form-label">Precio</label>
+                          <input type="number" step="0.01" name="precio[]" placeholder="Precio" class="form-control" required>
+                        </div>
+                        
+                        <!-- Cantidad -->
+                        <div class="col-12 col-md-3 mb-2 mb-md-0">
+                          <label class="form-label">Cantidad</label>
+                          <div class="input-group">
+                            <input type="number" name="cantidad[]" placeholder="Cantidad" class="form-control cantidad-input" required>
+                            <span class="input-group-text unidad-medida">--</span>
+                          </div>
+                        </div>
 
-          
-          <!-- Subtotal -->
-          <div class="col-md-3">
-            <label class="form-label">Subtotal</label>
-            <input name="sub_total[]" placeholder="Subtotal" class="form-control" required>
-          </div>
-          
-          <!-- Botón Eliminar -->
-          <div class="col-md-1 text-center">
-            <label class="form-label" style="visibility: hidden;">Eliminar</label>
-            <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Total -->
-      <div class="row mt-3">
-        <div class="col-md-2 fw-bold">TOTAL:</div>
-        <div class="col-md-4">
-          <input type="text" id="totalGeneral" class="form-control" readonly>
-        </div>
-      </div>
+                        
+                        <!-- Subtotal -->
+                        <div class="col-12 col-md-3 mb-2 mb-md-0">
+                          <label class="form-label">Subtotal</label>
+                          <input type="number" name="sub_total[]" placeholder="Subtotal" class="form-control" required>
+                        </div>
+                        
+                        <!-- Botón Eliminar -->
+                        <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
+                          <label class="form-label" style="visibility: hidden;">Eliminar</label>
+                          <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Total -->
+                    <div class="row mt-3">
+                      <div class="col-12 col-md-2 fw-bold d-flex align-items-center justify-content-center justify-content-md-start mb-2 mb-md-0">
+                        TOTAL:
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <input type="text" id="totalGeneral" class="form-control" readonly>
+                      </div>
+                    </div>
 
-      <!-- Botón Registrar -->
-      <div class="row mt-4">
-        <div class="col-md-3 offset-md-9">
-          <button type="submit" name="accion" value="crear" class="btn btn-register w-100">REGISTRAR</button>
-        </div>
-      </div>
-    </form>
+                    <!-- Botón Registrar -->
+                    <div class="row mt-4">
+                      <div class="col-12 col-md-6 offset-md-6 col-lg-4 offset-lg-8">
+                        <button type="submit" name="accion" value="crear" class="btn btn-register w-100 btn-responsive">REGISTRAR</button>
+                      </div>
+                    </div>
+                  </form>
                 </div>
             </div>
         </div>
     </div>
 
     <h3 class="mt-5">INGRESAR MATERIALES</h3>
-    <form class="d-flex justify-content-between align-items-center mt-3" action="Ingreso.php" method="get">
-    <div>
-        <input type="text" name="search" placeholder="Buscar por nombre, ID o fecha" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-        <button type="submit" class="btn btn-info">Buscar</button>
-    </div>
-            <button type="button" class="btn btn-success m-3" id="btnCrearIngreso" data-bs-toggle="modal" data-bs-target="#ingresoModal">
-                Registrar Ingreso de material
-            </button>
-</form>
+    
+    <!-- Formulario de búsqueda responsivo -->
+    <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="Ingreso.php" method="get">
+      <div class="d-flex flex-grow-1 me-md-2">
+        <input type="text" name="search" placeholder="Buscar por nombre, ID o fecha" 
+               value="<?php echo htmlspecialchars($searchTerm); ?>" 
+               class="form-control me-2">
+        <button type="submit" class="btn btn-info flex-shrink-0 btn-responsive">Buscar</button>
+      </div>
+      <button type="button" class="btn btn-success btn-responsive" id="btnCrearIngreso" data-bs-toggle="modal" data-bs-target="#ingresoModal">
+        Registrar Ingreso
+      </button>
+    </form>
 
-<!-- tabla -->
-<table class="table table-bordered mt-3">
-    <thead>
-        <tr>
-            <th>ID</th>
+    <!-- Tabla Responsiva -->
+    <div class="table-responsive">
+      <table class="table table-bordered mt-3">
+        <thead class="custom-table-header">
+          <tr>
             <th>Proveedor</th>
             <th>Total Ingreso</th>
             <th>Fecha de ingreso</th>
             <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if (!empty($ingresos)): ?>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (!empty($ingresos)): ?>
             <?php foreach ($ingresos as $ingreso): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($ingreso['id_ingreso']); ?></td>
-                    <td><?php echo htmlspecialchars($ingreso['proveedor_nombre']); ?></td>
-                    <td><?php echo htmlspecialchars($ingreso['total_ingreso'] . " Bs"); ?></td>
-                    <td><?php echo htmlspecialchars($ingreso['i_fecha']); ?></td>
-                    <td>
-                        <a href="#" class="btn btn-info btn-ver-ingreso" data-id="<?php echo $ingreso['id_ingreso']; ?>">Ver</a>
-                        <a href="Ingreso.php?id_material=<?php echo $ingreso['id_ingreso']; ?>&accion=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este registro de ingreso?');">Eliminar</a>
-                    </td>
-                </tr>
+              <tr>
+                <td><?php echo htmlspecialchars($ingreso['proveedor_nombre']); ?></td>
+                <td><?php echo htmlspecialchars($ingreso['total_ingreso'] . " Bs"); ?></td>
+                <td><?php echo htmlspecialchars($ingreso['i_fecha']); ?></td>
+                <td>
+                  <div class="btn-group-vertical btn-group-sm" role="group">
+                    <a href="#" class="btn btn-info btn-sm btn-ver-ingreso btn-responsive" data-id="<?php echo $ingreso['id_ingreso']; ?>">Ver</a>
+                    <a href="Ingreso.php?id_material=<?php echo $ingreso['id_ingreso']; ?>&accion=delete" class="btn btn-danger btn-sm btn-responsive" onclick="return confirm('¿Estás seguro de que deseas eliminar este registro de ingreso?');">Eliminar</a>
+                  </div>
+                </td>
+              </tr>
             <?php endforeach; ?>
-        <?php else: ?>
+          <?php else: ?>
             <tr>
-                <td colspan="5" class="text-center">No se encontraron resultados.</td>
+              <td colspan="4" class="text-center">No se encontraron resultados.</td>
             </tr>
-        <?php endif; ?>
-    </tbody>
-</table>
-  <!-- Template oculto para duplicar -->
-<div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
-  <div class="col-md-3">
-            <select name="id_material[]" class="form-control material-select" required>
-              <option value="">Seleccione un material</option>
-              <?php
-                  foreach ($materiales as $material) {
-                      echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                                    data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                              htmlspecialchars($material['m_nombre']) . 
-                              " (Stock: " . htmlspecialchars($material['stock']) . ")" .
-                          "</option>";
-                  }
-              ?>
-            </select>
-          </div>
-    <div class="col-md-2"><input name="precio[]" placeholder="Precio" class="form-control" required></div>
-    <div class="col-md-3">
-      <div class="input-group">
-        <input name="cantidad[]" placeholder="Cantidad" class="form-control cantidad-input" required>
-        <span class="input-group-text unidad-medida">--</span>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Template oculto para duplicar -->
+    <div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
+      <div class="col-12 col-md-3 mb-2 mb-md-0">
+        <select name="id_material[]" class="form-control material-select" required>
+          <option value="">Seleccione un material</option>
+          <?php
+              foreach ($materiales as $material) {
+                  echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                                data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                          htmlspecialchars($material['m_nombre']) . 
+                          " (Stock: " . htmlspecialchars($material['stock']) . ")" .
+                      "</option>";
+              }
+          ?>
+        </select>
       </div>
-    </div>
-    <div class="col-md-3"><input name="sub_total[]" placeholder="Sub_total" class="form-control" required></div>
-    <div class="col-md-1 text-center">
-      <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
-    </div>
-</div>        
+      <div class="col-12 col-md-2 mb-2 mb-md-0">
+        <input type="number" name="precio[]" placeholder="Precio" class="form-control" required>
+      </div>
+      <div class="col-12 col-md-3 mb-2 mb-md-0">
+        <div class="input-group">
+          <input type="number" name="cantidad[]" placeholder="Cantidad" class="form-control cantidad-input" required>
+          <span class="input-group-text unidad-medida">--</span>
+        </div>
+      </div>
+      <div class="col-12 col-md-3 mb-2 mb-md-0">
+        <input type="number" name="sub_total[]" placeholder="Sub_total" class="form-control" required>
+      </div>
+      <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
+        <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
+      </div>
+    </div>        
 </main>
 
 <!-- Modal Detalle Ingreso -->
 <div class="modal fade" id="detalleIngresoModal" tabindex="-1" aria-labelledby="detalleIngresoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="detalleIngresoLabel">Detalle de Ingreso</h5>

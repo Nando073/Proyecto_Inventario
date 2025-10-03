@@ -6,9 +6,34 @@ if (isset($_GET['msg'])) {
     echo "<script>alert('" . htmlspecialchars($_GET['msg']) . "');</script>";
 }
 
-// Obtener los detalles de los egresos
+// Obtener parámetros de búsqueda
+$funcionario = $_GET['funcionario'] ?? null;
+$area = $_GET['area'] ?? null;
+$fecha_inicio = $_GET['fecha_inicio'] ?? null;
+$fecha_fin = $_GET['fecha_fin'] ?? null;
+
 $egresoService = new N_Egreso();
-$detalles = $egresoService->ObtenerDetallesEgresos();
+
+// Validaciones de fechas
+$errores = [];
+$fecha_min = '2020-01-01';
+$fecha_max = date('Y-m-d');
+if ($fecha_inicio && $fecha_inicio < $fecha_min) $errores[] = "La fecha de inicio no puede ser menor a $fecha_min";
+if ($fecha_fin && $fecha_fin > $fecha_max) $errores[] = "La fecha de fin no puede ser mayor a hoy";
+if ($fecha_inicio && $fecha_fin && $fecha_inicio > $fecha_fin) $errores[] = "La fecha de inicio no puede ser mayor que la de fin";
+
+// Si hay búsqueda y no hay errores, usar buscarHistorialEgreso
+if (($funcionario || $area || $fecha_inicio || $fecha_fin) && empty($errores)) {
+    $detalles = $egresoService->buscarHistorialEgreso(
+        $area ?: null,
+        $funcionario ?: null,
+        $fecha_inicio ?: null,
+        $fecha_fin ?: null
+    );
+} else {
+    // Si hay errores o no hay búsqueda, obtener todos los datos
+    $detalles = $egresoService->ObtenerDetallesEgresos();
+}
 
 // Agrupar detalles por `id_egreso`
 $egresosAgrupados = [];
@@ -19,23 +44,6 @@ foreach ($detalles as $detalle) {
     }
     $egresosAgrupados[$id_egreso][] = $detalle;
 }
-
-// Verificar si se ha solicitado eliminar un egreso
-if (isset($_GET['id_egreso']) && $_GET['action'] === 'delete') {
-    $id_egreso = filter_input(INPUT_GET, 'id_egreso', FILTER_VALIDATE_INT);
-
-    if ($id_egreso) {
-        try {
-            $egresoService->eliminarEgreso($id_egreso);
-            header('Location: historial_egreso.php?msg=Egreso eliminado correctamente');
-            exit();
-        } catch (Exception $e) {
-            echo "Error al eliminar el egreso: " . htmlspecialchars($e->getMessage());
-        }
-    } else {
-        echo "ID de egreso no válido.";
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -45,7 +53,7 @@ if (isset($_GET['id_egreso']) && $_GET['action'] === 'delete') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historial de Egresos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="egreso.css">
+    <link rel="stylesheet" href="ingreso.css">
 </head>
 <body>
     <div class="container">
@@ -66,9 +74,9 @@ if (isset($_GET['id_egreso']) && $_GET['action'] === 'delete') {
             <form method="get">
                 <div class="search-form">
                     <div class="form-group">
-                        <label for="area"><i class="fas fa-box"></i> Area</label>
+                        <label for="area"><i class="fas fa-building"></i> Área</label>
                         <input type="text" id="area" name="area" class="search-input"
-                            placeholder="Ej: Administracion..." value="<?php echo htmlspecialchars($_GET['area'] ?? ''); ?>">
+                            placeholder="Ej: Administración..." value="<?php echo htmlspecialchars($_GET['area'] ?? ''); ?>">
                     </div>
                     
                     <div class="form-group">
@@ -98,7 +106,7 @@ if (isset($_GET['id_egreso']) && $_GET['action'] === 'delete') {
                 </div>
             </form>
             
-            <?php if (isset($errores) && $errores): ?>
+            <?php if (!empty($errores)): ?>
                 <div class="errores">
                     <?php foreach ($errores as $e) echo "<div><i class='fas fa-exclamation-circle'></i> $e</div>"; ?>
                 </div>
@@ -113,11 +121,16 @@ if (isset($_GET['id_egreso']) && $_GET['action'] === 'delete') {
                     $totalEgreso += $detalle['e_stock'];
                 }
             ?>
-                <div class="egreso-card">
-                    <div class="egreso-info">
+                <div class="cards">
+                    <div class="info">
                         <div class="info-item">
                             <span class="info-label"><i class="far fa-calendar-alt"></i> Fecha</span>
                             <span class="info-value"><?php echo htmlspecialchars($detalles[0]['e_fecha']); ?></span>
+                        </div>
+
+                         <div class="info-item">
+                            <span class="info-label"><i class="fas fa-cubes"></i> Área</span>
+                            <span class="info-value"><?php echo htmlspecialchars($detalles[0]['a_nombre']); ?></span>
                         </div>
                         
                         <div class="info-item">
@@ -129,18 +142,12 @@ if (isset($_GET['id_egreso']) && $_GET['action'] === 'delete') {
                             <span class="info-label"><i class="fas fa-receipt"></i> Código Solicitud</span>
                             <span class="info-value"><?php echo htmlspecialchars($detalles[0]['e_solicitud']); ?></span>
                         </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label"><i class="fas fa-cubes"></i> Total de Materiales</span>
-                            <span class="info-value"><?php echo number_format($totalEgreso); ?></span>
-                        </div>
                     </div>
                     
                     <div class="table-container">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID Detalle</th>
                                     <th>Material</th>
                                     <th>Categoría</th>
                                     <th>Cantidad</th>
@@ -149,17 +156,16 @@ if (isset($_GET['id_egreso']) && $_GET['action'] === 'delete') {
                             <tbody>
                                 <?php foreach ($detalles as $detalle): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($detalle['id_e_detalle']); ?></td>
                                     <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
                                     <td><?php echo htmlspecialchars($detalle['categoria_nombre']); ?></td>
-                                    <td><?php echo htmlspecialchars($detalle['e_stock']); ?></td>
+                                    <td><?php echo htmlspecialchars($detalle['e_stock'] . ' ' . $detalle['u_medida']); ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="3" style="text-align: right;">Total del Egreso:</td>
-                                    <td><?php echo number_format($totalEgreso); ?></td>
+                                    <td colspan="2" style="text-align: right;">Total del Egreso:</td>
+                                    <td><?php echo number_format($totalEgreso, 2); ?></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -172,53 +178,23 @@ if (isset($_GET['id_egreso']) && $_GET['action'] === 'delete') {
             </div>
         <?php endif; ?>
     </div>
-    
-    <!-- Modal de confirmación para eliminar -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Confirmar Eliminación</h3>
-                <span class="close" onclick="closeModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>¿Está seguro de que desea eliminar este egreso? Esta acción no se puede deshacer.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
-                <button class="btn btn-confirm" id="confirmDelete">Eliminar</button>
-            </div>
-        </div>
-    </div>
 
     <script>
-        // Función para abrir el modal de confirmación
-        function openDeleteModal(id_egreso) {
-            const modal = document.getElementById('deleteModal');
-            const confirmBtn = document.getElementById('confirmDelete');
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInicio = document.getElementById('fecha_inicio');
+            const fechaFin = document.getElementById('fecha_fin');
             
-            // Configurar el evento de eliminación
-            confirmBtn.onclick = function() {
-                window.location.href = `?action=delete&id_egreso=${id_egreso}`;
-            };
-            
-            // Mostrar el modal
-            modal.style.display = 'block';
-        }
-        
-        // Función para cerrar el modal
-        function closeModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-        }
-        
-        // Cerrar el modal al hacer clic fuera de él
-        window.onclick = function(event) {
-            const modal = document.getElementById('deleteModal');
-            if (event.target === modal) {
-                closeModal();
+            if(fechaInicio && fechaFin) {
+                fechaInicio.addEventListener('change', function() {
+                    fechaFin.min = this.value;
+                });
+                
+                fechaFin.addEventListener('change', function() {
+                    fechaInicio.max = this.value;
+                });
             }
-        };
+        });
         
-        // Mostrar mensaje de confirmación si existe
         <?php if (isset($_GET['msg'])): ?>
             alert('<?php echo htmlspecialchars($_GET['msg']); ?>');
         <?php endif; ?>

@@ -32,6 +32,11 @@ class N_Ingreso {
         $NIngreso = new D_Ingreso();
         $NIngreso->eliminarIngreso($id_ingreso);
     }
+
+    public function buscarHistorialIngreso($material, $proveedor, $fecha_inicio, $fecha_fin) {
+        $NIngreso = new D_Ingreso();
+        return $NIngreso->BuscarHistorialIngreso($material, $proveedor, $fecha_inicio, $fecha_fin);
+    }
     
 }
 ?>

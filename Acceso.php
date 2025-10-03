@@ -57,44 +57,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css?v=<?php echo(rand()); ?>">
-    <style>
-        /* body {
-            background-image: url('IMG/fondoWeb.jpg');
-            background-size: cover;
-            background-position: center;
-            font-family: Arial, sans-serif;
-        } */
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css?v=<?php echo(rand()); ?>">
 </head>
 <body>
-
-    <div class="container">
-        <div class="login-box">
-            <div class="image-section">
-                <img src="IMG/log.webp">
+  <div class="container">
+    <div class="login-box">
+      <div class="image-section">
+        <img src="IMG/log.webp" alt="Imagen login">
+      </div>
+      <div class="form-section">
+        <h2>Iniciar Sesión</h2>
+        <form method="post" autocomplete="off">
+            <div class="input-group">
+                <input type="text" id="usuario" name="usuario" placeholder="Usuario" autocomplete="off" required>
+                <span class="icon">📧</span>
             </div>
-            <div class="form-section">
-                <h2>Iniciar Sesión</h2>
-                <form  method="post">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="usuario" name="usuario" autocomplete="off" placeholder="Usuario"  required>
-                    <span class="icon">📧</span>
-                </div>
-                <div class="input-group">
-                    <input type="password" class="form-control" id="clave" name="clave" autocomplete="new-password" placeholder="Contraseña"  required>
-                    <span class="icon">🔒</span>
-                </div>
-                <button type="submit"  name="login" class="login-btn">INICIAR SESION</button>
-                <a href=""><img class="btnGoogle" src="IMG/google.png"></a>
-                </form>
-                <p class="terms">Está de acuerdo con los érminos y condiciones</p>
+            <div class="input-group">
+                <input type="password" id="clave" name="clave" placeholder="Contraseña" autocomplete="off" required>
+                <span class="icon">🔒</span>
             </div>
-        </div>
+            <button type="submit" name="login" class="login-btn">INICIAR SESIÓN</button>
+            
+            <button type="button" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
+                Iniciar sesión con Google
+            </button>
+        </form>
+        <p class="terms">Está de acuerdo con los términos y condiciones</p>
+      </div>
     </div>
+  </div>
 <script>
     document.getElementById('usuario').value = '';
     document.getElementById('clave').value = '';

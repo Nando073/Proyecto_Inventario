@@ -122,8 +122,6 @@ foreach ($usuarios as &$usuariO) {
 ?>
 
 
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -135,191 +133,188 @@ foreach ($usuarios as &$usuariO) {
     <script src="../DEMO/contrarer.js" defer></script>
     <script src="presentacion.js" defer></script>
     <title>Administrar Usuarios</title>
+
 </head>
 <body>
 <?php include '../DEMO/index.php'; ?>
 
-    <main>
-    <div class="card mb-4" style="max-width: 540px;margin-left: 60vh">
+<main>
+    <!-- Tarjeta Responsiva -->
+    <div class="card mb-4 mx-auto" style="max-width: 540px;">
         <div class="row g-0">
-          <div class="col-md-5">
-              <img src="../IMG/img.png" class="img-fluid rounded-start">
-          </div>
-          <div class="col-md-7">
-            <div class="card-body">
-              <h4 class="card-title">USUARIOS</h4>
-              <h3 class="card-text"><small class="text-body-secondary">CRUD</small></h3>
+            <div class="col-5 col-md-5">
+                <img src="../IMG/img.png" class="img-fluid rounded-start w-100 h-auto">
             </div>
-          </div>
-        </div>
-      </div>
-    
-
-        <!-- Formulario para crear o editar -->
-        <!-- Formulario único para crear o guardar cambios -->
-<!-- Modal -->
-<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg"> <!-- Puedes cambiar modal-lg por modal-md si lo prefieres -->
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ModalLabel">Crear o Editar Usuario</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <!-- Aquí va tu formulario -->
-        <form id="formUsuario" action="ADM_Usuario.php" method="post">
-            
-                <div class="form-group">
-                    <input type="hidden" class="form-control" id="id_usuario" name="id_usuario" value="<?php echo isset($usuario) ? $usuario['id_usuario'] : ''; ?>"required>
+            <div class="col-7 col-md-7">
+                <div class="card-body">
+                    <h4 class="card-title h5 h4-md">USUARIOS</h4>
+                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
                 </div>
-
-            <div class="form-group">
-                <label for="usuario">Nombre de usuario</label>
-                <input type="text" class="form-control" id="usuario" name="usuario" value="<?php echo isset($usuario) ? htmlspecialchars($usuario['usuario']) : ''; ?>" required>
             </div>
-            <label for="clave">Contraseña</label>
-            <div class="input-group">
-                <input type="password" class="form-control" id="clave" name="clave" value="">
-                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                    👁
-                </button>
-            </div>
-             <div class="form-group">
-                <label for="funcionario">Funcionario</label>
-                <select name="id_funcionario" id="id_funcionario" class="form-control" required>
-                    <option value="">Seleccione un funcionario</option>
-                    <?php foreach ($Funcionarios as $Funcionario): ?>
-                        <?php
-                            // Si es edición, marcamos seleccionado el funcionario actual
-                            $selected = (isset($usuario) && $usuario['id_funcionario'] == $Funcionario['id_funcionario']) ? 'selected' : '';
-                        ?>
-                        <option value="<?= htmlspecialchars($Funcionario['id_funcionario']); ?>" <?= $selected; ?>>
-                            <?= htmlspecialchars($Funcionario['f_nombre'] . ' ' . $Funcionario['f_apellido']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <!-- Botones dentro del modal -->
-            <div class="mt-3">
-                <button type="submit" name="accion" value="crear" class="btn btn-primary">Crear Usuario</button>
-                <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($usuario) ? '' : 'disabled'; ?>>Guardar Cambios</button>
-            </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-        <!-- Lista de usuarios -->
-<h3 class="mt-5">Administrar Usuarios</h3>
-<form class="d-flex align-items-center mt-3" action="ADM_Usuario.php" method="get">
-    <!-- Input de búsqueda -->
-    <div class="d-flex">
-        <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" class="form-control me-2" />
-        <button type="submit" class="btn btn-info">Buscar</button>
-    </div>
-
-    <!-- Botones a la derecha -->
-    <div class="d-flex align-items-center ms-auto">
-        <!-- Aquí va el dropdown “Todos los Usuarios” -->
-        <div class="btn-group me-2">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                Todos los Usuarios
-            </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
-                       href="ADM_Usuario.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
-                        Activos
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
-                       href="ADM_Usuario.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
-                        Inactivos
-                    </a>
-                </li>
-            </ul>
         </div>
-
-        <!-- Botón Registrar Usuario -->
-        <button type="button" class="btn btn-success" id="btnCrearUsuario" data-bs-toggle="modal" data-bs-target="#Modal">
-            Registrar Usuario
-        </button>
     </div>
-</form>
 
-<?php if (isset($_SESSION['mensaje'])): ?>
-    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
-        <?= htmlspecialchars($_SESSION['mensaje']); ?>
+    <!-- Modal -->
+    <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ModalLabel">Crear o Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formUsuario" action="ADM_Usuario.php" method="post">
+                        <input type="hidden" class="form-control" id="id_usuario" name="id_usuario" value="<?php echo isset($usuario) ? $usuario['id_usuario'] : ''; ?>" required>
+                        
+                        <div class="form-group mb-3">
+                            <label for="usuario">Nombre de usuario</label>
+                            <input type="text" class="form-control" id="usuario" name="usuario" value="<?php echo isset($usuario) ? htmlspecialchars($usuario['usuario']) : ''; ?>" required>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="clave">Contraseña</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="clave" name="clave" value="">
+                                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                    👁
+                                </button>
+                            </div>
+                        </div>
+                         
+                        <div class="form-group mb-3">
+                            <label for="funcionario">Funcionario</label>
+                            <select name="id_funcionario" id="id_funcionario" class="form-control" required>
+                                <option value="">Seleccione un funcionario</option>
+                                <?php foreach ($Funcionarios as $Funcionario): ?>
+                                    <?php
+                                        $selected = (isset($usuario) && $usuario['id_funcionario'] == $Funcionario['id_funcionario']) ? 'selected' : '';
+                                    ?>
+                                    <option value="<?= htmlspecialchars($Funcionario['id_funcionario']); ?>" <?= $selected; ?>>
+                                        <?= htmlspecialchars($Funcionario['f_nombre'] . ' ' . $Funcionario['f_apellido']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <!-- Botones dentro del modal -->
+                        <div class="mt-3">
+                            <button type="submit" name="accion" value="crear" class="btn btn-primary">Crear Usuario</button>
+                            <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($usuario) ? '' : 'disabled'; ?>>Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+
+    <!-- Formulario de Búsqueda Responsivo -->
+    <h3 class="mt-5">Administrar Usuarios</h3>
+    <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_Usuario.php" method="get">
+        <!-- Búsqueda -->
+        <div class="d-flex flex-grow-1 me-md-2">
+            <input type="text" name="search" placeholder="Buscar por nombre" 
+                   value="<?php echo htmlspecialchars($searchTerm); ?>" 
+                   class="form-control me-2">
+            <button type="submit" class="btn btn-info flex-shrink-0">Buscar</button>
+        </div>
+        
+        <!-- Botones de administración -->
+        <div class="d-flex flex-wrap gap-2 justify-content-end">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Todos
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
+                           href="ADM_Usuario.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                            Activos
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
+                           href="ADM_Usuario.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                            Inactivos
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <button type="button" class="btn btn-success" id="btnCrearUsuario" data-bs-toggle="modal" data-bs-target="#Modal">
+                Registrar
+            </button>
+        </div>
+    </form>
+
+    <!-- Mensajes -->
+    <?php if (isset($_SESSION['mensaje'])): ?>
+        <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+            <?= htmlspecialchars($_SESSION['mensaje']); ?>
+        </div>
+        <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+    <?php endif; ?>
+
+    <!-- Tabla Responsiva -->
+    <div class="table-responsive">
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Clave (Encriptada)</th>
+                    <th>Funcionario</th>
+                    <th>Fecha Registro</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($usuarios)): ?>
+                    <?php foreach ($usuarios as $Nusuario): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($Nusuario['usuario']); ?></td>
+                            <td>********</td>
+                            <td><?php echo htmlspecialchars($Nusuario['f_nombre'] . ' ' . $Nusuario['f_apellido']); ?></td>
+                            <td><?php echo htmlspecialchars($Nusuario['fecha_registro']); ?></td>
+                            <td>
+                                <?php if ($Nusuario['estado'] == 1): ?>
+                                    <span style="color: green; font-weight: bold;">Activo</span>
+                                <?php else: ?>
+                                    <span style="color: red; font-weight: bold;">Inactivo</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <div class="btn-group-vertical btn-group-sm" role="group">
+                                    <?php if ($Nusuario['estado'] == 1): ?>
+                                        <a href="ADM_Usuario.php?id_usuario=<?php echo $Nusuario['id_usuario']; ?>" class="btn btn-warning btn-sm">Editar</a>
+                                        <a href="ADM_Usuario.php?id_usuario=<?php echo $Nusuario['id_usuario']; ?>&action=delete" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">Eliminar</a>
+                                    <?php else: ?>
+                                        <a href="ADM_Usuario.php?id_usuario=<?= $Nusuario['id_usuario']; ?>&action=activar" class="btn btn-primary btn-sm">Activar</a>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="6" class="text-center">No hay usuarios para mostrar.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<?php if (isset($usuario)): ?>
+<script>
+    var myModal = new bootstrap.Modal(document.getElementById('Modal'));
+    window.addEventListener('load', () => {
+        myModal.show();
+    });
+</script>
 <?php endif; ?>
 
-
-        <table class="table table-bordered mt-3">
-    <thead>
-        <tr>
-            <th>Usuario</th>
-            <th>Clave (Encriptada)</th>
-            <th>Funcionario</th>
-            <th>Fecha Registro</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if (!empty($usuarios)): ?>
-            <?php foreach ($usuarios as $Nusuario): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($Nusuario['usuario']); ?></td>
-                    <td>********</td>
-                    <td><?php echo htmlspecialchars($Nusuario['f_nombre'] . ' ' . $Nusuario['f_apellido']); ?></td>
-                    <td><?php echo htmlspecialchars($Nusuario['fecha_registro']); ?></td>
-                    <td>
-                        <?php if ($Nusuario['estado'] == 1): ?>
-                            <span style="color: green; font-weight: bold;">Activo</span>
-                        <?php else: ?>
-                            <span style="color: red; font-weight: bold;">Inactivo</span>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <?php if ($Nusuario['estado'] == 1): ?>
-                            <!-- Si es activo -->
-                            <a href="ADM_Usuario.php?id_usuario=<?php echo $Nusuario['id_usuario']; ?>" class="btn btn-warning">Editar</a>
-                            <a href="ADM_Usuario.php?id_usuario=<?php echo $Nusuario['id_usuario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">Eliminar</a>
-                        <?php else: ?>
-                            <!-- Si es inactivo -->
-                            <a href="ADM_Usuario.php?id_usuario=<?= $Nusuario['id_usuario']; ?>&action=activar" class="btn btn-primary" onclick="return confirm('¿Deseas activar este usuario?');">Activar</a>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="6" class="text-center">No hay usuarios para mostrar.</td>
-            </tr>
-        <?php endif; ?>
-    </tbody>
-</table>
-
-    </div>
-                </main>
-
-                <?php if (isset($usuario)): ?>
-                <script>
-                    var myModal = new bootstrap.Modal(document.getElementById('Modal'));
-                    window.addEventListener('load', () => {
-                        myModal.show();
-                    });
-                </script>
-                <?php endif; ?>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Referencias a los elementos
     const btnCrearUsuario = document.getElementById("btnCrearUsuario");
     const togglePasswordBtn = document.getElementById("togglePassword");
     const form = document.getElementById("formUsuario");
@@ -330,16 +325,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Función para limpiar formulario
     btnCrearUsuario.addEventListener("click", function () {
-        // Limpia valores de todos los inputs
         form.querySelectorAll("input").forEach(input => input.value = "");
-
-        // Limpia id_usuario (no lo elimina, solo lo vacía)
         if (idInput) idInput.value = "";
-
-        // Desactiva "Guardar Cambios"
         if (btnGuardar) btnGuardar.disabled = true;
-
-        // Activa "Crear Usuario"
         if (btnCrear) btnCrear.disabled = false;
     });
 
@@ -347,8 +335,6 @@ document.addEventListener("DOMContentLoaded", function () {
     togglePasswordBtn.addEventListener('click', function () {
         const type = passwordInput.type === 'password' ? 'text' : 'password';
         passwordInput.type = type;
-
-        // Cambia el icono del botón según el estado
         togglePasswordBtn.textContent = type === 'password' ? '👁' : '🙈';
     });
 });

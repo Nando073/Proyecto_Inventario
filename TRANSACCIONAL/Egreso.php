@@ -181,6 +181,19 @@ if ($searchTerm) {
       font-weight: bold;
       margin-bottom: 5px;
     }
+    /* Mejoras para responsividad */
+    .parte-row .col-md-1 {
+      padding-bottom: 10px;
+    }
+    @media (max-width: 768px) {
+      .btn-responsive {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+      }
+      .modal-dialog {
+        margin: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -188,7 +201,7 @@ if ($searchTerm) {
 <main>
    <!-- Modal -->
     <div class="modal fade" id="egresoModal" tabindex="-1" aria-labelledby="egresoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="egresoModalLabel">Crear egreso</h5>
@@ -198,7 +211,7 @@ if ($searchTerm) {
                   <form id="formEgreso" action="Egreso.php" method="post" autocomplete="off">
                     <input type="hidden" name="accion" value="crear">
                     <div class="row mb-3">
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
                             <label class="form-label fw-bold">Área:</label>
                             <select name="area" id="selectArea" class="form-control" required>
                                 <option value="">Seleccione un área</option>
@@ -207,20 +220,20 @@ if ($searchTerm) {
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
                             <label class="form-label fw-bold">Funcionario:</label>
                             <select name="id_funcionario" id="selectFuncionario" class="form-control" required disabled>
                                 <option value="">Seleccione un funcionario</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-4">
                             <label for="codigo_solicitud" class="form-label fw-bold">Código de Solicitud:</label>
                             <input type="text" name="codigo_solicitud" id="codigo_solicitud" class="form-control" required pattern="[a-zA-Z0-9]+">
                         </div>
                     </div>
                     <div id="materiales-container">
                         <div class="parte-row row align-items-end mb-2">
-                            <div class="col-md-3">
+                            <div class="col-12 col-md-3 mb-2 mb-md-0">
                                 <label class="form-label">Categoría</label>
                                 <select name="categoria[]" class="form-control select-categoria" required>
                                     <option value="">Seleccione una categoría</option>
@@ -229,7 +242,7 @@ if ($searchTerm) {
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-12 col-md-4 mb-2 mb-md-0">
                                 <label class="form-label">Material</label>
                                 <select name="id_material[]" class="form-control select-material" required disabled>
                                     <option value="">Seleccione un material</option>
@@ -244,32 +257,34 @@ if ($searchTerm) {
                                     ?>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-12 col-md-3 mb-2 mb-md-0">
                                 <label class="form-label">Cantidad</label>
                                 <div class="input-group">
                                     <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
                                     <span class="input-group-text unidad-medida">--</span>
                                 </div>
                             </div>
-                            <div class="col-md-1 text-center">
-                                <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
+                            <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
+                                <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
                             </div>
                         </div>
                     </div>
                     <!-- Botón Añadir material -->
                     <div class="row mt-3">
-                        <div class="col-md-3">
-                            <button type="button" class="btn btn-add w-100" id="btnAgregar">AÑADIR MATERIAL</button>
+                        <div class="col-12 col-md-3 mb-2 mb-md-0">
+                            <button type="button" class="btn btn-add w-100 btn-responsive" id="btnAgregar">AÑADIR MATERIAL</button>
                         </div>
-                        <div class="col-md-6 fw-bold text-end">TOTAL CANTIDAD:</div>
-                        <div class="col-md-3">
+                        <div class="col-12 col-md-6 fw-bold text-center text-md-end mb-2 mb-md-0 d-flex align-items-center justify-content-center justify-content-md-end">
+                            TOTAL CANTIDAD:
+                        </div>
+                        <div class="col-12 col-md-3">
                             <input type="text" id="totalGeneral" class="form-control" readonly>
                         </div>
                     </div>
                     <!-- Botón Registrar -->
                     <div class="row mt-4">
-                        <div class="col-md-3 offset-md-9">
-                            <button type="submit" class="btn btn-register w-100">GENERAR EGRESO</button>
+                        <div class="col-12 col-md-6 offset-md-6 col-lg-4 offset-lg-8">
+                            <button type="submit" class="btn btn-register w-100 btn-responsive">GENERAR EGRESO</button>
                         </div>
                     </div>
                   </form>
@@ -279,97 +294,103 @@ if ($searchTerm) {
     </div>
 
     <h3 class="mt-5">EGRESAR MATERIALES</h3>
-    <form class="d-flex justify-content-between align-items-center mt-3" action="Egreso.php" method="get">
-        <div>
-            <input type="text" name="search" placeholder="Buscar por nombre, ID o fecha" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-            <button type="submit" class="btn btn-info">Buscar</button>
+    
+    <!-- Formulario de búsqueda responsivo -->
+    <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="Egreso.php" method="get">
+        <div class="d-flex flex-grow-1 me-md-2">
+            <input type="text" name="search" placeholder="Buscar por nombre, ID o fecha" 
+                   value="<?php echo htmlspecialchars($searchTerm); ?>" 
+                   class="form-control me-2">
+            <button type="submit" class="btn btn-info flex-shrink-0 btn-responsive">Buscar</button>
         </div>
 
-            <button type="button" class="btn btn-success m-3" id="btnCrearEgreso" data-bs-toggle="modal" data-bs-target="#egresoModal">
-                Registrar Egreso de material
-            </button>
+        <button type="button" class="btn btn-success btn-responsive" id="btnCrearEgreso" data-bs-toggle="modal" data-bs-target="#egresoModal">
+            Registrar Egreso
+        </button>
     </form>
 
-    <!-- tabla -->
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Funcionario</th>
-                <th>Código Solicitud</th>
-                <th>Total Cantidad</th>
-                <th>Fecha de egreso</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($egresos)): ?>
-                <?php foreach ($egresos as $egreso): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($egreso['id_egreso']); ?></td>
-                        <td><?php echo htmlspecialchars($egreso['funcionario_nombre']); ?></td>
-                        <td><?php echo htmlspecialchars($egreso['e_solicitud']); ?></td>
-                        <td><?php echo htmlspecialchars($egreso['e_total_cantidad']); ?></td>
-                        <td><?php echo htmlspecialchars($egreso['e_fecha']); ?></td>
-                        <td>
-                            <a href="#" class="btn btn-info btn-ver-egreso" data-id="<?php echo $egreso['id_egreso']; ?>">Ver</a>
-                            <a href="Egreso.php?id_egreso=<?php echo $egreso['id_egreso']; ?>&accion=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este registro de egreso?');">Eliminar</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
+    <!-- Tabla Responsiva -->
+    <div class="table-responsive">
+        <table class="table table-bordered mt-3">
+            <thead class="custom-table-header">
                 <tr>
-                    <td colspan="6" class="text-center">No se encontraron resultados.</td>
+                    <th>Funcionario</th>
+                    <th>Código Solicitud</th>
+                    <th>Total Cantidad</th>
+                    <th>Fecha de egreso</th>
+                    <th>Acciones</th>
                 </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php if (!empty($egresos)): ?>
+                    <?php foreach ($egresos as $egreso): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($egreso['funcionario_nombre']); ?></td>
+                            <td><?php echo htmlspecialchars($egreso['e_solicitud']); ?></td>
+                            <td><?php echo htmlspecialchars($egreso['e_total_cantidad']); ?></td>
+                            <td><?php echo htmlspecialchars($egreso['e_fecha']); ?></td>
+                            <td>
+                                <div class="btn-group-vertical btn-group-sm" role="group">
+                                    <a href="#" class="btn btn-info btn-sm btn-ver-egreso btn-responsive" data-id="<?php echo $egreso['id_egreso']; ?>">Ver</a>
+                                    <a href="Egreso.php?id_egreso=<?php echo $egreso['id_egreso']; ?>&accion=delete" class="btn btn-danger btn-sm btn-responsive" onclick="return confirm('¿Estás seguro de que deseas eliminar este registro de egreso?');">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5" class="text-center">No se encontraron resultados.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
     <!-- Template oculto para duplicar -->
-<div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
-    <div class="col-md-3">
-        <select name="categoria[]" class="form-control select-categoria" required>
-            <option value="">Seleccione una categoría</option>
-            <?php foreach (array_keys($materialesPorCategoria) as $categoria): ?>
-                <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-    <div class="col-md-4">
-        <select name="id_material[]" class="form-control select-material" required disabled>
-            <option value="">Seleccione un material</option>
-            <?php
-                foreach ($materiales as $material) {
-                    echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                                    data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                            htmlspecialchars($material['m_nombre']) . 
-                            " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
-                        "</option>";
-                }
-            ?>
-        </select>
-    </div>
-    <div class="col-md-3">
-        <div class="input-group">
-            <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
-            <span class="input-group-text unidad-medida">--</span>
+    <div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
+        <div class="col-12 col-md-3 mb-2 mb-md-0">
+            <select name="categoria[]" class="form-control select-categoria" required>
+                <option value="">Seleccione una categoría</option>
+                <?php foreach (array_keys($materialesPorCategoria) as $categoria): ?>
+                    <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="col-12 col-md-4 mb-2 mb-md-0">
+            <select name="id_material[]" class="form-control select-material" required disabled>
+                <option value="">Seleccione un material</option>
+                <?php
+                    foreach ($materiales as $material) {
+                        echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                                        data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                                htmlspecialchars($material['m_nombre']) . 
+                                " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
+                            "</option>";
+                    }
+                ?>
+            </select>
+        </div>
+        <div class="col-12 col-md-3 mb-2 mb-md-0">
+            <div class="input-group">
+                <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
+                <span class="input-group-text unidad-medida">--</span>
+            </div>
+        </div>
+        <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
+            <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
         </div>
     </div>
-    <div class="col-md-1 text-center">
-        <button type="button" class="btn btn-danger btn-sm remove-parte">X</button>
-    </div>
-</div>
 </main>
 
 <!-- Modal Detalle Egreso -->
 <div class="modal fade" id="detalleEgresoModal" tabindex="-1" aria-labelledby="detalleEgresoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="detalleEgresoLabel">Detalle de Egreso</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body" id="detalleEgresoBody">
-        <!-- Aquí se cargará el detalle por AJAX -->
         <div class="text-center">
           <span class="spinner-border"></span> Cargando...
         </div>
@@ -377,6 +398,7 @@ if ($searchTerm) {
     </div>
   </div>
 </div>
+
 
 <script>
     // Mover las variables fuera de DOMContentLoaded

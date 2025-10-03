@@ -4,12 +4,12 @@ verificarAcceso(['Administrador', 'Operador', 'Supervisor']);
 require_once '../NEGOCIO/N_Material.php';
 require_once '../NEGOCIO/N_Categoria.php';
 require_once '../NEGOCIO/N_U_Medida.php';
-require_once '../NEGOCIO/N_Egreso.php';
+//require_once '../NEGOCIO/N_Egreso.php';
 
 $materialService = new N_Material();
 $categoriaService = new N_Categoria();
 $medidaService = new N_U_Medida();
-$egresoService = new N_Egreso();
+//$egresoService = new N_Egreso();
 
 /// Verifica si se pasa un ID en la URL para editar o eliminar
 $material = null;
@@ -95,16 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Obtener la lista de materiales
 $materiales = $materialService->obtenerMateriales();
 
-$stockMaterial = $egresoService->obtenerStockPorLote();
-// Agrupa el stock por id_material
-$stockPorMaterial = [];
-foreach ($stockMaterial as $fila) {
-    $id_material = $fila['id_material'];
-    if (!isset($stockPorMaterial[$id_material])) {
-        $stockPorMaterial[$id_material] = 0;
-    }
-    $stockPorMaterial[$id_material] += $fila['stock_restante'];
-}
+
 //obtener la lista de categorías y medidas
 $categorias = $categoriaService->obtenerCategorias();
 $medidas = $medidaService->obtenerMedidas();
@@ -130,15 +121,15 @@ if ($searchTerm) {
 <?php include '../DEMO/index.php'; ?>
 
 <main>
-    <div class="card mb-4" style="max-width: 540px; margin-left: 60vh">
+    <div class="card mb-4 mx-auto" style="max-width: 540px;">
         <div class="row g-0">
             <div class="col-md-5">
-                <img src="../IMG/material.jpg" class="img-fluid rounded-start">
+                <img src="../IMG/material.jpg" class="img-fluid rounded-start w-100 h-auto">
             </div>
             <div class="col-md-7">
                 <div class="card-body">
-                    <h4 class="card-title">MATERIALES</h4>
-                    <h3 class="card-text"><small class="text-body-secondary">CRUD</small></h3>
+                    <h4 class="card-title h5 h4-md">MATERIALES</h4>
+                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
                 </div>
             </div>
         </div>
@@ -146,7 +137,7 @@ if ($searchTerm) {
 
     <!-- Modal -->
     <div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="materialModalLabel">Crear o Editar Material</h5>
@@ -207,12 +198,12 @@ if ($searchTerm) {
     </div>
 
     <h3 class="mt-5">Administrar Materiales</h3>
-    <form class="d-flex justify-content-between align-items-center mt-3" action="ADM_Material.php" method="get">
-        <div>
-            <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-            <button type="submit" class="btn btn-info">Buscar</button>
+    <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_Material.php" method="get">
+        <div class="d-flex flex-grow-1 me-md-2">
+            <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" class="form-control me-2"/>
+            <button type="submit" class="btn btn-info flex-shrink-0">Buscar</button>
         </div>
-        <button type="button" class="btn btn-success m-3" id="btnCrearMaterial" data-bs-toggle="modal" data-bs-target="#materialModal">
+        <button type="button" class="btn btn-success" id="btnCrearMaterial" data-bs-toggle="modal" data-bs-target="#materialModal">
             Registrar Material
         </button>
     </form>
@@ -222,7 +213,7 @@ if ($searchTerm) {
     </div>
     <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
 <?php endif; ?>
-
+<div class="table-responsive">
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
@@ -230,7 +221,6 @@ if ($searchTerm) {
                 <th>Descripción</th>
                 <th>Categoría</th>
                 <th>Unidad de Medida</th>
-                <th>Stock</th>
                 <th>Fecha Registro</th>
                 <th>Acciones</th>
             </tr>
@@ -242,12 +232,6 @@ if ($searchTerm) {
                     <td><?php echo htmlspecialchars($mat['m_descripcion']); ?></td>
                     <td><?php echo htmlspecialchars($mat['c_nombre']); ?></td>
                     <td><?php echo htmlspecialchars($mat['u_medida']); ?></td>
-                    <td>
-                        <?php
-                            $id_material = $mat['id_material'];
-                            echo isset($stockPorMaterial[$id_material]) ? $stockPorMaterial[$id_material] : 0;
-                        ?>
-                    </td>
                     <td><?php echo htmlspecialchars($mat['m_fecha']); ?></td>
                     <td>
                         <!-- Acciones -->
@@ -257,6 +241,7 @@ if ($searchTerm) {
                 </tr>
             <?php endforeach; ?>  
         </tbody>
+    </div>
     </table>
 </main>
 

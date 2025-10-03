@@ -134,15 +134,15 @@ foreach ($rolUsuarios as &$ru) {
 <?php include '../DEMO/index.php'; ?>
 
 <main>
-    <div class="card mb-4" style="max-width: 540px; margin-left: 60vh">
+    <div class="card mb-4 mx-auto" style="max-width: 540px;">
         <div class="row g-0">
             <div class="col-md-5">
-                <img src="../IMG/img.png" class="img-fluid rounded-start">
+                <img src="../IMG/img.png" class="img-fluid rounded-start w-100 h-auto">
             </div>
             <div class="col-md-7">
                 <div class="card-body">
-                    <h4 class="card-title">ROL_USUARIO</h4>
-                    <h3 class="card-text"><small class="text-body-secondary">CRUD</small></h3>
+                    <h4 class="card-title h5 h4-md">ROL_USUARIO</h4>
+                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
                 </div>
             </div>
         </div>
@@ -150,7 +150,7 @@ foreach ($rolUsuarios as &$ru) {
 
     <!-- Modal -->
     <div class="modal fade" id="RolUModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="materialModalLabel">Registrar o Editar Rol_Usuario</h5>
@@ -202,37 +202,42 @@ foreach ($rolUsuarios as &$ru) {
     </div>
 
     <h3 class="mt-5">Administrar Rol_Usuario</h3>
-    <form class="d-flex justify-content-between align-items-center mt-3" action="ADM_RolUsuario.php" method="get">
-        <div>
-            <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-            <button type="submit" class="btn btn-info">Buscar</button>
-        </div>
-        <!-- Botones de la derecha-->
-         <div class="d-flex align-items-center ms-auto">
-            <div class="btn-group me-2">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                Todos los RolUsuario
-            </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
-                       href="ADM_RolUsuario.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
-                        Activos
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
-                       href="ADM_RolUsuario.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
-                        Inactivos
-                    </a>
-                </li>
-            </ul>
-        </div>
-            <button type="button" class="btn btn-success m-3" id="btnRegistrarRol" data-bs-toggle="modal" data-bs-target="#RolUModal">
-                Registrar Rol_Usuario
-            </button>
-        </div>
-    </form>
+        <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_RolUsuario.php" method="get">
+            <!-- Búsqueda -->
+            <div class="d-flex flex-grow-1 me-md-2">
+                <input type="text" name="search" placeholder="Buscar por nombre" 
+                    value="<?php echo htmlspecialchars($searchTerm); ?>" 
+                    class="form-control me-2">
+                <button type="submit" class="btn btn-info flex-shrink-0">Buscar</button>
+            </div>
+            
+            <!-- Botones de administración -->
+            <div class="d-flex flex-wrap gap-2 justify-content-end">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Todos
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
+                            href="ADM_RolUsuario.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                                Activos
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
+                            href="ADM_RolUsuario.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                                Inactivos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <button type="button" class="btn btn-success" id="btnRegistrarRol" data-bs-toggle="modal" data-bs-target="#RolUModal">
+                    Registrar
+                </button>
+            </div>
+        </form>
 
     <!-- Mensajes -->
     <?php if (isset($_SESSION['mensaje'])): ?>
@@ -241,50 +246,51 @@ foreach ($rolUsuarios as &$ru) {
         </div>
         <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
     <?php endif; ?>
-
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>Rol</th>
-                <th>Usuario</th>
-                <th>Fecha de registro</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($rolUsuarios)): ?>
-                <?php foreach ($rolUsuarios as $ROL_U): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($ROL_U['r_nombre']); ?></td>
-                        <td><?php echo htmlspecialchars($ROL_U['f_nombre'] . ' ' . $ROL_U['f_apellido']); ?></td>
-                        <td><?php echo htmlspecialchars($ROL_U['fecha_registro']); ?></td>
-                        <td>
-                            <?php if ($ROL_U['estado'] == 1): ?>
-                                <span style="color: green; font-weight: bold;">Activo</span>
-                            <?php else: ?>
-                                <span style="color: red; font-weight: bold;">Inactivo</span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <?php if ($ROL_U['estado'] == 1): ?>
-                                <!-- Si es activo -->
-                                <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>" class="btn btn-warning">Editar</a>
-                                <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este Rol_Usuario?');">Eliminar</a>
-                            <?php else: ?>
-                                <!-- Si es inactivo -->
-                                <a href="ADM_RolUsuario.php?id_RolUsuario=<?= $ROL_U['id_rol_usuario']; ?>&action=activar" class="btn btn-primary" onclick="return confirm('¿Deseas activar este Rol_Usuario?');">Activar</a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
+    <div class="table-responsive">
+        <table class="table table-bordered mt-3">
+            <thead>
                 <tr>
-                    <td colspan="4" class="text-center">No hay resultados</td>
+                    <th>Rol</th>
+                    <th>Usuario</th>
+                    <th>Fecha de registro</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
                 </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php if (!empty($rolUsuarios)): ?>
+                    <?php foreach ($rolUsuarios as $ROL_U): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($ROL_U['r_nombre']); ?></td>
+                            <td><?php echo htmlspecialchars($ROL_U['f_nombre'] . ' ' . $ROL_U['f_apellido']); ?></td>
+                            <td><?php echo htmlspecialchars($ROL_U['fecha_registro']); ?></td>
+                            <td>
+                                <?php if ($ROL_U['estado'] == 1): ?>
+                                    <span style="color: green; font-weight: bold;">Activo</span>
+                                <?php else: ?>
+                                    <span style="color: red; font-weight: bold;">Inactivo</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <div class="btn-group-vertical btn-group-sm" role="group">
+                                    <?php if ($ROL_U['estado'] == 1): ?>
+                                        <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>" class="btn btn-warning btn-sm">Editar</a>
+                                        <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>&action=delete" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este Rol_Usuario?');">Eliminar</a>
+                                    <?php else: ?>
+                                        <a href="ADM_RolUsuario.php?id_RolUsuario=<?= $ROL_U['id_rol_usuario']; ?>&action=activar" class="btn btn-primary btn-sm">Activar</a>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4" class="text-center">No hay resultados</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </main>
 
 <?php if (isset($rolUsuario)): ?>

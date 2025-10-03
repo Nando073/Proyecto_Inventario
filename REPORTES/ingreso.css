@@ -151,12 +151,12 @@
         }
         
         .btn-search {
-            background: var(--primary);
+            background: var(--secondary);
             color: white;
         }
         
         .btn-search:hover {
-            background: #1a252f;
+            background: #2980b9;
         }
         
         .errores {
@@ -170,7 +170,7 @@
         }
         
         /* Panel de ingreso */
-        .ingreso-card {
+        .cards {
             background: linear-gradient(to right, #f9f9f9, #f1f5f9);
             border-radius: 8px;
             padding: 20px;
@@ -179,7 +179,7 @@
             border: 1px solid #e1e5e9;
         }
         
-        .ingreso-info {
+        .info {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
@@ -316,7 +316,7 @@
         }
         
         @media (max-width: 768px) {
-            .ingreso-info {
+            .info {
                 grid-template-columns: 1fr;
             }
             
@@ -348,7 +348,7 @@
                 padding: 10px;
             }
             
-            .ingreso-card {
+            .cards {
                 border: 1px solid #000;
                 page-break-inside: avoid;
             }

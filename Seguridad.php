@@ -10,7 +10,7 @@ header("Pragma: no-cache");
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 // 👤 Verificar que haya sesión iniciada
-if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_usuario'])) {
+if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_completo'])) {
     header("Location: ../Acceso.php");
     exit();
 }
@@ -48,5 +48,5 @@ if (!function_exists('verificarAcceso')) {
 }
 
 // Para mostrar el nombre del usuario
-$nombreUsuario = $_SESSION['nombre_usuario'] ?? 'PERFIL';
+$nombreUsuario = $_SESSION['nombre_completo'] ?? 'PERFIL';
 ?>

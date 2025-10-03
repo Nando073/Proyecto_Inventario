@@ -83,20 +83,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         body {
-        padding-top: 100px; /* ajusta según la altura de tu navbar */
+            padding-top: 100px;
+            background-color: #f8f9fa;
         }
         .material-card {
-            margin: 10px;
+            margin: 10px 0;
         }
         .category-title {
-            margin: 30px 0 10px 10px;
+            margin: 30px 0 10px 0;
             font-weight: bold;
             font-size: 1.5rem;
             border-left: 5px solid #007bff;
             padding-left: 10px;
         }
         .navbar {
-            background-color:rgb(65, 180, 136);
+            background-color: rgb(65, 180, 136);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .navbar-brand {
@@ -110,8 +111,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
             font-family: "Poppins", sans-serif; 
             font-weight: bold; 
             font-size: 20px; 
-            color:rgb(255, 255, 255); 
+            color: rgb(255, 255, 255); 
             letter-spacing: 2px; 
+        }
+        
+        /* Botón de menú responsivo */
+        .menu-back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        /* Menú desplegable */
+        .dropdown-menu-custom {
+            min-width: 200px;
+        }
+        
+        /* Mejoras responsivas */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 80px;
+            }
+            
+            .navbar-brand span {
+                font-size: 1rem;
+            }
+            
+            .navbar-brand img {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .category-title {
+                font-size: 1.2rem;
+                margin-left: 10px;
+            }
+            
+            .btn-responsive {
+                font-size: 0.875rem;
+                padding: 0.375rem 0.75rem;
+            }
+            
+            /* Ocultar texto en móviles pequeños */
+            @media (max-width: 480px) {
+                .navbar-brand span {
+                    display: none;
+                }
+                
+                .search-text {
+                    display: none;
+                }
+            }
+        }
+        
+        /* Cards responsivas */
+        .card {
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -119,6 +181,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
 <header>
   <nav class="navbar fixed-top shadow">
     <div class="container-fluid align-items-center d-flex">
+      
+      <!-- Botón de menú desplegable -->
+      <div class="dropdown">
+        <button class="menu-back-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-custom">
+          <li><a class="dropdown-item" href="../PRESENTACION/ADM_Usuario.php"><i class="bi bi-people"></i> Administrar Usuarios</a></li>
+          <li><a class="dropdown-item" href="../PRESENTACION/ADM_Material.php"><i class="bi bi-box-seam"></i> Administrar Materiales</a></li>
+          <li><a class="dropdown-item" href="../TRANSACCIONAL/Ingreso.php"><i class="bi bi-download"></i> Ingreso de Materiales</a></li>
+          <li><a class="dropdown-item" href="../REPORTES/Stock.php"><i class="bi bi-graph-up"></i> Reportes de Stock</a></li>
+        </ul>
+      </div>
 
       <!-- Logo y título -->
       <a class="navbar-brand" href="#">
@@ -126,34 +201,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
         <span>D.D.E.</span>
       </a>
 
-      <!-- Formulario de búsqueda -->
-      <form class="d-flex mx-auto" role="search">
+      <!-- Formulario de búsqueda responsivo -->
+      <form class="d-flex flex-grow-1 mx-2" role="search">
         <input class="form-control me-2" type="search" placeholder="Buscar material..." aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Buscar</button>
+        <!-- <button class="btn btn-outline-success btn-responsive search-text" type="submit">Buscar</button> -->
+        <button class="btn btn-outline-secondary d-none d-sm-block" type="submit">
+          <i class="bi bi-search"></i>
+        </button>
       </form>
-        <!-- Botón del carrito -->
-        <button type="button" class="btn btn-outline-light me-3 position-relative" data-bs-toggle="modal" data-bs-target="#modalCarrito">
-        <i class="bi bi-cart"></i> Carrito
-        <span id="badgeCarrito" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8em; display:none;">
-            0
-        </span>
-</button>
 
-      <!-- Usuario alineado a la derecha -->
-      <a class="navbar-brand d-flex align-items-center ms-auto" href="#">
-        <img src="../IMG/usuario.png" width="40" class="me-2">
-        <span><?php echo htmlspecialchars($nombreUsuario); ?></span>
-        <div class="menu-usuario" id="menuUsuario">
-                    <a href="../logout.php">Cerrar sesión</a>
-        </div>
-      </a>
+      <!-- Botón del carrito -->
+      <button type="button" class="btn btn-outline-light me-2 me-md-3 position-relative btn-responsive" data-bs-toggle="modal" data-bs-target="#modalCarrito">
+        <i class="bi bi-cart"></i> <span class="d-none d-md-inline">Carrito</span>
+        <span id="badgeCarrito" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8em; display:none;">
+          0
+        </span>
+      </button>
+
+      <!-- Usuario responsivo -->
+      <div class="dropdown">
+        <a class="navbar-brand d-flex align-items-center text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <span class="d-none d-md-inline"><?php echo htmlspecialchars($nombreUsuario); ?></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="../logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
+        </ul>
+      </div>
 
     </div>
   </nav>
 </header>
 
-
-<div class="container my-4 ">
+<div class="container my-4">
     <h2 class="text-center mb-4">📦 Egreso de Materiales</h2>
     <ul class="list-unstyled">
         <?php foreach ($materialesPorCategoria as $categoria => $items): ?>
@@ -161,23 +240,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
                 <div class="category-title"><?php echo htmlspecialchars($categoria); ?></div>
                 <div class="row">
                     <?php foreach ($items as $material): ?>
-                        <div class="col-md-4">
-                            <div class="card material-card shadow-sm">
-                                <div class="card-body">
+                        <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                            <div class="card material-card shadow-sm h-100">
+                                <div class="card-body d-flex flex-column">
                                     <h5 class="card-title"><?php echo htmlspecialchars($material['m_nombre']); ?></h5>
                                     <p class="card-text">Stock: <?php echo htmlspecialchars($material['stock_total'] . ' ' . $material['u_medida'] ); ?></p>
                                     <div class="mb-2">
-                                        <label for="cantidad_<?php echo $material['id_material']; ?>">Cantidad a egresar:</label>
+                                        <label for="cantidad_<?php echo $material['id_material']; ?>" class="form-label">Cantidad a egresar:</label>
                                         <input type="number" min="1" max="<?php echo htmlspecialchars($material['stock_total']); ?>" 
                                             name="cantidad[<?php echo $material['id_material']; ?>]" 
                                             id="cantidad_<?php echo $material['id_material']; ?>" 
                                             class="form-control" placeholder="Cantidad">
                                     </div>
-                                    <!-- Aquí puedes agregar lógica JS para añadir a una lista de egreso -->
-                                    <button type="button" class="btn btn-primary btn-sm agregar-egreso" 
-                                        data-id="<?php echo $material['id_material']; ?>">
-                                        Añadir al carrito
-                                    </button>
+                                    <div class="mt-auto">
+                                        <button type="button" class="btn btn-primary btn-sm agregar-egreso w-100 btn-responsive" 
+                                            data-id="<?php echo $material['id_material']; ?>">
+                                            Añadir al carrito
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
 
 <!-- Modal para el carrito de egreso -->
 <div class="modal fade" id="modalCarrito" tabindex="-1" aria-labelledby="modalCarritoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       
       <div class="modal-header">
@@ -201,29 +281,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
       <form id="formEgreso" method="post" action="Egreso.php">
         <div class="modal-body">
           <div class="row mb-3">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 mb-2 mb-md-0">
               <label class="form-label fw-bold">Usuario:</label>
               <input type="text" class="form-control" name="nombre_usuario" value="<?php echo htmlspecialchars($nombreUsuario); ?>" readonly>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
               <label class="form-label fw-bold">Código de Solicitud:</label>
               <input type="text" class="form-control" name="codigo_solicitud" placeholder="Ingrese código de solicitud" required>
             </div>
           </div>
+          
           <!-- Lista de materiales añadidos al carrito -->
-          <div id="carrito-materiales">
-            <!-- Aquí se agregan dinámicamente las filas de materiales -->
+          <div class="table-responsive">
+            <div id="carrito-materiales">
+              <!-- Aquí se agregan dinámicamente las filas de materiales -->
+            </div>
           </div>
+          
           <div class="row mt-3">
-            <div class="col-md-6 fw-bold">Total de materiales añadidos:</div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 fw-bold d-flex align-items-center justify-content-center justify-content-md-start mb-2 mb-md-0">
+              Total de materiales añadidos:
+            </div>
+            <div class="col-12 col-md-6">
               <input type="text" id="totalMateriales" class="form-control" readonly value="0">
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          <button type="submit" class="btn btn-primary">Generar Egreso</button>
+          <button type="button" class="btn btn-secondary btn-responsive" data-bs-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-primary btn-responsive">Generar Egreso</button>
         </div>
       </form>
     </div>
@@ -231,6 +317,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
 </div>
 
 <script>
+// Tu código JavaScript existente permanece igual
 document.addEventListener('DOMContentLoaded', function() {
     const carrito = [];
     const carritoMateriales = document.getElementById('carrito-materiales');
@@ -279,11 +366,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const row = document.createElement('div');
             row.className = 'row align-items-center mb-2';
             row.innerHTML = `
-                <div class="col-md-3"><input type="hidden" name="materiales[${idx}][id]" value="${item.id}">
-                    <input type="text" class="form-control" value="${item.nombre}" readonly></div>
-                <div class="col-md-3"><input type="text" class="form-control" value="${item.categoria}" readonly></div>
-                <div class="col-md-3"><input type="number" class="form-control" name="materiales[${idx}][cantidad]" value="${item.cantidad}" readonly></div>
-                <div class="col-md-2"><button type="button" class="btn btn-danger btn-sm quitar-material" data-idx="${idx}">X</button></div>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <input type="hidden" name="materiales[${idx}][id]" value="${item.id}">
+                    <input type="text" class="form-control" value="${item.nombre}" readonly>
+                </div>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <input type="text" class="form-control" value="${item.categoria}" readonly>
+                </div>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <input type="number" class="form-control" name="materiales[${idx}][cantidad]" value="${item.cantidad}" readonly>
+                </div>
+                <div class="col-12 col-md-2 text-center">
+                    <button type="button" class="btn btn-danger btn-sm quitar-material btn-responsive" data-idx="${idx}">X</button>
+                </div>
             `;
             carritoMateriales.appendChild(row);
         });
@@ -301,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     btnCard.classList.remove('btn-danger');
                     btnCard.classList.add('btn-primary');
                     btnCard.disabled = false;
-                    btnCard.textContent = 'Añadir a egreso';
+                    btnCard.textContent = 'Añadir al carrito';
                 }
                 renderCarrito();
                 actualizarBadgeCarrito();
@@ -334,6 +429,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

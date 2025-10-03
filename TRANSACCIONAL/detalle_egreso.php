@@ -27,15 +27,14 @@ if (empty($egresoDetalles)) {
 // Usamos el primer detalle para los datos generales
 $egreso = $egresoDetalles[0];
 ?>
-<h5>ID Egreso: <?php echo htmlspecialchars($egreso['id_egreso']); ?></h5>
 <h5>Fecha: <?php echo htmlspecialchars($egreso['e_fecha']); ?></h5>
+<h5>Area: <?php echo htmlspecialchars($egreso['a_nombre']); ?></h5>
 <h5>Funcionario: <?php echo htmlspecialchars($egreso['funcionario_nombre']); ?></h5>
 <h5>Código Solicitud: <?php echo htmlspecialchars($egreso['e_solicitud']); ?></h5>
 
 <table class="table table-bordered mt-2">
     <thead>
         <tr>
-            <th>ID Detalle</th>
             <th>Material</th>
             <th>Categoría</th>
             <th>Cantidad</th>
@@ -47,7 +46,6 @@ $egreso = $egresoDetalles[0];
             $totalEgreso += $detalle['e_stock'];
         ?>
         <tr>
-            <td><?php echo htmlspecialchars($detalle['id_e_detalle']); ?></td>
             <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
             <td><?php echo htmlspecialchars($detalle['categoria_nombre']); ?></td>
             <td><?php echo htmlspecialchars($detalle['e_stock'] . " - " . $detalle['u_medida']); ?></td>
@@ -56,7 +54,7 @@ $egreso = $egresoDetalles[0];
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="3">Total del Egreso</th>
+            <th colspan="2">Total del Egreso</th>
             <th><?php echo number_format($totalEgreso, 2); ?></th>
         </tr>
     </tfoot>

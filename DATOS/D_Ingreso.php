@@ -147,6 +147,17 @@ class D_Ingreso {
             }
         }
 
+          public function BuscarHistorialIngreso($material, $proveedor, $fecha_inicio, $fecha_fin) {
+            $sql = "CALL BuscarHistorialIngreso(?, ?, ?, ?)";
+            try {
+                $ps = $this->con->prepare($sql);
+                $ps->execute([$material, $proveedor, $fecha_inicio, $fecha_fin]);
+                return $ps->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $ex) {
+                echo "Error al buscar: " . $ex->getMessage();
+                return [];
+            }
+        }
 }
 
 ?>

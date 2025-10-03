@@ -1,23 +1,64 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const hamburguesa = document.querySelector('.mostrar-menu'); // Icono de menú
-    const cerrar = document.querySelector('.esconder-menu'); // Icono de cerrar
-    const sidebar = document.querySelector('aside'); // Menú lateral
-    const main = document.querySelector('main'); // Contenido principal
+    const hamburguesa = document.querySelector('.mostrar-menu');
+    const cerrar = document.querySelector('.esconder-menu');
+    const sidebar = document.querySelector('aside');
+    const main = document.querySelector('main');
 
-    // Establecer la vista inicial con aside visible y main al 80%
-    sidebar.classList.remove('hidden');
-    main.classList.remove('expanded');
+    const esMovil = () => window.innerWidth < 768;
 
-    // Mostrar el menú y reducir el main
-    hamburguesa.addEventListener('click', () => {
+    // Restaurar estado del menú en móviles
+    if (esMovil() && sidebar) {
+    const estadoMenu = localStorage.getItem('asideMenu');
+    if (estadoMenu === 'open') {
         sidebar.classList.remove('hidden');
-        main.classList.remove('expanded');
+    } else {
+        sidebar.classList.add('hidden');
+    }
+}
+
+    // Mostrar menú
+    if (hamburguesa) {
+        hamburguesa.addEventListener('click', () => {
+            if (esMovil() && sidebar) {
+                sidebar.classList.remove('hidden');
+                localStorage.setItem('asideMenu', 'open');
+            }
+        });
+    }
+
+    // Ocultar menú
+    if (cerrar) {
+        cerrar.addEventListener('click', () => {
+            if (esMovil() && sidebar) {
+                sidebar.classList.add('hidden');
+                localStorage.setItem('asideMenu', 'closed');
+            }
+        });
+    }
+
+    // Cerrar al hacer clic en enlaces
+    document.querySelectorAll('aside a').forEach(enlace => {
+        enlace.addEventListener('click', () => {
+            if (esMovil() && sidebar) {
+                sidebar.classList.add('hidden');
+                localStorage.setItem('asideMenu', 'closed');
+            }
+        });
     });
 
-    // Ocultar el menú y expandir el main
-    cerrar.addEventListener('click', () => {
-        sidebar.classList.add('hidden');
-        main.classList.add('expanded');
+    // Ajustar layout al cambiar tamaño
+    window.addEventListener('resize', () => {
+        if (!esMovil() && sidebar) {
+            sidebar.classList.remove('hidden'); // siempre visible en escritorio
+            localStorage.removeItem('asideMenu');
+            if (main) main.classList.remove('expanded');
+        } else if (esMovil() && sidebar) {
+            const estadoMenu = localStorage.getItem('asideMenu');
+            if (estadoMenu === 'open') {
+                sidebar.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('hidden');
+            }
+        }
     });
 });
-

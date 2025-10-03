@@ -104,15 +104,15 @@ if ($searchTerm) {
 <?php include '../DEMO/index.php'; ?>
 
 <main>
-    <div class="card mb-4" style="max-width: 540px; margin-left: 60vh">
+    <div class="card mb-4 mx-auto" style="max-width: 540px;">
         <div class="row g-0">
             <div class="col-md-5">
-                <img src="../IMG/cargo.jpeg" class="img-fluid rounded-start">
+                <img src="../IMG/cargo.jpeg" class="img-fluid rounded-start w-100 h-auto">
             </div>
             <div class="col-md-7">
                 <div class="card-body">
-                    <h4 class="card-title">CARGOS</h4>
-                    <h3 class="card-text"><small class="text-body-secondary">CRUD</small></h3>
+                    <h4 class="card-title h5 h4-md">CARGOS</h4>
+                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
                 </div>
             </div>
         </div>
@@ -120,7 +120,7 @@ if ($searchTerm) {
 
     <!-- Modal -->
     <div class="modal fade" id="cargoModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="materialModalLabel">Crear o Editar Cargo</h5>
@@ -151,12 +151,12 @@ if ($searchTerm) {
     </div>
 
     <h3 class="mt-5">Administrar Cargos</h3>
-    <form class="d-flex justify-content-between align-items-center mt-3" action="ADM_Cargo.php" method="get">
-        <div>
-            <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-            <button type="submit" class="btn btn-info">Buscar</button>
+    <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_Area.php" method="get">
+        <div class="d-flex flex-grow-1 me-md-2">
+            <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" class="form-control me-2"/>
+            <button type="submit" class="btn btn-info flex-shrink-0">Buscar</button>
         </div>
-        <button type="button" class="btn btn-success m-3" id="btnCrearCargo" data-bs-toggle="modal" data-bs-target="#cargoModal">
+        <button type="button" class="btn btn-success" id="btnCrearCargo" data-bs-toggle="modal" data-bs-target="#cargoModal">
             Registrar Cargo
         </button>
     </form>
@@ -168,32 +168,33 @@ if ($searchTerm) {
     </div>
     <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
 <?php endif; ?>
-
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Cantidad de fucionarios</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($cargos as $are): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($are['id_cargo']); ?></td>
-                <td><?php echo htmlspecialchars($are['nombre_c']); ?></td>
-                <td><?php echo htmlspecialchars($are['descripcion_c']); ?></td>
-                <td><?php echo htmlspecialchars($are['funcionarios_c']); ?></td>
-                <td>
-                    <a href="ADM_Cargo.php?id_cargo=<?php echo $are['id_cargo']; ?>" class="btn btn-warning">Editar</a>
-                    <a href="ADM_Cargo.php?id_cargo=<?php echo $are['id_cargo']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta cargo?');">Eliminar</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Cantidad de fucionarios</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($cargos as $are): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($are['id_cargo']); ?></td>
+                    <td><?php echo htmlspecialchars($are['nombre_c']); ?></td>
+                    <td><?php echo htmlspecialchars($are['descripcion_c']); ?></td>
+                    <td><?php echo htmlspecialchars($are['funcionarios_c']); ?></td>
+                    <td>
+                        <a href="ADM_Cargo.php?id_cargo=<?php echo $are['id_cargo']; ?>" class="btn btn-warning">Editar</a>
+                        <a href="ADM_Cargo.php?id_cargo=<?php echo $are['id_cargo']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta cargo?');">Eliminar</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 </main>
 
 <?php if (isset($cargo)): ?>

@@ -26,14 +26,12 @@ if (empty($ingresoDetalles)) {
 
 $ingreso = $ingresoDetalles[0];
 ?>
-<h5>ID Ingreso: <?php echo htmlspecialchars($ingreso['id_ingreso']); ?></h5>
 <h5>Fecha: <?php echo htmlspecialchars($ingreso['i_fecha']); ?></h5>
 <h5>Proveedor: <?php echo htmlspecialchars($ingreso['proveedor_nombre']); ?></h5>
 
 <table class="table table-bordered mt-2">
     <thead>
         <tr>
-            <th>ID Detalle</th>
             <th>Material</th>
             <th>Precio</th>
             <th>Cantidad</th>
@@ -46,7 +44,6 @@ $ingreso = $ingresoDetalles[0];
             $totalIngreso += $detalle['sub_total'];
         ?>
         <tr>
-            <td><?php echo htmlspecialchars($detalle['id_d_ingreso']); ?></td>
             <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
             <td><?php echo htmlspecialchars($detalle['precio']); ?> Bs.</td>
             <td><?php echo htmlspecialchars($detalle['cantidad'] . " - " . $detalle['u_medida']); ?></td>
@@ -56,7 +53,7 @@ $ingreso = $ingresoDetalles[0];
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="4">Total del Ingreso</th>
+            <th colspan="3">Total del Ingreso</th>
             <th><?php echo number_format($totalIngreso, 2); ?> Bs.</th>
         </tr>
     </tfoot>

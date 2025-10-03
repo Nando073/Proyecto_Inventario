@@ -178,7 +178,21 @@ class D_Egreso {
         return [];
     }
 }
-    
+
+
+    public function BuscarHistorialEgreso($funcionario, $area, $fecha_inicio, $fecha_fin) {
+        $sql = "CALL BuscarHistorialEgreso(?, ?, ?, ?)";
+        try {
+            $ps = $this->con->prepare($sql);
+            $ps->execute([$funcionario, $area, $fecha_inicio, $fecha_fin]);
+            return $ps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex) {
+            echo "Error al buscar: " . $ex->getMessage();
+            return [];
+        }
+        
+    }
+
 }
 
 ?>

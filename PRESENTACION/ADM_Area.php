@@ -104,15 +104,15 @@ if ($searchTerm) {
 <?php include '../DEMO/index.php'; ?>
 
 <main>
-    <div class="card mb-4" style="max-width: 540px; margin-left: 60vh">
+    <div class="card mb-4 mx-auto" style="max-width: 540px;">
         <div class="row g-0">
-            <div class="col-md-5">
-                <img src="../IMG/area.jpeg" class="img-fluid rounded-start">
+            <div class="col-5 col-md-5">
+                <img src="../IMG/area.jpeg" class="img-fluid rounded-start w-100 h-auto">
             </div>
-            <div class="col-md-7">
+            <div class="col-7 col-md-7">
                 <div class="card-body">
-                    <h4 class="card-title">AREAS</h4>
-                    <h3 class="card-text"><small class="text-body-secondary">CRUD</small></h3>
+                    <h4 class="card-title h5 h4-md">AREAS</h4>
+                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
                 </div>
             </div>
         </div>
@@ -120,7 +120,7 @@ if ($searchTerm) {
 
     <!-- Modal -->
     <div class="modal fade" id="areaModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="materialModalLabel">Crear o Editar Area</h5>
@@ -151,13 +151,13 @@ if ($searchTerm) {
     </div>
 
     <h3 class="mt-5">Administrar Areas</h3>
-    <form class="d-flex justify-content-between align-items-center mt-3" action="ADM_Area.php" method="get">
-        <div>
-            <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-            <button type="submit" class="btn btn-info">Buscar</button>
+    <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_Area.php" method="get">
+        <div class="d-flex flex-grow-1 me-md-2">
+            <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" class="form-control me-2"/>
+            <button type="submit" class="btn btn-info flex-shrink-0">Buscar</button>
         </div>
-        <button type="button" class="btn btn-success m-3" id="btnCrearArea" data-bs-toggle="modal" data-bs-target="#areaModal">
-            Registrar Area
+        <button type="button" class="btn btn-success" id="btnCrearArea" data-bs-toggle="modal" data-bs-target="#areaModal">
+            Registrar Área
         </button>
     </form>
 
@@ -168,32 +168,33 @@ if ($searchTerm) {
     </div>
     <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
 <?php endif; ?>
-
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Cantidad de fucionarios</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($areas as $are): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($are['id_area']); ?></td>
-                <td><?php echo htmlspecialchars($are['a_nombre']); ?></td>
-                <td><?php echo htmlspecialchars($are['a_descripcion']); ?></td>
-                <td><?php echo htmlspecialchars($are['a_funcionarios']); ?></td>
-                <td>
-                    <a href="ADM_Area.php?id_area=<?php echo $are['id_area']; ?>" class="btn btn-warning">Editar</a>
-                    <a href="ADM_Area.php?id_area=<?php echo $are['id_area']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta area?');">Eliminar</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Cantidad de fucionarios</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($areas as $are): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($are['id_area']); ?></td>
+                    <td><?php echo htmlspecialchars($are['a_nombre']); ?></td>
+                    <td><?php echo htmlspecialchars($are['a_descripcion']); ?></td>
+                    <td><?php echo htmlspecialchars($are['a_funcionarios']); ?></td>
+                    <td>
+                        <a href="ADM_Area.php?id_area=<?php echo $are['id_area']; ?>" class="btn btn-warning">Editar</a>
+                        <a href="ADM_Area.php?id_area=<?php echo $are['id_area']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta area?');">Eliminar</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 </main>
 
 <?php if (isset($area)): ?>

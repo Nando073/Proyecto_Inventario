@@ -138,26 +138,27 @@ foreach ($funcionarios as &$funcionariO) {
 <?php include '../DEMO/index.php'; ?>
 
     <main>
-    <div class="card mb-4" style="max-width: 540px;margin-left: 60vh">
+    <!-- Modifica tu tarjeta principal -->
+    <div class="card mb-4 mx-auto" style="max-width: 540px;">
         <div class="row g-0">
-          <div class="col-md-5">
-              <img src="../IMG/img.png" class="img-fluid rounded-start">
-          </div>
-          <div class="col-md-7">
-            <div class="card-body">
-              <h4 class="card-title">FUNCIONARIOS</h4>
-              <h3 class="card-text"><small class="text-body-secondary">CRUD</small></h3>
+            <div class="col-5 col-md-5">
+                <img src="../IMG/img.png" class="img-fluid rounded-start w-100 h-auto">
             </div>
-          </div>
+            <div class="col-7 col-md-7">
+                <div class="card-body">
+                    <h4 class="card-title h5 h4-md">FUNCIONARIOS</h4>
+                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
+                </div>
+            </div>
         </div>
-      </div>
+    </div>
     
 
         <!-- Formulario para crear o editar -->
         <!-- Formulario único para crear o guardar cambios -->
 <!-- Modal -->
 <div class="modal fade" id="funcionarioModal" tabindex="-1" aria-labelledby="usuarioModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg"> <!-- Puedes cambiar modal-lg por modal-md si lo prefieres -->
+  <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Puedes cambiar modal-lg por modal-md si lo prefieres -->
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="usuarioModalLabel">Crear o Editar Funcionarios</h5>
@@ -241,40 +242,47 @@ foreach ($funcionarios as &$funcionariO) {
 
         <!-- Lista de funcionarios -->
         <h3 class="mt-5">Administrar Funcionarios</h3>
-        <form class="d-flex justify-content-between align-items-center mt-3" action="ADM_Funcionario.php" method="get">
-            <div>
-                <input type="text" name="search" placeholder="Buscar por f_nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-                <button type="submit" class="btn btn-info">Buscar</button>
-            </div>
-            <!-- Botones a la derecha -->
-            <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
-                <div class="d-flex align-items-center ms-auto">
-                    <div class="btn-group me-2">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            Todos los Funcionarios
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
-                                href="ADM_Funcionario.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
-                                    Activos
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
-                                href="ADM_Funcionario.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
-                                    Inactivos
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- Botón Registrar Funcionario -->
-                    <button type="button" class="btn btn-success m-3" id="btnCrearFunci" data-bs-toggle="modal" data-bs-target="#funcionarioModal">
-                            Registrar Funcionario
-                    </button>
+        <!-- Reemplaza tu formulario de búsqueda actual con este -->
+            <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_Funcionario.php" method="get">
+                <!-- Búsqueda -->
+                <div class="d-flex flex-grow-1 me-md-2">
+                    <input type="text" name="search" placeholder="Buscar por nombre" 
+                        value="<?php echo htmlspecialchars($searchTerm); ?>" 
+                        class="form-control me-2">
+                    <button type="submit" class="btn btn-info flex-shrink-0">Buscar</button>
                 </div>
-            <?php endif; ?>
-        </form>
+                
+                <!-- Botones de administración -->
+                <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
+                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+                        <!-- Dropdown -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Todos los Funcionarios
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
+                                    href="ADM_Funcionario.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                                        Activos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
+                                    href="ADM_Funcionario.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                                        Inactivos
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Botón Registrar -->
+                        <button type="button" class="btn btn-success" id="btnCrearFunci" data-bs-toggle="modal" data-bs-target="#funcionarioModal">
+                            Registrar
+                        </button>
+                    </div>
+                <?php endif; ?>
+            </form>
 <!-- Mensaje -->
 <?php if (isset($_SESSION['mensaje'])): ?>
     <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
@@ -283,64 +291,66 @@ foreach ($funcionarios as &$funcionariO) {
     <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
 <?php endif; ?>
 
-        <table class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <!-- <th>ID</th> -->
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Correo</th>
-                    <th>Area</th>
-                    <th>Cargo</th>
-                    <th>Cédula de Identidad</th>
-                    <th>Fecha Registro</th>
-                    <th>Estado</th>
-                    <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
-                        <th>Acciones</th>
-                    <?php endif; ?>
-                </tr>
-            </thead>
-            <tbody>
-            <?php if (!empty($funcionarios)): ?>
-                <?php foreach ($funcionarios as $Nfuncionarios): ?>
-                    <tr>
-                        
-                        <td><?php echo htmlspecialchars($Nfuncionarios['f_nombre']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['f_apellido']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['f_correo']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['a_nombre']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['nombre_c']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['ci'] . ' ' . $Nfuncionarios['complemento_ci']); ?></td>
-                        <td><?php echo htmlspecialchars($Nfuncionarios['f_fecha_registro']); ?></td>
-                        <td>
-                            <?php if ($Nfuncionarios['f_estado'] == 1): ?>
-                                <span style="color: green; font-weight: bold;">Activo</span>
-                            <?php else: ?>
-                                <span style="color: red; font-weight: bold;">Inactivo</span>
-                            <?php endif; ?>
-                         </td>
-                        <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
-                            <td>
-                                <?php if ($Nfuncionarios['f_estado'] == 1): ?>
-                                    <!-- Si es activo -->
-                                        <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>" class="btn btn-warning">Editar</a>
-                                        <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este funcionario?');">Eliminar</a>
+        <!-- Reemplaza tu tabla actual con esto -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered mt-3">
+                            <!-- El contenido de tu tabla permanece igual -->
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Correo</th>
+                                    <th>Area</th>
+                                    <th>Cargo</th>
+                                    <th>Cédula de Identidad</th>
+                                    <th>Fecha Registro</th>
+                                    <th>Estado</th>
+                                    <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
+                                        <th>Acciones</th>
+                                    <?php endif; ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($funcionarios)): ?>
+                                    <?php foreach ($funcionarios as $Nfuncionarios): ?>
+                                        <tr>
+                                            
+                                            <td><?php echo htmlspecialchars($Nfuncionarios['f_nombre']); ?></td>
+                                            <td><?php echo htmlspecialchars($Nfuncionarios['f_apellido']); ?></td>
+                                            <td><?php echo htmlspecialchars($Nfuncionarios['f_correo']); ?></td>
+                                            <td><?php echo htmlspecialchars($Nfuncionarios['a_nombre']); ?></td>
+                                            <td><?php echo htmlspecialchars($Nfuncionarios['nombre_c']); ?></td>
+                                            <td><?php echo htmlspecialchars($Nfuncionarios['ci'] . ' ' . $Nfuncionarios['complemento_ci']); ?></td>
+                                            <td><?php echo htmlspecialchars($Nfuncionarios['f_fecha_registro']); ?></td>
+                                            <td>
+                                                <?php if ($Nfuncionarios['f_estado'] == 1): ?>
+                                                    <span style="color: green; font-weight: bold;">Activo</span>
+                                                <?php else: ?>
+                                                    <span style="color: red; font-weight: bold;">Inactivo</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
+                                                <td>
+                                                    <?php if ($Nfuncionarios['f_estado'] == 1): ?>
+                                                        <!-- Si es activo -->
+                                                            <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>" class="btn btn-warning">Editar</a>
+                                                            <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este funcionario?');">Eliminar</a>
+                                                    <?php else: ?>
+                                                        <!-- Si es inactivo -->
+                                                        <a href="ADM_Funcionario.php?id_funcionario=<?= $Nfuncionarios['id_funcionario']; ?>&action=activar" class="btn btn-primary" onclick="return confirm('¿Deseas activar este funcionario?');">Activar</a>
+                                                    <?php endif; ?>
+                                                </td>
+                                            <?php endif; ?>
+                                        </tr>
+                                    <?php endforeach; ?>
                                 <?php else: ?>
-                                    <!-- Si es inactivo -->
-                                    <a href="ADM_Funcionario.php?id_funcionario=<?= $Nfuncionarios['id_funcionario']; ?>&action=activar" class="btn btn-primary" onclick="return confirm('¿Deseas activar este funcionario?');">Activar</a>
+                                    <tr>
+                                        <td colspan="10" class="text-center">No hay funcionarios para mostrar.</td>
+                                    </tr>
                                 <?php endif; ?>
-                            </td>
-                        <?php endif; ?>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                 <tr>
-                     <td colspan="10" class="text-center">No hay funcionarios para mostrar.</td>
-                </tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
+                            </tbody>
+                        </table>
+                    </div>
                 </main>
 
                 <?php if (isset($funcionario)): ?>

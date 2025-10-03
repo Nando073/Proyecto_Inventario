@@ -132,15 +132,15 @@ foreach ($proveedores as &$proveedorItem) {
 <?php include '../DEMO/index.php'; ?>
 
 <main>
-    <div class="card mb-4" style="max-width: 540px; margin-left: 60vh">
+    <div class="card mb-4 mx-auto" style="max-width: 540px;">
         <div class="row g-0">
-            <div class="col-md-5">
-                <img src="../IMG/medida.jpeg" class="img-fluid rounded-start">
+            <div class="col-5 col-md-5">
+                <img src="../IMG/medida.jpeg" class="img-fluid rounded-start w-100 h-auto">
             </div>
-            <div class="col-md-7">
+            <div class="col-7 col-md-7">
                 <div class="card-body">
-                    <h4 class="card-title">PROVEEDORES</h4>
-                    <h3 class="card-text"><small class="text-body-secondary">CRUD</small></h3>
+                    <h4 class="card-title h5 h4-md">PROVEEDORES</h4>
+                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
                 </div>
             </div>
         </div>
@@ -148,7 +148,7 @@ foreach ($proveedores as &$proveedorItem) {
 
     <!-- Modal -->
     <div class="modal fade" id="proveedorModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="materialModalLabel">Crear o Editar Proveedor</h5>
@@ -206,37 +206,41 @@ foreach ($proveedores as &$proveedorItem) {
     </div>
 
     <h3 class="mt-5">Administrar Proveedores</h3>
-    <form class="d-flex justify-content-between align-items-center mt-3" action="ADM_Proveedor.php" method="get">
-        <div>
-            <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-            <button type="submit" class="btn btn-info">Buscar</button>
+    <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_Proveedor.php" method="get">
+        <!-- Búsqueda -->
+        <div class="d-flex flex-grow-1 me-md-2 mb-2 mb-md-0">
+            <input type="text" name="search" placeholder="Buscar proveedor" 
+                value="<?php echo htmlspecialchars($searchTerm); ?>" 
+                class="form-control me-2">
+            <button type="submit" class="btn btn-info flex-shrink-0">Buscar</button>
         </div>
-        <!-- Botones a la derecha -->
-            <div class="d-flex align-items-center ms-auto">
-                <div class="btn-group me-2">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        Todos los Proveedores
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
-                            href="ADM_Proveedor.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
-                                Activos
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
-                            href="ADM_Proveedor.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
-                                Inactivos
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <!-- Botón Registrar Proveedor -->
-                <button type="button" class="btn btn-success m-3" id="btnCrearProveedor" data-bs-toggle="modal" data-bs-target="#proveedorModal">
-                    Registrar Proveedor
+        
+        <!-- Botones de administración -->
+        <div class="d-flex flex-wrap gap-2 justify-content-end">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Todos
                 </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item <?php echo $estadoFiltro === 'activo' ? 'active' : ''; ?>" 
+                        href="ADM_Proveedor.php?estado=activo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                            Activos
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item <?php echo $estadoFiltro === 'inactivo' ? 'active' : ''; ?>" 
+                        href="ADM_Proveedor.php?estado=inactivo<?php echo $searchTerm ? '&search='.urlencode($searchTerm) : ''; ?>">
+                            Inactivos
+                        </a>
+                    </li>
+                </ul>
             </div>
+            
+            <button type="button" class="btn btn-success" id="btnCrearProveedor" data-bs-toggle="modal" data-bs-target="#proveedorModal">
+                Registrar
+            </button>
+        </div>
     </form>
 
     <!-- Mensaje -->
@@ -247,6 +251,7 @@ foreach ($proveedores as &$proveedorItem) {
         <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
     <?php endif; ?>
 
+<div class="table-responsive">
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
@@ -278,14 +283,14 @@ foreach ($proveedores as &$proveedorItem) {
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?php if ($Proveedor['p_estado'] == 1): ?>
-                                <!-- Si es activo -->
-                                <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>" class="btn btn-warning">Editar</a>
-                                <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta proveedor?');">Eliminar</a>
-                            <?php else: ?>
-                                <!-- Si es inactivo -->
-                                <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>&action=activar" class="btn btn-primary">Activar</a>
-                            <?php endif; ?>
+                            <div class="btn-group-vertical btn-group-sm" role="group">
+                                <?php if ($Proveedor['p_estado'] == 1): ?>
+                                    <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>&action=delete" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este proveedor?');">Eliminar</a>
+                                <?php else: ?>
+                                    <a href="ADM_Proveedor.php?id_proveedor=<?php echo $Proveedor['id_proveedor']; ?>&action=activar" class="btn btn-primary btn-sm">Activar</a>
+                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -296,6 +301,7 @@ foreach ($proveedores as &$proveedorItem) {
             <?php endif; ?>
         </tbody>
     </table>
+</div>
 </main>
 
 <?php if (isset($proveedor)): ?>

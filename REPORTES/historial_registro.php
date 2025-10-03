@@ -5,11 +5,37 @@ require_once '../NEGOCIO/N_Ingreso.php';
 if (isset($_GET['msg'])) {
     echo "<script>alert('" . htmlspecialchars($_GET['msg']) . "');</script>";
 }
-// Obtener los detalles de los ingresos
-$ingresoService = new N_Ingreso();
-$detalles = $ingresoService->ObtenerDetallesIngresos();
 
-// Agrupar detalles por `id_ingreso`
+// Obtener parámetros de búsqueda
+$material = $_GET['material'] ?? null;
+$proveedor = $_GET['proveedor'] ?? null;
+$fecha_inicio = $_GET['fecha_inicio'] ?? null;
+$fecha_fin = $_GET['fecha_fin'] ?? null;
+
+$ingresoService = new N_Ingreso();
+
+// Validaciones de fechas
+$errores = [];
+$fecha_min = '2020-01-01';
+$fecha_max = date('Y-m-d');
+if ($fecha_inicio && $fecha_inicio < $fecha_min) $errores[] = "La fecha de inicio no puede ser menor a $fecha_min";
+if ($fecha_fin && $fecha_fin > $fecha_max) $errores[] = "La fecha de fin no puede ser mayor a hoy";
+if ($fecha_inicio && $fecha_fin && $fecha_inicio > $fecha_fin) $errores[] = "La fecha de inicio no puede ser mayor que la de fin";
+
+// Si hay búsqueda y no hay errores, usar buscarHistorialIngreso
+if (($material || $proveedor || $fecha_inicio || $fecha_fin) && empty($errores)) {
+    $detalles = $ingresoService->buscarHistorialIngreso(
+        $material ?: null,
+        $proveedor ?: null,
+        $fecha_inicio ?: null,
+        $fecha_fin ?: null
+    );
+} else {
+    // Si hay errores o no hay búsqueda, obtener todos los datos
+    $detalles = $ingresoService->ObtenerDetallesIngresos();
+}
+
+// Agrupar detalles por `id_ingreso` (esto funciona tanto para búsqueda como para todos los datos)
 $ingresosAgrupados = [];
 foreach ($detalles as $detalle) {
     $id_ingreso = $detalle['id_ingreso'];
@@ -17,23 +43,6 @@ foreach ($detalles as $detalle) {
         $ingresosAgrupados[$id_ingreso] = [];
     }
     $ingresosAgrupados[$id_ingreso][] = $detalle;
-}
-
-// Verificar si se ha solicitado eliminar un ingreso
-if (isset($_GET['id_ingreso']) && $_GET['action'] === 'delete') {
-    $id_ingreso = filter_input(INPUT_GET, 'id_ingreso', FILTER_VALIDATE_INT);
-
-    if ($id_ingreso) {
-        try {
-            $ingresoService->eliminarIngreso($id_ingreso);
-            header('Location: historial_registro.php?msg=Ingreso eliminado correctamente');
-            exit();
-        } catch (Exception $e) {
-            echo "Error al eliminar el ingreso: " . htmlspecialchars($e->getMessage());
-        }
-    } else {
-        echo "ID de ingreso no válido.";
-    }
 }
 ?>
 
@@ -67,7 +76,7 @@ if (isset($_GET['id_ingreso']) && $_GET['action'] === 'delete') {
                     <div class="form-group">
                         <label for="material"><i class="fas fa-box"></i> Material</label>
                         <input type="text" id="material" name="material" class="search-input"
-                            placeholder="Ej: Cemento..." value="<?php echo htmlspecialchars($_GET['material'] ?? ''); ?>">
+                            placeholder="Ej: Material..." value="<?php echo htmlspecialchars($_GET['material'] ?? ''); ?>">
                     </div>
                     
                     <div class="form-group">
@@ -97,7 +106,7 @@ if (isset($_GET['id_ingreso']) && $_GET['action'] === 'delete') {
                 </div>
             </form>
             
-            <?php if (isset($errores) && $errores): ?>
+            <?php if (!empty($errores)): ?>
                 <div class="errores">
                     <?php foreach ($errores as $e) echo "<div><i class='fas fa-exclamation-circle'></i> $e</div>"; ?>
                 </div>
@@ -112,9 +121,9 @@ if (isset($_GET['id_ingreso']) && $_GET['action'] === 'delete') {
                     $totalIngreso += $detalle['sub_total'];
                 }
             ?>
-                <div class="ingreso-card">
+                <div class="cards">
                     
-                    <div class="ingreso-info">
+                    <div class="info">
                         <div class="info-item">
                             <span class="info-label"><i class="far fa-calendar-alt"></i> Fecha</span>
                             <span class="info-value"><?php echo htmlspecialchars($detalles[0]['i_fecha']); ?></span>
@@ -135,7 +144,6 @@ if (isset($_GET['id_ingreso']) && $_GET['action'] === 'delete') {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID Detalle</th>
                                     <th>Material</th>
                                     <th>Precio Unitario</th>
                                     <th>Cantidad</th>
@@ -145,7 +153,6 @@ if (isset($_GET['id_ingreso']) && $_GET['action'] === 'delete') {
                             <tbody>
                                 <?php foreach ($detalles as $detalle): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($detalle['id_d_ingreso']); ?></td>
                                     <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
                                     <td><?php echo number_format($detalle['precio'], 2); ?> Bs.</td>
                                     <td><?php echo htmlspecialchars($detalle['cantidad'] . " " . $detalle['u_medida']); ?></td>
@@ -155,7 +162,7 @@ if (isset($_GET['id_ingreso']) && $_GET['action'] === 'delete') {
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="4" style="text-align: right;">Total del Ingreso:</td>
+                                    <td colspan="3" style="text-align: right;">Total del Ingreso:</td>
                                     <td><?php echo number_format($totalIngreso, 2); ?> Bs.</td>
                                 </tr>
                             </tfoot>
@@ -169,53 +176,23 @@ if (isset($_GET['id_ingreso']) && $_GET['action'] === 'delete') {
             </div>
         <?php endif; ?>
     </div>
-    
-    <!-- Modal de confirmación para eliminar -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Confirmar Eliminación</h3>
-                <span class="close" onclick="closeModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>¿Está seguro de que desea eliminar este ingreso? Esta acción no se puede deshacer.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
-                <button class="btn btn-confirm" id="confirmDelete">Eliminar</button>
-            </div>
-        </div>
-    </div>
 
     <script>
-        // Función para abrir el modal de confirmación
-        function openDeleteModal(id_ingreso) {
-            const modal = document.getElementById('deleteModal');
-            const confirmBtn = document.getElementById('confirmDelete');
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInicio = document.getElementById('fecha_inicio');
+            const fechaFin = document.getElementById('fecha_fin');
             
-            // Configurar el evento de eliminación
-            confirmBtn.onclick = function() {
-                window.location.href = `?action=delete&id_ingreso=${id_ingreso}`;
-            };
-            
-            // Mostrar el modal
-            modal.style.display = 'block';
-        }
-        
-        // Función para cerrar el modal
-        function closeModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-        }
-        
-        // Cerrar el modal al hacer clic fuera de él
-        window.onclick = function(event) {
-            const modal = document.getElementById('deleteModal');
-            if (event.target === modal) {
-                closeModal();
+            if(fechaInicio && fechaFin) {
+                fechaInicio.addEventListener('change', function() {
+                    fechaFin.min = this.value;
+                });
+                
+                fechaFin.addEventListener('change', function() {
+                    fechaInicio.max = this.value;
+                });
             }
-        };
+        });
         
-        // Mostrar mensaje de confirmación si existe
         <?php if (isset($_GET['msg'])): ?>
             alert('<?php echo htmlspecialchars($_GET['msg']); ?>');
         <?php endif; ?>
