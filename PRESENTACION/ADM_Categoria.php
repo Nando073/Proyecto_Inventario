@@ -184,8 +184,10 @@ if ($searchTerm) {
                 <td><?php echo htmlspecialchars($cate['c_descripcion']); ?></td>
                 <td><?php echo htmlspecialchars($cate['c_materiales']); ?></td>
                 <td>
-                    <a href="ADM_Categoria.php?id_categoria=<?php echo $cate['id_categoria']; ?>" class="btn btn-warning">Editar</a>
-                    <a href="ADM_Categoria.php?id_categoria=<?php echo $cate['id_categoria']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta categoria?');">Eliminar</a>
+                    <div class="d-flex flex-column flex-md-row gap-1">
+                        <a href="ADM_Categoria.php?id_categoria=<?php echo $cate['id_categoria']; ?>" class="btn btn-warning">Editar</a>
+                        <a href="ADM_Categoria.php?id_categoria=<?php echo $cate['id_categoria']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta categoria?');">Eliminar</a>
+                    </div>
                 </td>
             </tr>
             <?php endforeach; ?>

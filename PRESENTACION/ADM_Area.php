@@ -187,8 +187,10 @@ if ($searchTerm) {
                     <td><?php echo htmlspecialchars($are['a_descripcion']); ?></td>
                     <td><?php echo htmlspecialchars($are['a_funcionarios']); ?></td>
                     <td>
-                        <a href="ADM_Area.php?id_area=<?php echo $are['id_area']; ?>" class="btn btn-warning">Editar</a>
-                        <a href="ADM_Area.php?id_area=<?php echo $are['id_area']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta area?');">Eliminar</a>
+                        <div class="d-flex flex-column flex-md-row gap-1">
+                            <a href="ADM_Area.php?id_area=<?php echo $are['id_area']; ?>" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="ADM_Area.php?id_area=<?php echo $are['id_area']; ?>&action=delete" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta area?');">Eliminar</a>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>

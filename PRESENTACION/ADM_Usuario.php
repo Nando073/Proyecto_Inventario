@@ -129,9 +129,8 @@ foreach ($usuarios as &$usuariO) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="../DEMO/styles.css?v=<?php echo(rand()); ?>"> 
+    <link rel="stylesheet" href="../DEMO/styles.css?v=<?php echo(rand()); ?>"/> 
     <script src="../DEMO/contrarer.js" defer></script>
-    <script src="presentacion.js" defer></script>
     <title>Administrar Usuarios</title>
 
 </head>
@@ -283,7 +282,7 @@ foreach ($usuarios as &$usuariO) {
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <div class="btn-group-vertical btn-group-sm" role="group">
+                                <div class="d-flex flex-column flex-md-row gap-1">
                                     <?php if ($Nusuario['estado'] == 1): ?>
                                         <a href="ADM_Usuario.php?id_usuario=<?php echo $Nusuario['id_usuario']; ?>" class="btn btn-warning btn-sm">Editar</a>
                                         <a href="ADM_Usuario.php?id_usuario=<?php echo $Nusuario['id_usuario']; ?>&action=delete" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">Eliminar</a>

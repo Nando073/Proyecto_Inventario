@@ -181,8 +181,10 @@ if ($searchTerm) {
                 <td><?php echo htmlspecialchars($u_medida['u_descripcion']); ?></td>
                 <td><?php echo htmlspecialchars($u_medida['u_materiales']); ?></td>
                 <td>
-                    <a href="ADM_U_Medida.php?id_medida=<?php echo $u_medida['id_medida']; ?>" class="btn btn-warning">Editar</a>
-                    <a href="ADM_U_Medida.php?id_medida=<?php echo $u_medida['id_medida']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta medida?');">Eliminar</a>
+                    <div class="d-flex flex-column flex-md-row gap-1">
+                        <a href="ADM_U_Medida.php?id_medida=<?php echo $u_medida['id_medida']; ?>" class="btn btn-warning">Editar</a>
+                        <a href="ADM_U_Medida.php?id_medida=<?php echo $u_medida['id_medida']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta medida?');">Eliminar</a>
+                    </div>
                 </td>
             </tr>
             <?php endforeach; ?>

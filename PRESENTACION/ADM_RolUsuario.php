@@ -272,7 +272,7 @@ foreach ($rolUsuarios as &$ru) {
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <div class="btn-group-vertical btn-group-sm" role="group">
+                                <div class="d-flex flex-column flex-md-row gap-1">
                                     <?php if ($ROL_U['estado'] == 1): ?>
                                         <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>" class="btn btn-warning btn-sm">Editar</a>
                                         <a href="ADM_RolUsuario.php?id_RolUsuario=<?php echo $ROL_U['id_rol_usuario']; ?>&action=delete" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este Rol_Usuario?');">Eliminar</a>

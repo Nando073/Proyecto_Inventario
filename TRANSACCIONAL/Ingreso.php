@@ -312,7 +312,7 @@ if ($searchTerm) {
                 <td><?php echo htmlspecialchars($ingreso['total_ingreso'] . " Bs"); ?></td>
                 <td><?php echo htmlspecialchars($ingreso['i_fecha']); ?></td>
                 <td>
-                  <div class="btn-group-vertical btn-group-sm" role="group">
+                  <div class="d-flex flex-column flex-md-row gap-1">
                     <a href="#" class="btn btn-info btn-sm btn-ver-ingreso btn-responsive" data-id="<?php echo $ingreso['id_ingreso']; ?>">Ver</a>
                     <a href="Ingreso.php?id_material=<?php echo $ingreso['id_ingreso']; ?>&accion=delete" class="btn btn-danger btn-sm btn-responsive" onclick="return confirm('¿Estás seguro de que deseas eliminar este registro de ingreso?');">Eliminar</a>
                   </div>

@@ -39,10 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             $paginaInicio = 'PRESENTACION/ADM_Material.php';
         } 
         elseif (in_array('Supervisor', $rolesUsuario)) {
-            $paginaInicio = 'TRANSACCIONAL/Solicitud.php';
+            $paginaInicio = 'TRANSACCIONAL/CATALOGO/Solicitud.php';
         }
         elseif (in_array('Funcionario', $rolesUsuario)) {
-            $paginaInicio = 'TRANSACCIONAL/Solicitud.php';
+            $paginaInicio = 'TRANSACCIONAL/CATALOGO/Solicitud.php';
         }
 
         header("Location: $paginaInicio");

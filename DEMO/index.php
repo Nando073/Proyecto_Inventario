@@ -27,18 +27,19 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
         </div>
         
         <nav class="menu">
-           <div class="perfil" id="perfilUsuario" onclick="toggleMenu()">
+            <div class="perfil" id="perfilUsuario">
                 <span id="nombreUsuario"><?php echo mb_strtoupper(htmlspecialchars($nombreUsuario), 'UTF-8'); ?></span>
                 <div class="menu-usuario" id="menuUsuario">
                     <a href="../logout.php" title="Cerrar sesión">
-                        <img src="../IMG/logout.png"  width="20">
+                        <img src="../IMG/logout.png" width="20" alt="Cerrar sesión">
+                        <span>Cerrar Sesión</span>
                     </a>
                 </div>
             </div>
         </nav>
    </header> 
-   <aside class="hidden">
-        <span class="esconder-menu">&#215;</span>
+   <aside>
+         <label class="esconder-menu">&#215;</label> <!-- SIN for="asideToggle" -->
         <div class="aside">
             <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
             <details>
@@ -72,7 +73,7 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
                 <ul>
                     <li><a href="../TRANSACCIONAL/Ingreso.php">INGRESO</a></li>
                     <li><a href="../TRANSACCIONAL/Egreso.php">EGRESO</a></li>
-                    <li><a href="../TRANSACCIONAL/Solicitud.php">CATALOGO DE MATERIALES</a></li>
+                    <li><a href="../TRANSACCIONAL/CATALOGO/Solicitud.php">CATALOGO DE MATERIALES</a></li>
                 </ul>
             </details>
             <?php endif; ?>

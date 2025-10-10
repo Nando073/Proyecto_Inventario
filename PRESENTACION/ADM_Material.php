@@ -235,8 +235,10 @@ if ($searchTerm) {
                     <td><?php echo htmlspecialchars($mat['m_fecha']); ?></td>
                     <td>
                         <!-- Acciones -->
-                        <a href="ADM_Material.php?id_material=<?php echo $mat['id_material']; ?>" class="btn btn-warning">Editar</a>
-                        <a href="ADM_Material.php?id_material=<?php echo $mat['id_material']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este material?');">Eliminar</a>
+                         <div class="d-flex flex-column flex-md-row gap-1">
+                            <a href="ADM_Material.php?id_material=<?php echo $mat['id_material']; ?>" class="btn btn-warning">Editar</a>
+                            <a href="ADM_Material.php?id_material=<?php echo $mat['id_material']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este material?');">Eliminar</a>
+                        </div>
                     </td>
                 </tr>
             <?php endforeach; ?>  

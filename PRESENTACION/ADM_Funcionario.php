@@ -331,14 +331,16 @@ foreach ($funcionarios as &$funcionariO) {
                                             </td>
                                             <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
                                                 <td>
-                                                    <?php if ($Nfuncionarios['f_estado'] == 1): ?>
-                                                        <!-- Si es activo -->
-                                                            <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>" class="btn btn-warning">Editar</a>
-                                                            <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este funcionario?');">Eliminar</a>
-                                                    <?php else: ?>
-                                                        <!-- Si es inactivo -->
-                                                        <a href="ADM_Funcionario.php?id_funcionario=<?= $Nfuncionarios['id_funcionario']; ?>&action=activar" class="btn btn-primary" onclick="return confirm('¿Deseas activar este funcionario?');">Activar</a>
-                                                    <?php endif; ?>
+                                                    <div class="d-flex flex-column flex-md-row gap-1">
+                                                        <?php if ($Nfuncionarios['f_estado'] == 1): ?>
+                                                            <!-- Si es activo -->
+                                                                <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>" class="btn btn-warning">Editar</a>
+                                                                <a href="ADM_Funcionario.php?id_funcionario=<?php echo $Nfuncionarios['id_funcionario']; ?>&action=delete" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este funcionario?');">Eliminar</a>
+                                                        <?php else: ?>
+                                                            <!-- Si es inactivo -->
+                                                            <a href="ADM_Funcionario.php?id_funcionario=<?= $Nfuncionarios['id_funcionario']; ?>&action=activar" class="btn btn-primary" onclick="return confirm('¿Deseas activar este funcionario?');">Activar</a>
+                                                        <?php endif; ?>
+                                                    </div>
                                                 </td>
                                             <?php endif; ?>
                                         </tr>
