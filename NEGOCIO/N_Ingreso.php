@@ -29,8 +29,13 @@ class N_Ingreso {
 
     // Método para eliminar un ingreso por ID
     public function eliminarIngreso($id_ingreso) {
-        $NIngreso = new D_Ingreso();
-        $NIngreso->eliminarIngreso($id_ingreso);
+        try {
+            $NIngreso = new D_Ingreso();
+            $resultado = $NIngreso->eliminarIngreso($id_ingreso);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     public function buscarHistorialIngreso($material, $proveedor, $fecha_inicio, $fecha_fin) {

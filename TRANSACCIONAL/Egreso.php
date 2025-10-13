@@ -22,16 +22,35 @@ if (isset($_GET['id_egreso']) && $_GET['accion'] === 'delete') {
 
     if ($id_egreso) {
         try {
-            $egresoService->eliminarEgreso($id_egreso);
-            header('Location: Egreso.php?msg=Egreso eliminado correctamente');
+            // Llamar al servicio que ejecuta el procedimiento almacenado
+            $resultado = $egresoService->eliminarEgreso($id_egreso);
+
+            // Verificar el resultado
+            if (isset($resultado['success']) && $resultado['success'] == 1) {
+                $_SESSION['mensaje'] = "Egreso eliminado correctamente.";
+                $_SESSION['tipo_mensaje'] = "success";
+            } else {
+                $_SESSION['mensaje'] = $resultado['mensaje'] ?? "No se puede eliminar el egreso. Puede que ya esté eliminado o tenga relaciones.";
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
+
+            header('Location: Egreso.php');
             exit();
+
         } catch (Exception $e) {
-            echo "Error al eliminar el egreso: " . htmlspecialchars($e->getMessage());
+            $_SESSION['mensaje'] = "Error al eliminar egreso: " . $e->getMessage();
+            $_SESSION['tipo_mensaje'] = "danger";
+            header('Location: Egreso.php');
+            exit();
         }
     } else {
-        echo "ID de egreso no válido.";
+        $_SESSION['mensaje'] = "ID de egreso no válido.";
+        $_SESSION['tipo_mensaje'] = "danger";
+        header('Location: Egreso.php');
+        exit();
     }
 }
+
 
 // Procesar POST para registrar egreso y detalles
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -309,6 +328,14 @@ if ($searchTerm) {
         </button>
     </form>
 
+    <!-- Mensaje -->
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+        <?= htmlspecialchars($_SESSION['mensaje']); ?>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+<?php endif; ?>
+
     <!-- Tabla Responsiva -->
     <div class="table-responsive">
         <table class="table table-bordered mt-3">
@@ -347,39 +374,39 @@ if ($searchTerm) {
     </div>
 
     <!-- Template oculto para duplicar -->
-    <div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
-        <div class="col-12 col-md-3 mb-2 mb-md-0">
-            <select name="categoria[]" class="form-control select-categoria" required>
-                <option value="">Seleccione una categoría</option>
-                <?php foreach (array_keys($materialesPorCategoria) as $categoria): ?>
-                    <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="col-12 col-md-4 mb-2 mb-md-0">
-            <select name="id_material[]" class="form-control select-material" required disabled>
-                <option value="">Seleccione un material</option>
-                <?php
-                    foreach ($materiales as $material) {
-                        echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                                        data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                                htmlspecialchars($material['m_nombre']) . 
-                                " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
-                            "</option>";
-                    }
-                ?>
-            </select>
-        </div>
-        <div class="col-12 col-md-3 mb-2 mb-md-0">
-            <div class="input-group">
-                <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
-                <span class="input-group-text unidad-medida">--</span>
+            <div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <select name="categoria[]" class="form-control select-categoria" required>
+                        <option value="">Seleccione una categoría</option>
+                        <?php foreach (array_keys($materialesPorCategoria) as $categoria): ?>
+                            <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 mb-2 mb-md-0">
+                    <select name="id_material[]" class="form-control select-material" required disabled>
+                        <option value="">Seleccione un material</option>
+                        <?php
+                            foreach ($materiales as $material) {
+                                echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                                                data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                                        htmlspecialchars($material['m_nombre']) . 
+                                        " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
+                                    "</option>";
+                            }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <div class="input-group">
+                        <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
+                        <span class="input-group-text unidad-medida">--</span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
+                    <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
+                </div>
             </div>
-        </div>
-        <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
-            <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
-        </div>
-    </div>
 </main>
 
 <!-- Modal Detalle Egreso -->
@@ -399,34 +426,32 @@ if ($searchTerm) {
   </div>
 </div>
 
-
 <script>
-    // Mover las variables fuera de DOMContentLoaded
-const materialesPorCategoria = <?php echo json_encode($materialesPorCategoria); ?>;
-const funcionariosPorArea = <?php echo json_encode($funcionariosPorArea); ?>;
+    document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.btn-ver-egreso').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const idEgreso = this.getAttribute('data-id');
+      const modalBody = document.getElementById('detalleEgresoBody');
+      modalBody.innerHTML = "<div class='text-center'><span class='spinner-border'></span> Cargando...</div>";
+      const modal = new bootstrap.Modal(document.getElementById('detalleEgresoModal'));
+      modal.show();
 
-// Un solo event listener DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Botón "Ver" para mostrar el detalle en el modal
-    document.querySelectorAll('.btn-ver-egreso').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const idEgreso = this.getAttribute('data-id');
-            const modalBody = document.getElementById('detalleEgresoBody');
-            modalBody.innerHTML = "<div class='text-center'><span class='spinner-border'></span> Cargando...</div>";
-            const modal = new bootstrap.Modal(document.getElementById('detalleEgresoModal'));
-            modal.show();
-
-            fetch('detalle_egreso.php?id=' + idEgreso)
-                .then(response => response.text())
-                .then(html => {
-                    modalBody.innerHTML = html;
-                })
-                .catch(() => {
-                    modalBody.innerHTML = "<div class='alert alert-danger'>Error al cargar el detalle.</div>";
-                });
+      fetch('detalle_egreso.php?id=' + idEgreso)
+        .then(response => response.text())
+        .then(html => {
+          modalBody.innerHTML = html;
+        })
+        .catch(() => {
+          modalBody.innerHTML = "<div class='alert alert-danger'>Error al cargar el detalle.</div>";
         });
     });
+  });
+});
+    document.addEventListener('DOMContentLoaded', () => {
+    // Variables globales para categorías y materiales
+    const materialesPorCategoria = window.materialesPorCategoria || {};
+    const funcionariosPorArea = window.funcionariosPorArea || {};
 
     const btnAgregar = document.getElementById('btnAgregar');
     const partesContainer = document.getElementById('materiales-container');
@@ -434,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectArea = document.getElementById('selectArea');
     const selectFuncionario = document.getElementById('selectFuncionario');
 
-    // Área y funcionario
+    // --- Área y funcionario ---
     selectArea.addEventListener('change', function() {
         const areaId = this.value;
         selectFuncionario.innerHTML = '<option value="">Seleccione un funcionario</option>';
@@ -450,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Validación solo números en cantidad
+    // --- Validación solo números en cantidad y código ---
     document.addEventListener('input', function(e) {
         if (e.target.classList.contains('input-cantidad')) {
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
@@ -460,55 +485,65 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Calcular total cantidad ---
     function calcularTotal() {
         let total = 0;
-        document.querySelectorAll('input[name="cantidad[]"]').forEach(input => {
+        partesContainer.querySelectorAll('input[name="cantidad[]"]').forEach(input => {
             const val = parseInt(input.value);
             if (!isNaN(val)) total += val;
         });
         totalInput.value = total;
     }
 
-    // Función para actualizar la unidad de medida
+    // --- Obtener materiales ya seleccionados ---
+    function materialesSeleccionados() {
+        return Array.from(partesContainer.querySelectorAll('.select-material'))
+            .map(sel => sel.value)
+            .filter(v => v !== "");
+    }
+
+    // --- Actualizar unidad de medida ---
     function actualizarUnidadMedida(selectMaterial) {
         const unidad = selectMaterial.selectedOptions[0]?.getAttribute('data-unidad') || '--';
         const row = selectMaterial.closest('.parte-row');
         const unidadSpan = row.querySelector('.unidad-medida');
-        if (unidadSpan) {
-            unidadSpan.textContent = unidad;
-        }
+        if (unidadSpan) unidadSpan.textContent = unidad;
     }
 
+    // --- Actualizar materiales por categoría y filtrar duplicados ---
     function actualizarMaterialesPorCategoria(row) {
         const selectCategoria = row.querySelector('.select-categoria');
         const selectMaterial = row.querySelector('.select-material');
-        
+
         selectCategoria.addEventListener('change', function() {
             const categoria = this.value;
             selectMaterial.innerHTML = '<option value="">Seleccione un material</option>';
             selectMaterial.disabled = true;
-            
+
             // Resetear unidad de medida
             const unidadSpan = row.querySelector('.unidad-medida');
-            if (unidadSpan) {
-                unidadSpan.textContent = '--';
-            }
-            
+            if (unidadSpan) unidadSpan.textContent = '--';
+
             if (categoria && materialesPorCategoria[categoria]) {
+                const yaSeleccionados = materialesSeleccionados().filter(v => v !== selectMaterial.value);
                 materialesPorCategoria[categoria].forEach(mat => {
-                    const option = document.createElement('option');
-                    option.value = mat.id_material;
-                    option.textContent = `${mat.m_nombre} (Stock: ${mat.stock_total})`;
-                    option.setAttribute('data-unidad', mat.u_medida || '--');
-                    selectMaterial.appendChild(option);
+                    if (!yaSeleccionados.includes(String(mat.id_material))) {
+                        const option = document.createElement('option');
+                        option.value = mat.id_material;
+                        option.textContent = `${mat.m_nombre} (Stock: ${mat.stock_total})`;
+                        option.setAttribute('data-unidad', mat.u_medida || '--');
+                        selectMaterial.appendChild(option);
+                    }
                 });
                 selectMaterial.disabled = false;
             }
         });
 
-        // Event listener para cambio de material (actualizar unidad)
+        // Al cambiar material, muestra unidad
         selectMaterial.addEventListener('change', function() {
             actualizarUnidadMedida(this);
+            // Actualiza todos los selects para filtrar duplicados
+            actualizarTodosLosMateriales();
         });
 
         // Inicializar unidad si ya hay un valor seleccionado
@@ -517,37 +552,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- Actualiza todos los selects de materiales para filtrar duplicados ---
+    function actualizarTodosLosMateriales() {
+        partesContainer.querySelectorAll('.parte-row').forEach(row => {
+            const selectCategoria = row.querySelector('.select-categoria');
+            const selectMaterial = row.querySelector('.select-material');
+            if (selectCategoria.value && materialesPorCategoria[selectCategoria.value]) {
+                const yaSeleccionados = materialesSeleccionados().filter(v => v !== selectMaterial.value);
+                const actualSeleccionado = selectMaterial.value;
+                selectMaterial.innerHTML = '<option value="">Seleccione un material</option>';
+                materialesPorCategoria[selectCategoria.value].forEach(mat => {
+                    if (!yaSeleccionados.includes(String(mat.id_material)) || String(mat.id_material) === actualSeleccionado) {
+                        const option = document.createElement('option');
+                        option.value = mat.id_material;
+                        option.textContent = `${mat.m_nombre} (Stock: ${mat.stock_total})`;
+                        option.setAttribute('data-unidad', mat.u_medida || '--');
+                        selectMaterial.appendChild(option);
+                    }
+                });
+                selectMaterial.value = actualSeleccionado;
+            }
+        });
+    }
+
+    // --- Añadir nueva fila ---
     function agregarFila() {
-    const template = document.getElementById('parte-template').cloneNode(true);
-    template.classList.remove('d-none');
-    template.removeAttribute('id');
-    
-    // Limpiar los valores
-    template.querySelector('.select-categoria').value = '';
-    template.querySelector('.select-material').innerHTML = '<option value="">Seleccione un material</option>';
-    template.querySelector('.select-material').disabled = true;
-    template.querySelector('.input-cantidad').value = '';
-    template.querySelector('.unidad-medida').textContent = '--';
+        const template = document.getElementById('parte-template').cloneNode(true);
+        template.classList.remove('d-none');
+        template.removeAttribute('id');
 
-    template.querySelector('.remove-parte').addEventListener('click', () => {
-        template.remove();
-        calcularTotal();
-    });
-    
-    actualizarMaterialesPorCategoria(template);
-    template.querySelector('input[name="cantidad[]"]').addEventListener('input', calcularTotal);
-    partesContainer.appendChild(template);
-}
+        template.querySelector('.select-categoria').value = '';
+        template.querySelector('.select-material').innerHTML = '<option value="">Seleccione un material</option>';
+        template.querySelector('.select-material').disabled = true;
+        template.querySelector('.input-cantidad').value = '';
+        template.querySelector('.unidad-medida').textContent = '--';
 
-    // Inicializar filas existentes
-    document.querySelectorAll('.parte-row').forEach(row => {
+        template.querySelector('.remove-parte').addEventListener('click', () => {
+            template.remove();
+            calcularTotal();
+            actualizarTodosLosMateriales();
+        });
+
+        actualizarMaterialesPorCategoria(template);
+        template.querySelector('input[name="cantidad[]"]').addEventListener('input', calcularTotal);
+        partesContainer.appendChild(template);
+    }
+
+    // --- Inicializar filas existentes ---
+    partesContainer.querySelectorAll('.parte-row').forEach(row => {
         actualizarMaterialesPorCategoria(row);
         row.querySelector('.remove-parte').addEventListener('click', () => {
             row.remove();
             calcularTotal();
+            actualizarTodosLosMateriales();
         });
         row.querySelector('input[name="cantidad[]"]').addEventListener('input', calcularTotal);
-        
+
         // Inicializar unidad de medida para filas existentes
         const selectMaterial = row.querySelector('.select-material');
         if (selectMaterial && selectMaterial.value) {
@@ -557,29 +617,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnAgregar.addEventListener('click', agregarFila);
 
-    // Abrir modal y limpiar formulario
+    // --- Abrir modal y limpiar formulario ---
     document.getElementById("btnCrearEgreso").addEventListener("click", function () {
         const form = document.getElementById("formEgreso");
         form.reset();
         // Eliminar filas adicionales
-        document.querySelectorAll('#materiales-container .parte-row:not(:first-child)').forEach(row => row.remove());
+        partesContainer.querySelectorAll('.parte-row:not(:first-child)').forEach(row => row.remove());
         // Limpiar selects y total
-        document.querySelectorAll('.select-material').forEach(sel => {
+        partesContainer.querySelectorAll('.select-material').forEach(sel => {
             sel.innerHTML = '<option value="">Seleccione un material</option>';
             sel.disabled = true;
         });
         totalInput.value = '';
         // Resetear unidades de medida
-        document.querySelectorAll('.unidad-medida').textContent = '--';
+        partesContainer.querySelectorAll('.unidad-medida').forEach(span => span.textContent = '--');
         // Limpiar funcionarios
         selectFuncionario.innerHTML = '<option value="">Seleccione un funcionario</option>';
         selectFuncionario.disabled = true;
     });
 
-    // Evento global para cambio de materiales (por si acaso)
+    // --- Evento global para cambio de materiales (por si acaso) ---
     document.addEventListener("change", function (e) {
         if (e.target.classList.contains("select-material")) {
             actualizarUnidadMedida(e.target);
+            actualizarTodosLosMateriales();
+        }
+        if (e.target.classList.contains("select-categoria")) {
+            actualizarTodosLosMateriales();
         }
     });
 });

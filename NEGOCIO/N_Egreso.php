@@ -26,8 +26,13 @@ class N_Egreso {
 
     
     public function eliminarEgreso($id_egreso) {
-        $NEgreso = new D_Egreso();
-        $NEgreso->eliminarEgreso($id_egreso);
+        try {
+            $NEgreso = new D_Egreso();
+            $resultado = $NEgreso->eliminarEgreso($id_egreso);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }  
     
     public function obtenerStockPorLote() {

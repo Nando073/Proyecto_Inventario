@@ -47,10 +47,12 @@ foreach ($stockPorLote as $fila) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stock de Materiales</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">  
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -103,51 +105,52 @@ foreach ($stockPorLote as $fila) {
                 </div>
             </form>
         </div>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>Material</th>
-                    <th>Proveedor</th>
-                    <th>Fecha Ingreso</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Total</th>
-                    <th>Stock Actual / Total Bs</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($agrupado)): ?>
-                    <?php foreach ($agrupado as $material => $datos): ?>
-                        <tr class="material-row">
-                            <td rowspan="<?php echo count($datos['subfilas']) + 1; ?>">
-                                <?php echo htmlspecialchars($material); ?>
-                            </td>
-                            <td colspan="5"></td>
-                            <td rowspan="<?php echo count($datos['subfilas']) + 1; ?>">
-                                <?php echo htmlspecialchars($datos['stock_total']); ?> 
-                                <span class="total-bs">(Total Bs: <?php echo number_format($datos['total_bs'], 2); ?>)</span>
+        <div class="table-responsive" style="overflow-x:auto;">
+            <table class="table table-bordered mt-3" style="min-width: 800px;">
+                <thead>
+                    <tr>
+                        <th>Material</th>
+                        <th>Proveedor</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Total</th>
+                        <th>Stock Actual / Total Bs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($agrupado)): ?>
+                        <?php foreach ($agrupado as $material => $datos): ?>
+                            <tr class="material-row">
+                                <td rowspan="<?php echo count($datos['subfilas']) + 1; ?>">
+                                    <?php echo htmlspecialchars($material); ?>
+                                </td>
+                                <td colspan="5"></td>
+                                <td rowspan="<?php echo count($datos['subfilas']) + 1; ?>">
+                                    <?php echo htmlspecialchars($datos['stock_total']); ?> 
+                                    <span class="total-bs">(Total Bs: <?php echo number_format($datos['total_bs'], 2); ?>)</span>
+                                </td>
+                            </tr>
+                            <?php foreach ($datos['subfilas'] as $sub): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($sub['proveedor_nombre']); ?></td>
+                                    <td><?php echo htmlspecialchars($sub['i_fecha']); ?></td>
+                                    <td><?php echo htmlspecialchars($sub['stock_restante'] . ' - ' . $sub['u_medida']); ?></td>
+                                    <td><?php echo htmlspecialchars($sub['precio'] . ' Bs'); ?></td>
+                                    <td><?php echo htmlspecialchars(number_format($sub['stock_restante'] * $sub['precio'], 2) . ' Bs'); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" class="no-data">
+                                <i class="fas fa-info-circle"></i> No se encontraron resultados para la búsqueda
                             </td>
                         </tr>
-                        <?php foreach ($datos['subfilas'] as $sub): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($sub['proveedor_nombre']); ?></td>
-                                <td><?php echo htmlspecialchars($sub['i_fecha']); ?></td>
-                                <td><?php echo htmlspecialchars($sub['stock_restante'] . ' - ' . $sub['u_medida']); ?></td>
-                                <td><?php echo htmlspecialchars($sub['precio'] . ' Bs'); ?></td>
-                                <td><?php echo htmlspecialchars(number_format($sub['stock_restante'] * $sub['precio'], 2) . ' Bs'); ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="7" class="no-data">
-                            <i class="fas fa-info-circle"></i> No se encontraron resultados para la búsqueda
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>

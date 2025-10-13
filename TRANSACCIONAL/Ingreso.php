@@ -1,116 +1,143 @@
 <?php
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
 require_once '../Seguridad.php';
 verificarAcceso(['Administrador', 'Operador']);
 require_once '../NEGOCIO/N_Ingreso.php';
 require_once '../NEGOCIO/N_Material.php';
 require_once '../NEGOCIO/N_Proveedor.php';
 
-// echo '<pre>';
-// print_r($_POST);
-// echo '</pre>';
-// exit();
-
 $ingresoService = new N_Ingreso();
-
 $materialService = new N_Material();
 $provService = new N_Proveedor();
 
-$detalle = null;
-$ingreso = null;
+// Cargar materiales y proveedores
+$materiales = $materialService->obtenerMateriales();
+$proveedores = $provService->obtenerProveedoresActivos();
 
-//eliminar ingreso por id
-$ingresos = $ingresoService->ObtenerIngresosRegistrado();
+// Agrupar materiales por categoría (para el frontend)
+$materialesPorCategoria = [];
+foreach ($materiales as $mat) {
+    $cat = $mat['c_nombre'] ?? 'Sin categoría';
+    if (!isset($materialesPorCategoria[$cat])) {
+        $materialesPorCategoria[$cat] = [];
+    }
+    $materialesPorCategoria[$cat][] = $mat;
+}
 
-    // Verificar si se ha solicitado eliminar un ingreso
-if (isset($_GET['id_material']) && $_GET['accion'] === 'delete') {
-    $id_material = filter_input(INPUT_GET, 'id_material', FILTER_VALIDATE_INT);
+// =================== ELIMINAR INGRESO ===================
+if (isset($_GET['id_ingreso']) && $_GET['accion'] === 'delete') {
+    $id_ingreso = filter_input(INPUT_GET, 'id_ingreso', FILTER_VALIDATE_INT);
 
-    if ($id_material) {
+    if ($id_ingreso) {
         try {
-            $ingresoService->eliminarIngreso($id_material);
-            header('Location: Ingreso.php?msg=Ingreso eliminado correctamente');
+            // Llamar al servicio que ejecuta el procedimiento almacenado
+            $resultado = $ingresoService->eliminarIngreso($id_ingreso);
+
+            // Verificar el resultado
+            if (isset($resultado['success']) && $resultado['success'] == 1) {
+                $_SESSION['mensaje'] = "Ingreso eliminado correctamente.";
+                $_SESSION['tipo_mensaje'] = "success";
+            } else {
+                $_SESSION['mensaje'] = $resultado['message'] ?? "No se puede eliminar el ingreso. por que ya tiene egresos relacionados.";
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
+
+            header('Location: Ingreso.php');
             exit();
+
         } catch (Exception $e) {
-            echo "Error al eliminar el ingreso: " . htmlspecialchars($e->getMessage());
+            $_SESSION['mensaje'] = "Error al eliminar ingreso: " . $e->getMessage();
+            $_SESSION['tipo_mensaje'] = "danger";
+            header('Location: Ingreso.php');
+            exit();
         }
     } else {
-        echo "ID de ingreso no válido.";
+        $_SESSION['mensaje'] = "ID de ingreso no válido.";
+        $_SESSION['tipo_mensaje'] = "danger";
+        header('Location: Ingreso.php');
+        exit();
     }
 }
 
-// Procesar POST para registrar ingreso y detalles
+
+// =================== REGISTRAR INGRESO ===================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_proveedor = filter_input(INPUT_POST, 'id_proveedor', FILTER_SANITIZE_SPECIAL_CHARS);
+    $id_proveedor = filter_input(INPUT_POST, 'id_proveedor', FILTER_VALIDATE_INT);
     $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_SPECIAL_CHARS);
 
+    $categorias = $_POST['categoria'] ?? [];
     $id_material = $_POST['id_material'] ?? [];
     $precios = $_POST['precio'] ?? [];
     $cantidades = $_POST['cantidad'] ?? [];
     $subtotales = $_POST['sub_total'] ?? [];
 
-    // Filtrar filas incompletas
-    $id_material = array_filter($id_material, fn($value) => !empty($value));
-    $precios = array_filter($precios, fn($value) => !empty($value));
-    $cantidades = array_filter($cantidades, fn($value) => !empty($value));
-    $subtotales = array_filter($subtotales, fn($value) => !empty($value));
-
-    // Validar que los arrays tengan la misma longitud
-    if (count($id_material) !== count($precios) || count($id_material) !== count($cantidades) || count($id_material) !== count($subtotales)) {
-        echo "Error: Los detalles no están sincronizados.";
+    // Validar campos obligatorios
+    if (!$id_proveedor) {
+        echo "Error: Debe seleccionar un proveedor.";
         exit();
     }
 
-    $totalCalculado = 0;
+    // Filtrar filas incompletas
+    $totalFilas = count($id_material);
     $detallesValidos = [];
+    $materialesSeleccionados = [];
+    $totalCalculado = 0;
 
-    for ($i = 0; $i < count($id_material); $i++) {
-        $idMat = isset($id_material[$i]) ? trim($id_material[$i]) : null;
-        $precio = isset($precios[$i]) ? filter_var($precios[$i], FILTER_VALIDATE_FLOAT) : false;
-        $cantidad = isset($cantidades[$i]) ? filter_var($cantidades[$i], FILTER_VALIDATE_INT) : false;
-        $subtotal = isset($subtotales[$i]) ? filter_var($subtotales[$i], FILTER_VALIDATE_FLOAT) : false;
+    for ($i = 0; $i < $totalFilas; $i++) {
+        $categoria = trim($categorias[$i] ?? '');
+        $idMat = trim($id_material[$i] ?? '');
+        $precio = filter_var($precios[$i] ?? '', FILTER_VALIDATE_FLOAT);
+        $cantidad = filter_var($cantidades[$i] ?? '', FILTER_VALIDATE_INT);
+        $subtotal = filter_var($subtotales[$i] ?? '', FILTER_VALIDATE_FLOAT);
 
-        if (empty($idMat) || $precio === false || $cantidad === false || $subtotal === false) {
-            echo "Error: Verifica que todos los detalles estén completos y válidos en la fila " . ($i + 1) . ".";
+        // Validar que no se seleccione material sin categoría
+        if (empty($categoria)) {
+            echo "Error: Debe seleccionar una categoría antes de elegir un material (fila " . ($i + 1) . ").";
             exit();
         }
 
-        $totalCalculado += $subtotal;
+        // Validar material único y completo
+        if (empty($idMat)) {
+            echo "Error: Falta seleccionar material en la fila " . ($i + 1);
+            exit();
+        }
+        if (in_array($idMat, $materialesSeleccionados)) {
+            echo "Error: El material en la fila " . ($i + 1) . " ya fue seleccionado.";
+            exit();
+        }
+        if ($precio === false || $cantidad === false || $subtotal === false) {
+            echo "Error: Verifica los datos numéricos en la fila " . ($i + 1);
+            exit();
+        }
+
+        // Guardar fila válida
         $detallesValidos[] = [
             'id_material' => $idMat,
             'precio' => $precio,
             'cantidad' => $cantidad,
             'sub_total' => $subtotal
         ];
+        $totalCalculado += $subtotal;
+        $materialesSeleccionados[] = $idMat;
     }
 
-    // Procesar acción
+    // Si la acción es crear ingreso
     if ($accion === 'crear') {
         try {
-            $mensaje = $ingresoService->registrarIngresoCompleto($id_proveedor, $totalCalculado, $detallesValidos);
+            $ingresoService->registrarIngresoCompleto($id_proveedor, $totalCalculado, $detallesValidos);
             echo "<script>
-                alert('¡Ingreso registrado correctamente!');
-                window.location.href='Ingreso.php';
-            </script>";
+                    alert('¡Ingreso registrado correctamente!');
+                    window.location.href='Ingreso.php';
+                  </script>";
             exit();
         } catch (Exception $e) {
-            echo "Error al registrar: " . htmlspecialchars($e->getMessage());
+            echo "Error al registrar ingreso: " . htmlspecialchars($e->getMessage());
         }
     } else {
-        echo "Error: Acción no válida.";
+        echo "Acción no válida.";
     }
 }
 
-// Carga inicial de datos
-
-$materiales = $materialService->obtenerMateriales();
-$proveedores = $provService->obtenerProveedoresActivos();
-
-// buscar
-$ingresoService = new N_Ingreso();
-$ingresos = $ingresoService->ObtenerIngresosRegistrado();
-// Buscador
+// =================== BUSCAR INGRESOS ===================
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_SPECIAL_CHARS) : '';
 if ($searchTerm) {
     $ingresos = $ingresoService->buscarPorSimilitud($searchTerm);
@@ -118,6 +145,7 @@ if ($searchTerm) {
     $ingresos = $ingresoService->ObtenerIngresosRegistrado();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -206,34 +234,47 @@ if ($searchTerm) {
                         <button type="button" class="btn btn-add w-100 btn-responsive" id="btnAgregar">AÑADIR MATERIAL</button>
                       </div>
                     </div>
-                    
+                  <div class="gray-bg p-3 rounded border bg-light">
+                    <!-- Contenedor de materiales -->
                     <div id="materiales-container">
+                      <!-- Fila de material base -->
                       <div class="parte-row row align-items-end mb-2">
-                        <!-- Material -->
-                        <div class="col-12 col-md-3 mb-2 mb-md-0">
-                          <label class="form-label">Material</label>
-                          <select name="id_material[]" class="form-control material-select" required>
-                            <option value="">Seleccione un material</option>
-                            <?php
-                                foreach ($materiales as $material) {
-                                    echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                                                  data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                                            htmlspecialchars($material['m_nombre']) . 
-                                            " (Stock: " . htmlspecialchars($material['stock']) . ")" .
-                                        "</option>";
-                                }
-                            ?>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 d-flex align-items-center">
+                          <label class="form-label fw-bold mb-0">Categoría:</label>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
+                          <select name="categoria[]" class="form-control categoria-select" required>
+                            <option value="">Seleccione categoría</option>
+                            <?php foreach (array_keys($materialesPorCategoria) as $cat): ?>
+                              <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
+                            <?php endforeach; ?>
                           </select>
                         </div>
-                        
+
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 d-flex align-items-center">
+                          <label class="form-label fw-bold mb-0">Material:</label>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
+                          <select name="id_material[]" class="form-control material-select" disabled required>
+                            <option value="">Seleccione un material</option>
+                            <?php foreach ($materiales as $material): ?>
+                              <option value="<?= htmlspecialchars($material['id_material']) ?>"
+                                      data-categoria="<?= htmlspecialchars($material['c_nombre'] ?? $material['categoria']) ?>"
+                                      data-unidad="<?= htmlspecialchars($material['u_medida']) ?>">
+                                  <?= htmlspecialchars($material['m_nombre']) ?> 
+                              </option>
+                            <?php endforeach; ?>
+                          </select>
+                        </div>
+
                         <!-- Precio -->
-                        <div class="col-12 col-md-2 mb-2 mb-md-0">
+                        <div class="col-12 col-md-2 mt-3">
                           <label class="form-label">Precio</label>
                           <input type="number" step="0.01" name="precio[]" placeholder="Precio" class="form-control" required>
                         </div>
-                        
+
                         <!-- Cantidad -->
-                        <div class="col-12 col-md-3 mb-2 mb-md-0">
+                        <div class="col-12 col-md-4 mt-3">
                           <label class="form-label">Cantidad</label>
                           <div class="input-group">
                             <input type="number" name="cantidad[]" placeholder="Cantidad" class="form-control cantidad-input" required>
@@ -241,21 +282,20 @@ if ($searchTerm) {
                           </div>
                         </div>
 
-                        
                         <!-- Subtotal -->
-                        <div class="col-12 col-md-3 mb-2 mb-md-0">
+                        <div class="col-12 col-md-3 mt-3">
                           <label class="form-label">Subtotal</label>
-                          <input type="number" name="sub_total[]" placeholder="Subtotal" class="form-control" required>
+                          <input type="number" name="sub_total[]" placeholder="Subtotal" class="form-control" readonly>
                         </div>
-                        
-                        <!-- Botón Eliminar -->
-                        <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
-                          <label class="form-label" style="visibility: hidden;">Eliminar</label>
+
+                        <!-- Botón eliminar -->
+                        <div class="col-12 col-md-3 mt-3">
                           <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
                         </div>
                       </div>
                     </div>
-                    
+                  </div>
+ 
                     <!-- Total -->
                     <div class="row mt-3">
                       <div class="col-12 col-md-2 fw-bold d-flex align-items-center justify-content-center justify-content-md-start mb-2 mb-md-0">
@@ -292,7 +332,13 @@ if ($searchTerm) {
         Registrar Ingreso
       </button>
     </form>
-
+  <!-- Mensaje -->
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
+        <?= htmlspecialchars($_SESSION['mensaje']); ?>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
+<?php endif; ?>
     <!-- Tabla Responsiva -->
     <div class="table-responsive">
       <table class="table table-bordered mt-3">
@@ -314,7 +360,7 @@ if ($searchTerm) {
                 <td>
                   <div class="d-flex flex-column flex-md-row gap-1">
                     <a href="#" class="btn btn-info btn-sm btn-ver-ingreso btn-responsive" data-id="<?php echo $ingreso['id_ingreso']; ?>">Ver</a>
-                    <a href="Ingreso.php?id_material=<?php echo $ingreso['id_ingreso']; ?>&accion=delete" class="btn btn-danger btn-sm btn-responsive" onclick="return confirm('¿Estás seguro de que deseas eliminar este registro de ingreso?');">Eliminar</a>
+                    <a href="Ingreso.php?id_ingreso=<?php echo $ingreso['id_ingreso']; ?>&accion=delete" class="btn btn-danger btn-sm btn-responsive" onclick="return confirm('¿Estás seguro de que deseas eliminar este registro de ingreso?');">Eliminar</a>
                   </div>
                 </td>
               </tr>
@@ -329,38 +375,56 @@ if ($searchTerm) {
     </div>
 
     <!-- Template oculto para duplicar -->
-    <div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
-      <div class="col-12 col-md-3 mb-2 mb-md-0">
-        <select name="id_material[]" class="form-control material-select" required>
-          <option value="">Seleccione un material</option>
-          <?php
-              foreach ($materiales as $material) {
-                  echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                                data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                          htmlspecialchars($material['m_nombre']) . 
-                          " (Stock: " . htmlspecialchars($material['stock']) . ")" .
-                      "</option>";
-              }
-          ?>
-        </select>
-      </div>
-      <div class="col-12 col-md-2 mb-2 mb-md-0">
-        <input type="number" name="precio[]" placeholder="Precio" class="form-control" required>
-      </div>
-      <div class="col-12 col-md-3 mb-2 mb-md-0">
-        <div class="input-group">
-          <input type="number" name="cantidad[]" placeholder="Cantidad" class="form-control cantidad-input" required>
-          <span class="input-group-text unidad-medida">--</span>
-        </div>
-      </div>
-      <div class="col-12 col-md-3 mb-2 mb-md-0">
-        <input type="number" name="sub_total[]" placeholder="Sub_total" class="form-control" required>
-      </div>
-      <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
-        <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
-      </div>
-    </div>        
-</main>
+        <div id="parte-template" class="d-none">
+          <div class="parte-row row align-items-end mb-2">
+            <div class="col-12 col-md-2 mb-2 mb-md-0 d-flex align-items-center">
+              <label class="form-label fw-bold mb-0">Categoría:</label>
+            </div>
+            <div class="col-12 col-md-4 mb-2 mb-md-0">
+              <select name="categoria[]" class="form-control categoria-select" required>
+                <option value="">Seleccione categoría</option>
+                <?php foreach (array_keys($materialesPorCategoria) as $cat): ?>
+                  <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="col-12 col-md-2 mb-2 mb-md-0 d-flex align-items-center">
+              <label class="form-label fw-bold mb-0">Material:</label>
+            </div>
+            <div class="col-12 col-md-4 mb-2 mb-md-0">
+              <select name="id_material[]" class="form-control material-select" disabled required>
+                <option value="">Seleccione un material</option>
+                <?php foreach ($materiales as $material): ?>
+                  <option value="<?= htmlspecialchars($material['id_material']) ?>"
+                          data-categoria="<?= htmlspecialchars($material['c_nombre'] ?? $material['categoria']) ?>"
+                          data-unidad="<?= htmlspecialchars($material['u_medida']) ?>">
+                      <?= htmlspecialchars($material['m_nombre']) ?> 
+                  </option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="col-12 col-md-2 mt-3">
+              <label class="form-label">Precio</label>
+              <input type="number" step="0.01" name="precio[]" placeholder="Precio" class="form-control" required>
+            </div>
+            <div class="col-12 col-md-4 mt-3">
+              <label class="form-label">Cantidad</label>
+              <div class="input-group">
+                <input type="number" name="cantidad[]" placeholder="Cantidad" class="form-control cantidad-input" required>
+                <span class="input-group-text unidad-medida">--</span>
+              </div>
+            </div>
+            <div class="col-12 col-md-3 mt-3">
+              <label class="form-label">Subtotal</label>
+              <input type="number" name="sub_total[]" placeholder="Subtotal" class="form-control" readonly>
+            </div>
+            <div class="col-12 col-md-3 mt-3">
+              <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
+            </div>
+          </div>
+        </div>  
+        <!-- /* Fin del template oculto */    -->
+      </main>
 
 <!-- Modal Detalle Ingreso -->
 <div class="modal fade" id="detalleIngresoModal" tabindex="-1" aria-labelledby="detalleIngresoLabel" aria-hidden="true">
@@ -382,7 +446,7 @@ if ($searchTerm) {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // ----------- Modal Ver Detalle de Ingreso -----------
+  // ----------- Modal Ver Detalle de Ingreso (AJAX) -----------
   document.querySelectorAll('.btn-ver-ingreso').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -413,60 +477,104 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ----------- Lógica de materiales dinámicos -----------
   const btnAgregar = document.getElementById('btnAgregar');
-  const partesContainer = document.getElementById('materiales-container');
+  const container = document.getElementById('materiales-container');
   const totalInput = document.getElementById('totalGeneral');
+  const parteTemplate = document.getElementById('parte-template');
 
-  function calcularTotal() {
+  // Calcular subtotal y total general
+  function calcularTotales() {
     let total = 0;
-    document.querySelectorAll('input[name="sub_total[]"]').forEach(input => {
-      const val = parseFloat(input.value);
-      if (!isNaN(val)) total += val;
+    container.querySelectorAll('.parte-row').forEach(row => {
+      const precio = parseFloat(row.querySelector('input[name="precio[]"]').value) || 0;
+      const cantidad = parseFloat(row.querySelector('input[name="cantidad[]"]').value) || 0;
+      const subtotal = precio * cantidad;
+      row.querySelector('input[name="sub_total[]"]').value = subtotal.toFixed(2);
+      total += subtotal;
     });
     totalInput.value = total.toFixed(2);
   }
 
-  function actualizarSubtotal(row) {
-    const precioInput = row.querySelector('input[name="precio[]"]');
-    const cantidadInput = row.querySelector('input[name="cantidad[]"]');
-    const subtotalInput = row.querySelector('input[name="sub_total[]"]');
-
-    function calcularSubtotal() {
-      const precio = parseFloat(precioInput.value) || 0;
-      const cantidad = parseFloat(cantidadInput.value) || 0;
-      subtotalInput.value = (precio * cantidad).toFixed(2);
-      calcularTotal();
-    }
-
-    precioInput.addEventListener('input', calcularSubtotal);
-    cantidadInput.addEventListener('input', calcularSubtotal);
+  // Obtener materiales seleccionados (para evitar duplicados)
+  function materialesSeleccionados() {
+    return Array.from(container.querySelectorAll('.material-select'))
+      .map(sel => sel.value)
+      .filter(v => v !== "");
   }
 
-  function agregarFila() {
-    const template = document.getElementById('parte-template').cloneNode(true);
-    template.classList.remove('d-none');
-    template.removeAttribute('id');
-    template.querySelectorAll('input').forEach(input => input.value = '');
-    template.querySelector('select').value = '';
-    template.querySelector('.unidad-medida').textContent = '--';
+  // Configurar eventos de una fila
+  function configurarFila(row) {
+    const categoriaSelect = row.querySelector('.categoria-select');
+    const materialSelect = row.querySelector('.material-select');
+    const precio = row.querySelector('input[name="precio[]"]');
+    const cantidad = row.querySelector('input[name="cantidad[]"]');
+    const unidad = row.querySelector('.unidad-medida');
 
-    template.querySelector('.remove-parte').addEventListener('click', () => {
-      template.remove();
-      calcularTotal();
+    // Deshabilitar material al inicio
+    materialSelect.disabled = true;
+
+    // Cuando cambia la categoría, habilita y filtra los materiales
+    categoriaSelect.addEventListener('change', () => {
+      const categoria = categoriaSelect.value;
+      materialSelect.disabled = (categoria === "");
+      materialSelect.value = "";
+      unidad.textContent = "--";
+
+      materialSelect.querySelectorAll('option').forEach(opt => {
+        const pertenece = opt.getAttribute('data-categoria');
+        const seleccionado = materialesSeleccionados();
+        if (opt.value === "" || (pertenece === categoria && !seleccionado.includes(opt.value))) {
+          opt.hidden = false;
+        } else {
+          opt.hidden = true;
+        }
+      });
     });
 
-    actualizarSubtotal(template);
-    partesContainer.appendChild(template);
-  }
+    // Al elegir material → muestra unidad
+    materialSelect.addEventListener('change', () => {
+      if (!categoriaSelect.value) {
+        alert("Debe seleccionar una categoría antes del material.");
+        materialSelect.value = "";
+        materialSelect.disabled = true;
+        return;
+      }
+      const unidadText = materialSelect.selectedOptions[0]?.getAttribute("data-unidad") || "--";
+      unidad.textContent = unidadText;
+    });
 
-  // Inicializar filas existentes
-  document.querySelectorAll('.parte-row').forEach(row => {
-    actualizarSubtotal(row);
+    // Precio y cantidad recalculan subtotal y total
+    [precio, cantidad].forEach(inp => inp.addEventListener('input', calcularTotales));
+
+    // Botón eliminar
     row.querySelector('.remove-parte').addEventListener('click', () => {
       row.remove();
-      calcularTotal();
+      calcularTotales();
+      // Si no queda ninguna fila, agrega una nueva desde el template
+      if (container.querySelectorAll('.parte-row').length === 0) {
+        agregarFila();
+      }
     });
-  });
+  }
 
+  // Añadir nueva fila desde el template oculto
+  function agregarFila() {
+    if (!parteTemplate) return;
+    const templateRow = parteTemplate.querySelector('.parte-row');
+    if (!templateRow) return;
+    const clone = templateRow.cloneNode(true);
+    clone.querySelectorAll('input').forEach(i => i.value = '');
+    clone.querySelectorAll('select').forEach(s => s.value = '');
+    clone.querySelector('.unidad-medida').textContent = '--';
+    configurarFila(clone);
+    container.appendChild(clone);
+  }
+
+  // Inicializar la primera fila visible
+  if (container.firstElementChild) {
+    configurarFila(container.firstElementChild);
+  }
+
+  // Evento para añadir fila
   btnAgregar.addEventListener('click', agregarFila);
 
   // ----------- Evento de cambio para materiales (unidad de medida) -----------

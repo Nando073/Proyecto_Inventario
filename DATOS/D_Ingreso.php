@@ -130,6 +130,8 @@ class D_Ingreso {
             try {
                 $ps = $this->con->prepare($sql);
                 $ps->execute([$id_ingreso]);
+                $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+                return $resultado['success']; // Devuelve 1 o 0
             } catch (PDOException $ex) {
                 throw new Exception("Error al eliminar el ingreso: " . $ex->getMessage());
             }

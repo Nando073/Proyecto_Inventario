@@ -192,9 +192,8 @@ if ($searchTerm) {
             </tr>
             <?php endforeach; ?>
         </tbody>
-    </div>
     </table>
-    <a href="../Acceso.php"><button type="button" class="btn btn-info">Acceso</button></a>
+</div>
 </main>
 
 <?php if (isset($categoria)): ?>
