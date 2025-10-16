@@ -1,17 +1,56 @@
 
 <?php
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL); verificar errores
-
-
 require_once '../../Seguridad.php';
 verificarAcceso(['Administrador','Supervisor', 'Funcionario', 'Operador']);
 require_once '../../NEGOCIO/N_Egreso.php';
 require_once '../../NEGOCIO/N_Material.php';
+require_once '../../NEGOCIO/SOLICITUDES_N/N_Solicitudes.php';
 // Instanciar el servicio de egreso
 $egresoService = new N_Egreso();
 $materialService = new N_Egreso();
+
+$solicitudService = new N_Solicitud();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['materiales'])) {
+    $id_usuario = $_SESSION['id_usuario'] ?? null;
+    $materiales = $_POST['materiales']; // Array: materiales[0][id], materiales[0][cantidad]
+    $detalle = trim($_POST['detalle'] ?? '');
+
+    if (!$id_usuario) {
+        echo "<script>alert('No se pudo identificar al usuario.');</script>";
+        exit();
+    }
+
+    // Armar array de detalles para el procedimiento
+    $detalles_solicitud = [];
+    foreach ($materiales as $mat) {
+        $id_material = isset($mat['id']) ? intval($mat['id']) : 0;
+        $cantidad = isset($mat['cantidad']) ? intval($mat['cantidad']) : 0;
+        if ($id_material > 0 && $cantidad > 0) {
+            $detalles_solicitud[] = [
+                'id_material' => $id_material,
+                'cantidad' => $cantidad
+            ];
+        }
+    }
+
+    if (empty($detalles_solicitud)) {
+        echo "<script>alert('Debe añadir al menos un material válido.');</script>";
+        exit();
+    }
+
+    try {
+        $solicitudService->registrarSolicitudConDetalles($id_usuario, $detalle, $detalles_solicitud);
+        echo "<script>
+            alert('¡Solicitud registrada correctamente!');
+            window.location.href='Solicitud.php';
+        </script>";
+        exit();
+    } catch (Exception $e) {
+        echo "<script>alert('Error al registrar la solicitud: " . htmlspecialchars($e->getMessage()) . "');</script>";
+    }
+}
+
 
 // Obtener materiales agrupados por categoría
 $materiales = $materialService->obtenerStockTotalPorMaterial();
@@ -78,10 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
 <html lang="es">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=<?php echo(rand()); ?>"> <!-- Tu archivo CSS generado arriba -->
-<link rel="stylesheet" href="solicitud.css?v=<?php echo(rand()); ?>">   
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=<?php echo(rand()); ?>"> <!-- Tu archivo CSS generado arriba -->
+    <link rel="stylesheet" href="solicitud.css?v=<?php echo(rand()); ?>">   
 </head>
 <body class="bg-light">
 <header>
@@ -169,6 +208,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
                 </div>
               </li>
               <li><hr class="dropdown-divider"></li>
+              <?php if (count(array_intersect(['Administrador', 'Supervisor'], $_SESSION['rol_asignado'])) > 0): ?>
+                <li><a class="dropdown-item" href="APROBAR_SOLICITUDES/Solicitud_espera.php"><i class="bi bi-box-arrow-right"></i>Solicitud en Espera</a></li>
+              <?php endif; ?>
+              <li><a class="dropdown-item" href="ESTADO_SOLICITUDES/Estado_solicitud.php"><i class="bi bi-box-arrow-right"></i>Estado de Solicitud</a></li>
               <li><a class="dropdown-item" href="../../logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
             </ul>
           </div>
@@ -180,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
 <main>
   <div class="container-fluid px-2 py-3">
     <div class="container-fluid px-2 py-3">
-      <h2 class="text-center mb-4">📦 Egreso de Materiales</h2>
+      <h2 class="text-center mb-4">📦 Solicitud de Materiales</h2>
       
       <!-- ACORDEÓN DE CATEGORÍAS -->
       <div class="accordion" id="categoriasAccordion">
@@ -244,16 +287,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
             <h5 class="modal-title" id="modalCarritoLabel">Generar Egreso</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
-          <form id="formEgreso" method="post" action="Egreso.php">
+          <form id="formSolicitud" method="post" action="Solicitud.php">
             <div class="modal-body">
               <div class="row mb-3">
                 <div class="col-12 col-md-6 mb-2 mb-md-0">
-                  <label class="form-label fw-bold">Usuario:</label>
+                  <label class="form-label fw-bold">Funcionario:</label>
                   <input type="text" class="form-control" name="nombre_usuario" value="<?= htmlspecialchars($nombreUsuario) ?>" readonly>
-                </div>
-                <div class="col-12 col-md-6">
-                  <label class="form-label fw-bold">Código de Solicitud:</label>
-                  <input type="text" class="form-control" name="codigo_solicitud" placeholder="Ingrese código de solicitud" required>
                 </div>
               </div>
               <div class="table-responsive">
@@ -267,6 +306,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
                 </div>
                 <div class="col-12 col-md-6">
                   <input type="text" id="totalMateriales" class="form-control" readonly value="0">
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-12 col-md-4 fw-bold d-flex align-items-center justify-content-center justify-content-md-start mb-2 mb-md-0">
+                  Comentarios (opcional):
+                </div>
+                <div class="col-12 col-md-8">
+                  <input type="text" class="form-control" name="detalle" id="detalleSolicitud">
                 </div>
               </div>
             </div>
@@ -339,11 +386,11 @@ document.addEventListener('DOMContentLoaded', function() {
             row.className = 'row align-items-center mb-2';
             row.innerHTML = `
                 <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <input type="hidden" name="materiales[${idx}][id]" value="${item.id}">
-                    <input type="text" class="form-control" value="${item.nombre}" readonly>
+                    <input type="text" class="form-control" value="${item.categoria}" readonly>
                 </div>
                 <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <input type="text" class="form-control" value="${item.categoria}" readonly>
+                    <input type="hidden" name="materiales[${idx}][id]" value="${item.id}">
+                    <input type="text" class="form-control" value="${item.nombre}" readonly>
                 </div>
                 <div class="col-12 col-md-3 mb-2 mb-md-0">
                     <input type="number" class="form-control" name="materiales[${idx}][cantidad]" value="${item.cantidad}" readonly>
@@ -389,12 +436,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    document.getElementById('formEgreso').addEventListener('submit', function(e) {
-        if (carrito.length === 0) {
-            alert('Debe añadir al menos un material al carrito.');
-            e.preventDefault();
-        }
-    });
+      document.getElementById('formSolicitud').addEventListener('submit', function(e) {
+      if (carrito.length === 0) {
+          alert('Debe añadir al menos un material al carrito.');
+          e.preventDefault();
+      }
+  });
 });
 </script>
 

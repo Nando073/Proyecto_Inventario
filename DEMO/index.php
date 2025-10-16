@@ -73,7 +73,7 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
                 <ul>
                     <li><a href="../TRANSACCIONAL/Ingreso.php">INGRESO</a></li>
                     <li><a href="../TRANSACCIONAL/Egreso.php">EGRESO</a></li>
-                    <li><a href="../TRANSACCIONAL/CATALOGO/Solicitud.php">CATALOGO DE MATERIALES</a></li>
+                    <li><a href="../TRANSACCIONAL/CATALOGO/Generar_Solicitud.php">GENERAR SOLICITUD</a></li>
                 </ul>
             </details>
             <?php endif; ?>

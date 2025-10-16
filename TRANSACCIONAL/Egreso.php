@@ -425,7 +425,10 @@ if ($searchTerm) {
     </div>
   </div>
 </div>
-
+<script>
+    window.materialesPorCategoria = <?php echo json_encode($materialesPorCategoria); ?>;
+    window.funcionariosPorArea = <?php echo json_encode($funcionariosPorArea); ?>;
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.btn-ver-egreso').forEach(btn => {
