@@ -194,7 +194,7 @@ if ($searchTerm) {
     .custom-table-header { background-color: #0d1b2a; color: white; }
     .btn-add { background-color: #4caf50; color: white; }
     .btn-delete { background-color: #c0392b; color: white; }
-    .btn-register { background-color: #8e44ad; color: white; }
+    .btn-register { background-color: #2847f1ff; color: white; }
     .card { border-radius: 10px; padding: 20px; }
     .form-label {
       font-weight: bold;
@@ -250,8 +250,8 @@ if ($searchTerm) {
                             <input type="text" name="codigo_solicitud" id="codigo_solicitud" class="form-control" required pattern="[a-zA-Z0-9]+">
                         </div>
                     </div>
-                    <div id="materiales-container">
-                        <div class="parte-row row align-items-end mb-2">
+                    <div id="materiales-container" class="border rounded p-3 bg-light">
+                        <div class="parte-row row align-items-end mb-2 border bg-primary bg-opacity-10 p-4 rounded">
                             <div class="col-12 col-md-3 mb-2 mb-md-0">
                                 <label class="form-label">Categoría</label>
                                 <select name="categoria[]" class="form-control select-categoria" required>
@@ -374,38 +374,42 @@ if ($searchTerm) {
     </div>
 
     <!-- Template oculto para duplicar -->
-            <div id="parte-template" class="parte-row row align-items-end mb-2 d-none">
-                <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <select name="categoria[]" class="form-control select-categoria" required>
-                        <option value="">Seleccione una categoría</option>
-                        <?php foreach (array_keys($materialesPorCategoria) as $categoria): ?>
-                            <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-12 col-md-4 mb-2 mb-md-0">
-                    <select name="id_material[]" class="form-control select-material" required disabled>
-                        <option value="">Seleccione un material</option>
-                        <?php
-                            foreach ($materiales as $material) {
-                                echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                                                data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                                        htmlspecialchars($material['m_nombre']) . 
-                                        " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
-                                    "</option>";
-                            }
-                        ?>
-                    </select>
-                </div>
-                <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <div class="input-group">
-                        <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
-                        <span class="input-group-text unidad-medida">--</span>
-                    </div>
-                </div>
-                <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
-                    <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
-                </div>
+            <div id="parte-template" class="parte-row row align-items-end mb-2 d-none border rounded p-3 bg-primary bg-opacity-10">
+                            <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                <label class="form-label">Categoría</label>
+                                <select name="categoria[]" class="form-control select-categoria" required>
+                                    <option value="">Seleccione una categoría</option>
+                                    <?php foreach (array_keys($materialesPorCategoria) as $categoria): ?>
+                                        <option value="<?php echo htmlspecialchars($categoria); ?>"><?php echo htmlspecialchars($categoria); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-4 mb-2 mb-md-0">
+                                <label class="form-label">Material</label>
+                                <select name="id_material[]" class="form-control select-material" required disabled>
+                                    <option value="">Seleccione un material</option>
+                                    <?php
+                                        foreach ($materiales as $material) {
+                                            echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
+                                                            data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
+                                                    htmlspecialchars($material['m_nombre']) . 
+                                                    " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
+                                                "</option>";
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                <label class="form-label">Cantidad</label>
+                                <div class="input-group">
+                                    <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
+                                    <span class="input-group-text unidad-medida">--</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-1 text-center mb-2 mb-md-0">
+                                <button type="button" class="btn btn-danger btn-sm remove-parte w-100">X</button>
+                            </div>
+                        </div>
             </div>
 </main>
 

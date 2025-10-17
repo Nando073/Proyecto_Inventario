@@ -84,11 +84,12 @@ a {
 }
 
 .menu a {
-    color: #F2F2F2;
+    color: #000000;
     text-transform: uppercase;
     text-decoration: none;
     padding: 0 10px;
     transition: 0.4s;
+    cursor: pointer;
 }
 
 .esconder-menu {
@@ -102,7 +103,7 @@ a {
     transition: 0.4s;
 }
 
-a:hover, .mostrar-menu:hover, .esconder-menu:hover {
+a:hover .mostrar-menu:hover, .esconder-menu:hover {
     color: #324759;
 }
 
@@ -306,6 +307,7 @@ select[multiple] {
     
     #nombreUsuario {
         font-size: 0.9rem;
+        pointer-events: painted;
     }
     
     /* Perfil debe ser visible y clickeable en móvil */

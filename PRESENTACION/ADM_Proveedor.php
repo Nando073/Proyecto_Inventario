@@ -151,7 +151,7 @@ foreach ($proveedores as &$proveedorItem) {
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="materialModalLabel">Crear o Editar Proveedor</h5>
+                    <h5 class="modal-title" id="materialModalLabel">Formulario Proveedor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -196,8 +196,8 @@ foreach ($proveedores as &$proveedorItem) {
                         </div>
 
                         <div class="mt-3">
-                            <button type="submit" name="accion" value="crear" class="btn btn-primary">Crear Proveedor</button>
-                            <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($proveedor) ? '' : 'disabled'; ?>>Guardar Cambios</button>
+                            <button type="submit" name="accion" value="crear" class="btn btn-primary" style="<?php echo isset($proveedor) ? 'display:none;' : ''; ?>">Crear Proveedor</button>
+                            <button type="submit" name="accion" value="guardar" class="btn btn-success" style="<?php echo isset($proveedor) ? '' : 'display:none;'; ?>">Guardar Cambios</button>
                         </div>
                     </form>
                 </div>
@@ -328,11 +328,11 @@ document.getElementById("btnCrearProveedor").addEventListener("click", function 
 
     // Desactiva el botón de guardar
     const btnGuardar = form.querySelector('button[name="accion"][value="guardar"]');
-    if (btnGuardar) btnGuardar.disabled = true;
+    if (btnGuardar) btnGuardar.style.display = "none";
 
     // Activa el botón de crear
     const btnCrear = form.querySelector('button[name="accion"][value="crear"]');
-    if (btnCrear) btnCrear.disabled = false;
+    if (btnCrear) btnCrear.style.display = "inline-block";
 });
 </script>
 

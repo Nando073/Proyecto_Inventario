@@ -35,6 +35,9 @@ class D_Area {
             $ps = $this->con->prepare($sql);
             $ps->execute([ $a_nombre, $a_descripcion]);
             echo "material registrado correctamente.";
+             // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -87,6 +90,9 @@ class D_Area {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_area, $a_nombre, $a_descripcion]);
             echo "area actualizado correctamente.";
+            // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();
         }

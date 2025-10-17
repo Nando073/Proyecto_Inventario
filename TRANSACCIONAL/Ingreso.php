@@ -177,7 +177,7 @@ if ($searchTerm) {
       color: white;
     }
     .btn-register {
-      background-color: #8e44ad;
+      background-color: #2847f1ff;
       color: white;
     }
     .card {
@@ -238,7 +238,7 @@ if ($searchTerm) {
                     <!-- Contenedor de materiales -->
                     <div id="materiales-container">
                       <!-- Fila de material base -->
-                      <div class="parte-row row align-items-end mb-2">
+                      <div class="parte-row row align-items-end mb-3 border rounded p-3 bg-primary bg-opacity-10">
                         <div class="col-12 col-md-2 mb-2 mb-md-0 d-flex align-items-center">
                           <label class="form-label fw-bold mb-0">Categoría:</label>
                         </div>
@@ -294,6 +294,7 @@ if ($searchTerm) {
                         </div>
                       </div>
                     </div>
+
                   </div>
  
                     <!-- Total -->
@@ -376,7 +377,7 @@ if ($searchTerm) {
 
     <!-- Template oculto para duplicar -->
         <div id="parte-template" class="d-none">
-          <div class="parte-row row align-items-end mb-2">
+          <div class="parte-row row align-items-end mb-2 border rounded p-3 bg-primary bg-opacity-10">
             <div class="col-12 col-md-2 mb-2 mb-md-0 d-flex align-items-center">
               <label class="form-label fw-bold mb-0">Categoría:</label>
             </div>

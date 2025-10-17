@@ -161,7 +161,7 @@ foreach ($funcionarios as &$funcionariO) {
   <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Puedes cambiar modal-lg por modal-md si lo prefieres -->
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="usuarioModalLabel">Crear o Editar Funcionarios</h5>
+        <h5 class="modal-title" id="usuarioModalLabel">Formulario Funcionarios</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
@@ -229,8 +229,8 @@ foreach ($funcionarios as &$funcionariO) {
             </div>
             <!-- Botones dentro del modal -->
             <div class="mt-3">
-                <button type="submit" name="accion" value="crear" class="btn btn-primary">Crear Funcionario</button>
-                <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($funcionario) ? '' : 'disabled'; ?>>Guardar Cambios</button>
+                <button type="submit" name="accion" value="crear" class="btn btn-primary" style="<?php echo isset($funcionario) ? 'display:none;' : ''; ?>">Crear Funcionario</button>
+                <button type="submit" name="accion" value="guardar" class="btn btn-success" style="<?php echo isset($funcionario) ? '' : 'display:none;'; ?>">Guardar Cambios</button>
               </div>
         </form>
       </div>
@@ -378,11 +378,11 @@ foreach ($funcionarios as &$funcionariO) {
 
         // Desactiva el botón "Guardar Cambios"
         const btnGuardar = form.querySelector('button[name="accion"][value="guardar"]');
-        if (btnGuardar) btnGuardar.disabled = true;
+        if (btnGuardar) btnGuardar.style.display = "none";
 
         // Activa el botón "Crear Usuario"
         const btnCrear = form.querySelector('button[name="accion"][value="crear"]');
-        if (btnCrear) btnCrear.disabled = false;
+        if (btnCrear) btnCrear.style.display = "inline-block";
     });
     document.getElementById('toggleComplemento').addEventListener('change', function () {
     let complementoGroup = document.getElementById('complementoGroup');

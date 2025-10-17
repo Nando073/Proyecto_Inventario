@@ -123,7 +123,7 @@ if ($searchTerm) {
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="materialModalLabel">Crear o Editar Cargo</h5>
+                    <h5 class="modal-title" id="materialModalLabel">Formulario Cargo</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -141,8 +141,8 @@ if ($searchTerm) {
                         </div>
 
                         <div class="mt-3">
-                            <button type="submit" name="accion" value="crear" class="btn btn-primary">Crear Cargo</button>
-                            <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($cargo) ? '' : 'disabled'; ?>>Guardar Cambios</button>
+                            <button type="submit" name="accion" value="crear" class="btn btn-primary" style="<?php echo isset($cargo) ? 'display:none;' : ''; ?>">Crear Cargo</button>
+                            <button type="submit" name="accion" value="guardar" class="btn btn-success" style="<?php echo isset($cargo) ? '' : 'display:none;'; ?>">Guardar Cambios</button>
                         </div>
                     </form>
                 </div>
@@ -151,7 +151,7 @@ if ($searchTerm) {
     </div>
 
     <h3 class="mt-5">Administrar Cargos</h3>
-    <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_Area.php" method="get">
+    <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_Cargo.php" method="get">
         <div class="d-flex flex-grow-1 me-md-2">
             <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" class="form-control me-2"/>
             <button type="submit" class="btn btn-info flex-shrink-0">Buscar</button>
@@ -223,11 +223,11 @@ document.getElementById("btnCrearCargo").addEventListener("click", function () {
 
     // Desactiva el botón de guardar
     const btnGuardar = form.querySelector('button[name="accion"][value="guardar"]');
-    if (btnGuardar) btnGuardar.disabled = true;
+    if (btnGuardar) btnGuardar.style.display = "none";
 
     // Activa el botón de crear
     const btnCrear = form.querySelector('button[name="accion"][value="crear"]');
-    if (btnCrear) btnCrear.disabled = false;
+    if (btnCrear) btnCrear.style.display = "inline-block";
 });
 </script>
 

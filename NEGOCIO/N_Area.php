@@ -5,8 +5,13 @@ class N_Area {
 
     // Método para adicionar a_descripcion
     public function adicionar( $a_nombre, $a_descripcion) {
-        $NArea = new D_Area(); 
-        $NArea->Adicionar( $a_nombre, $a_descripcion);  // Llamar al método de D_Area
+        try {
+            $NArea = new D_Area();
+            $resultado = $NArea->Adicionar( $a_nombre, $a_descripcion);  // Llamar al método de D_Area
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar todos las areas
@@ -34,8 +39,13 @@ class N_Area {
 
     // Método para modificar un area
     public function modificar($id_area, $a_nombre, $a_descripcion) {
-        $NArea = new D_Area();
-        $NArea->modificar($id_area, $a_nombre, $a_descripcion);  // Llamar al método modificar de D_Area
+        try {
+            $NArea = new D_Area();
+            $resultado = $NArea->modificar($id_area, $a_nombre, $a_descripcion);  // Llamar al método modificar de D_Area
+            return ['success' => (bool)$resultado['success']]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar un area por ID

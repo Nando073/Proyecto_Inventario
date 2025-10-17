@@ -119,6 +119,11 @@ if ($estadoFiltro === 'activo') {
 foreach ($usuarios as &$usuariO) {
     $usuariO['estado_texto'] = $usuariO['estado'] == 1 ? 'Activo' : 'Inactivo';
 }
+//buscar por termino 
+$searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
+if ($searchTerm) {
+    $usuarios = $usuarioService->buscarPorSimilitud($searchTerm);
+}
 ?>
 
 
@@ -158,7 +163,7 @@ foreach ($usuarios as &$usuariO) {
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="ModalLabel">Crear o Editar Usuario</h5>
+                    <h5 class="modal-title" id="ModalLabel">Formulario Usuario</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -197,9 +202,10 @@ foreach ($usuarios as &$usuariO) {
 
                         <!-- Botones dentro del modal -->
                         <div class="mt-3">
-                            <button type="submit" name="accion" value="crear" class="btn btn-primary">Crear Usuario</button>
-                            <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($usuario) ? '' : 'disabled'; ?>>Guardar Cambios</button>
-                        </div>
+                        <button type="submit" id="btnCrear" name="accion" value="crear" class="btn btn-primary" style="<?php echo isset($usuario) ? 'display:none;' : ''; ?>">Crear Usuario</button>
+                        <button type="submit" id="btnGuardar" name="accion" value="guardar" class="btn btn-success" style="<?php echo isset($usuario) ? '' : 'display:none;'; ?>">Guardar Cambios</button>
+                    </div>
+
                     </form>
                 </div>
             </div>
@@ -211,9 +217,7 @@ foreach ($usuarios as &$usuariO) {
     <form class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mt-3 gap-2" action="ADM_Usuario.php" method="get">
         <!-- Búsqueda -->
         <div class="d-flex flex-grow-1 me-md-2">
-            <input type="text" name="search" placeholder="Buscar por nombre" 
-                   value="<?php echo htmlspecialchars($searchTerm); ?>" 
-                   class="form-control me-2">
+            <input type="text" name="search" placeholder="Buscar por nombre" value="<?php echo htmlspecialchars($searchTerm); ?>" class="form-control me-2">
             <button type="submit" class="btn btn-info flex-shrink-0">Buscar</button>
         </div>
         
@@ -286,6 +290,7 @@ foreach ($usuarios as &$usuariO) {
                                     <?php if ($Nusuario['estado'] == 1): ?>
                                         <a href="ADM_Usuario.php?id_usuario=<?php echo $Nusuario['id_usuario']; ?>" class="btn btn-warning btn-sm">Editar</a>
                                         <a href="ADM_Usuario.php?id_usuario=<?php echo $Nusuario['id_usuario']; ?>&action=delete" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">Eliminar</a>
+
                                     <?php else: ?>
                                         <a href="ADM_Usuario.php?id_usuario=<?= $Nusuario['id_usuario']; ?>&action=activar" class="btn btn-primary btn-sm">Activar</a>
                                     <?php endif; ?>
@@ -314,20 +319,36 @@ foreach ($usuarios as &$usuariO) {
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const btnCrearUsuario = document.getElementById("btnCrearUsuario");
-    const togglePasswordBtn = document.getElementById("togglePassword");
+    const btnCrearUsuario = document.getElementById("btnCrearUsuario"); // botón que abre el modal para crear
+    const btnEditarUsuario = document.querySelectorAll(".btnEditarUsuario"); // botones de editar
+    const btnCrear = document.getElementById("btnCrear");
+    const btnGuardar = document.getElementById("btnGuardar");
     const form = document.getElementById("formUsuario");
-    const passwordInput = document.getElementById('clave');
     const idInput = document.getElementById("id_usuario");
-    const btnGuardar = form.querySelector('button[name="accion"][value="guardar"]');
-    const btnCrear = form.querySelector('button[name="accion"][value="crear"]');
 
-    // Función para limpiar formulario
+    // Cuando se presiona "Registrar" o "Crear Usuario"
     btnCrearUsuario.addEventListener("click", function () {
-        form.querySelectorAll("input").forEach(input => input.value = "");
+        // Limpiar todos los inputs manualmente
+    form.querySelectorAll("input, select, textarea").forEach(input => {
+        input.value = "";          // limpia texto
+        if (input.type === "checkbox" || input.type === "radio") {
+            input.checked = false; // desmarca check/radio
+        }
+    });
         if (idInput) idInput.value = "";
-        if (btnGuardar) btnGuardar.disabled = true;
-        if (btnCrear) btnCrear.disabled = false;
+        btnCrear.style.display = "inline-block"; // mostrar Crear
+        btnGuardar.style.display = "none";        // ocultar Guardar
+    });
+    
+    // Cuando se presiona "Editar" (suponiendo que tienes botones con clase .btnEditarUsuario)
+    btnEditarUsuario.forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            const usuarioId = this.dataset.id; // id del usuario a editar
+            idInput.value = usuarioId;
+            btnCrear.style.display = "none";        // ocultar Crear
+            btnGuardar.style.display = "inline-block"; // mostrar Guardar
+            // aquí puedes rellenar el formulario con los datos del usuario si quieres
+        });
     });
 
     // Función para mostrar/ocultar contraseña

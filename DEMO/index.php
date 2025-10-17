@@ -28,7 +28,7 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
         
         <nav class="menu">
             <div class="perfil" id="perfilUsuario">
-                <span id="nombreUsuario"><?php echo mb_strtoupper(htmlspecialchars($nombreUsuario), 'UTF-8'); ?></span>
+                <a><span id="nombreUsuario"><?php echo mb_strtoupper(htmlspecialchars($nombreUsuario), 'UTF-8'); ?></span></a>
                 <div class="menu-usuario" id="menuUsuario">
                     <a href="../logout.php" title="Cerrar sesión">
                         <img src="../IMG/logout.png" width="20" alt="Cerrar sesión">

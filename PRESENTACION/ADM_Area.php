@@ -47,38 +47,69 @@ if (isset($_GET['id_area'])) {
 }
 // Manejo de creación/actualización vía POST
 $accion = $_POST['accion'] ?? '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($accion === 'crear') {
         $a_nombre = trim(strip_tags($_POST['a_nombre'] ?? ''));
         $a_descripcion = trim(strip_tags($_POST['a_descripcion'] ?? ''));
-        //$a_funcionarios = filter_input(INPUT_POST, 'a_funcionarios', FILTER_VALIDATE_INT);
-        if ($a_nombre && $a_descripcion !== false) {
-            $areaService->adicionar($a_nombre, $a_descripcion);
+
+        if ($a_nombre && $a_descripcion) {
+            try {
+                $resultado = $areaService->adicionar($a_nombre, $a_descripcion);
+
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Área registrada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se pudo registrar el área.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al registrar el área: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
+
             header('Location: ADM_Area.php');
             exit();
         } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
+            $_SESSION['mensaje'] = "Todos los campos son obligatorios.";
+            $_SESSION['tipo_mensaje'] = "warning";
+            header('Location: ADM_Area.php');
+            exit();
         }
+
     } elseif ($accion === 'guardar') {
         $id_area = filter_input(INPUT_POST, 'id_area', FILTER_VALIDATE_INT);
         $a_nombre = trim(strip_tags($_POST['a_nombre'] ?? ''));
         $a_descripcion = trim(strip_tags($_POST['a_descripcion'] ?? ''));
-        //$a_funcionarios = filter_input(INPUT_POST, 'a_funcionarios', FILTER_VALIDATE_INT);
-        if ($id_area && $a_nombre && $p_direccion !== false) {
-            $existing = $areaService->buscarPorId($id_area);
-            if ($existing) {
-                $areaService->modificar($id_area, $a_nombre, $a_descripcion);
-                echo "";
-                header('Location: ADM_Area.php');
-                exit();
-            } else {
-                echo "Error: No existe la categoría con ID $id_area.";
+
+        if ($id_area && $a_nombre && $a_descripcion) {
+            try {
+                $resultado = $areaService->modificar($id_area, $a_nombre, $a_descripcion);
+
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Área modificada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se pudo modificar el área.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al modificar el área: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
             }
+
+            header('Location: ADM_Area.php');
+            exit();
         } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
+            $_SESSION['mensaje'] = "Todos los campos son obligatorios y válidos.";
+            $_SESSION['tipo_mensaje'] = "warning";
+            header('Location: ADM_Area.php');
+            exit();
         }
     }
 }
+
 
 // Obtener la lista de areas
 $areas = $areaService->obtenerAreas();
@@ -123,7 +154,7 @@ if ($searchTerm) {
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="materialModalLabel">Crear o Editar Area</h5>
+                    <h5 class="modal-title" id="materialModalLabel">Formulario Área</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -141,8 +172,8 @@ if ($searchTerm) {
                         </div>
 
                         <div class="mt-3">
-                            <button type="submit" name="accion" value="crear" class="btn btn-primary">Crear Area</button>
-                            <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($area) ? '' : 'disabled'; ?>>Guardar Cambios</button>
+                            <button type="submit" name="accion" value="crear" class="btn btn-primary" style="<?php echo isset($area) ? 'display:none;' : ''; ?>">Crear Area</button>
+                            <button type="submit" name="accion" value="guardar" class="btn btn-success" style="<?php echo isset($area) ? '' : 'display:none;'; ?>">Guardar Cambios</button>
                         </div>
                     </form>
                 </div>
@@ -223,11 +254,11 @@ document.getElementById("btnCrearArea").addEventListener("click", function () {
 
     // Desactiva el botón de guardar
     const btnGuardar = form.querySelector('button[name="accion"][value="guardar"]');
-    if (btnGuardar) btnGuardar.disabled = true;
+    if (btnGuardar) btnGuardar.style.display = "none";
 
     // Activa el botón de crear
     const btnCrear = form.querySelector('button[name="accion"][value="crear"]');
-    if (btnCrear) btnCrear.disabled = false;
+    if (btnCrear) btnCrear.style.display = "inline-block";
 });
 </script>
 

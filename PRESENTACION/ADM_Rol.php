@@ -124,7 +124,7 @@ if ($searchTerm) {
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="materialModalLabel">Registrar o Editar Rol</h5>
+                    <h5 class="modal-title" id="materialModalLabel">Formulario Rol</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -142,8 +142,8 @@ if ($searchTerm) {
                         </div>
 
                         <div class="mt-3">
-                            <button type="submit" name="accion" value="Registrar" class="btn btn-primary">Registrar Rol</button>
-                            <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($rol) ? '' : 'disabled'; ?>>Guardar Cambios</button>
+                            <button type="submit" name="accion" value="Registrar" class="btn btn-primary" style="<?php echo isset($rol) ? 'display:none;' : ''; ?>">Registrar Rol</button>
+                            <button type="submit" name="accion" value="guardar" class="btn btn-success" style="<?php echo isset($rol) ? '' : 'display:none;'; ?>">Guardar Cambios</button>
                         </div>
                     </form>
                 </div>
@@ -173,7 +173,6 @@ if ($searchTerm) {
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Fecha</th>
@@ -183,7 +182,6 @@ if ($searchTerm) {
         <tbody>
             <?php foreach ($areas as $are): ?>
             <tr>
-                <td><?php echo htmlspecialchars($are['id_rol']); ?></td>
                 <td><?php echo htmlspecialchars($are['r_nombre']); ?></td>
                 <td><?php echo htmlspecialchars($are['r_descripcion']); ?></td>
                 <td><?php echo htmlspecialchars($are['r_fecha']); ?></td>
@@ -224,11 +222,11 @@ document.getElementById("btnRegistrarRol").addEventListener("click", function ()
 
     // Desactiva el botón de guardar
     const btnGuardar = form.querySelector('button[name="accion"][value="guardar"]');
-    if (btnGuardar) btnGuardar.disabled = true;
+    if (btnGuardar) btnGuardar.style.display = "none";
 
     // Activa el botón de Registrar
     const btnRegistrar = form.querySelector('button[name="accion"][value="Registrar"]');
-    if (btnRegistrar) btnRegistrar.disabled = false;
+    if (btnRegistrar) btnRegistrar.style.display = "inline-block";
 });
 </script>
 

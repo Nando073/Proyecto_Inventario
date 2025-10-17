@@ -97,7 +97,6 @@ $roles = $rolService->obtenerRoles();
 $usuarios = $usuarioService->ObtenerUsuarios();
 
 // Buscar por término
-// Obtener lista de RolUsuario (con o sin búsqueda)
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 if ($searchTerm) {
     $rolUsuarios = $rolUsuarioService->buscarPorSimilitud($searchTerm);
@@ -153,7 +152,7 @@ foreach ($rolUsuarios as &$ru) {
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="materialModalLabel">Registrar o Editar Rol_Usuario</h5>
+                    <h5 class="modal-title" id="materialModalLabel">Formulario Rol_Usuario</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -192,8 +191,8 @@ foreach ($rolUsuarios as &$ru) {
 
                         
                         <div class="mt-3">
-                            <button type="submit" name="accion" value="Registrar" class="btn btn-primary">Registrar Rol_Usuario</button>
-                            <button type="submit" name="accion" value="guardar" class="btn btn-success" <?php echo isset($rolUsuario) ? '' : 'disabled'; ?>>Guardar Cambios</button>
+                            <button type="submit" name="accion" value="Registrar" class="btn btn-primary" style="<?php echo isset($rolUsuario) ? 'display:none;' : ''; ?>">Registrar Rol_Usuario</button>
+                            <button type="submit" name="accion" value="guardar" class="btn btn-success" style="<?php echo isset($rolUsuario) ? '' : 'display:none;'; ?>">Guardar Cambios</button>
                         </div>
                     </form>
                 </div>
@@ -317,11 +316,11 @@ document.getElementById("btnRegistrarRol").addEventListener("click", function ()
 
     // Desactiva el botón de guardar
     const btnGuardar = form.querySelector('button[name="accion"][value="guardar"]');
-    if (btnGuardar) btnGuardar.disabled = true;
+    if (btnGuardar) btnGuardar.style.display = "none";
 
     // Activa el botón de Registrar
     const btnRegistrar = form.querySelector('button[name="accion"][value="Registrar"]');
-    if (btnRegistrar) btnRegistrar.disabled = false;
+    if (btnRegistrar) btnRegistrar.style.display = "inline-block";
 });
 </script>
 
