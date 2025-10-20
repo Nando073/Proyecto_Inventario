@@ -90,7 +90,8 @@ class D_Ingreso {
             $this->con->commit();
     
             return "Ingreso y detalles registrados correctamente.";
-    
+            $resultado = $sp->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             $this->con->rollBack(); // Revertir en caso de error
             throw new Exception("Error en la transacción: " . $ex->getMessage());

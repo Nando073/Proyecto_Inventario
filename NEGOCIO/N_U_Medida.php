@@ -6,8 +6,13 @@ class N_U_Medida {
 
     // Método para adicionar una unidad de medida
     public function adicionar($u_medida, $u_descripcion) {
-        $NMedida = new D_U_Medida(); 
-        $NMedida->Adicionar($u_medida, $u_descripcion);
+        try{
+            $NMedida = new D_U_Medida(); 
+            $resultado = $NMedida->Adicionar($u_medida, $u_descripcion);
+            return ['success' => (bool) $resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar todas las unidades de medida
@@ -35,8 +40,13 @@ public function eliminar($id_medida) {
 
     // Método para modificar una unidad de medida
     public function modificar($id_medida, $u_medida, $u_descripcion) {
-        $NMedida = new D_U_Medida();
-        $NMedida->modificar($id_medida, $u_medida, $u_descripcion);
+        try {
+            $NMedida = new D_U_Medida();
+            $resultado = $NMedida->modificar($id_medida, $u_medida, $u_descripcion);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar una unidad de medida por ID

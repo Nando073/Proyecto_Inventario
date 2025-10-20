@@ -35,6 +35,8 @@ class D_Categoria {
             $ps = $this->con->prepare($sql);
             $ps->execute([$c_nombre, $c_descripcion]);
             echo "Categoría registrada correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -87,6 +89,8 @@ class D_Categoria {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_categoria, $c_nombre, $c_descripcion]);
             echo "Categoría actualizada correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return ['success' => $resultado['success']]; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();
         }

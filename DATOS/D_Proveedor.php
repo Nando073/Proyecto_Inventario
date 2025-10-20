@@ -45,6 +45,9 @@ class D_Proveedor {
             $ps = $this->con->prepare($sql);
             $ps->execute([ $p_nombre, $nit, $departamento, $p_direccion, $p_celular]);
             echo "material registrado correctamente.";
+                // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -70,6 +73,8 @@ class D_Proveedor {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_proveedor]);
             echo "material eliminado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al eliminar: " . $ex->getMessage();
         }
@@ -95,6 +100,8 @@ class D_Proveedor {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular]);
             echo "Funcionario actualizado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return ['success' => $resultado['success']]; // Devuelve 1 o
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();
         }

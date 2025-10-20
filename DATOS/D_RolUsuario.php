@@ -30,6 +30,9 @@ class D_RolUsuario {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_rol, $id_usuario]);
             echo "RolUsuario registrado correctamente.";
+            // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -55,6 +58,8 @@ class D_RolUsuario {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_RolUsuario]);
             echo "RolUsuario eliminado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al eliminar: " . $ex->getMessage();
         }
@@ -80,6 +85,9 @@ class D_RolUsuario {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_RolUsuario, $id_rol, $id_usuario]);
             echo "RolUsuario actualizado correctamente.";
+            // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return ['success' => $resultado['success']]; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();
         }

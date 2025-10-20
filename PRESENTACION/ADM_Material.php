@@ -65,32 +65,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_STRING);
 
     //var_dump($m_nombre, $m_descripcion, $id_categoria, $id_medida, $accion);
-    if ($m_nombre && $m_descripcion && $id_categoria && $id_medida && $accion) {
-        $existingMaterial = $materialService->buscarPorId($id_material);
 
         if ($accion === 'crear') {
-            if ($existingMaterial) {
-                echo "Error: El material con el ID $id_material ya existe. No se puede crear.";
-            } else {
-                $materialService->adicionar( $m_nombre, $m_descripcion, $id_categoria, $id_medida);
+            if ($m_nombre && $m_descripcion && $id_categoria && $id_medida) {
+                try {
+                    $resultado = $materialService->adicionar( $m_nombre, $m_descripcion, $id_categoria, $id_medida);
+                    if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Material registrado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo registrar el material. ya existe.";
+                        $_SESSION[ 'tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al crear material existente: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }  
+            
                 header('Location: ADM_Material.php');
                 exit();
             }
         } elseif ($accion === 'guardar') {
-            if ($existingMaterial) {
-                $materialService->modificar($id_material, $m_nombre, $m_descripcion, $id_categoria, $id_medida);
-                header('Location: ADM_Material.php');
-                exit();
-            } else {
-                echo "Error: El material con el ID $id_material no existe. No se puede modificar.";
+            if ($id_material && $m_nombre && $m_descripcion && $id_categoria && $id_medida) {
+                try {
+                    $resultado = $materialService->modificar($id_material, $m_nombre, $m_descripcion, $id_categoria, $id_medida);
+                    if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Material modificada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se pudo modificar el material.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al modificar el material: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
             }
-        } else {
-            echo "Error: Acción no válida.";
+        header('Location: ADM_Material.php');
+        exit();
         }
-    } else {
-        echo "Error: Todos los campos son necesarios y deben ser válidos.";
     }
-}
+} 
+
 
 // Obtener la lista de materiales
 $materiales = $materialService->obtenerMateriales();
@@ -207,6 +222,7 @@ if ($searchTerm) {
             Registrar Material
         </button>
     </form>
+    <!-- Mensajes de éxito o error -->
 <?php if (isset($_SESSION['mensaje'])): ?>
     <div class="alert alert-<?= $_SESSION['tipo_mensaje']; ?> mt-3">
         <?= htmlspecialchars($_SESSION['mensaje']); ?>

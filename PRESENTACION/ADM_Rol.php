@@ -50,33 +50,47 @@ if (isset($_GET['id_rol'])) {
 // Manejo de creación/actualización vía POST
 $accion = $_POST['accion'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id_rol = filter_input(INPUT_POST, 'id_rol', FILTER_VALIDATE_INT);
+    $r_nombre = trim(strip_tags($_POST['r_nombre'] ?? ''));
+    $r_descripcion = trim(strip_tags($_POST['r_descripcion'] ?? ''));
+
     if ($accion === 'Registrar') {
-        $r_nombre = trim(strip_tags($_POST['r_nombre'] ?? ''));
-        $r_descripcion = trim(strip_tags($_POST['r_descripcion'] ?? ''));
-        //$a_funcionarios = filter_input(INPUT_POST, 'a_funcionarios', FILTER_VALIDATE_INT);
-        if ($r_nombre && $r_descripcion !== false) {
-            $rolService->adicionar($r_nombre, $r_descripcion);
+        
+        if ($r_nombre && $r_descripcion) {
+            try {
+                $resultado = $rolService->adicionar($r_nombre, $r_descripcion);
+                    if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Rol registrado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo registrar el Rol. ya existe";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al registrar Rol: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
             header('Location: ADM_Rol.php');
             exit();
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
-        }
+        } 
     } elseif ($accion === 'guardar') {
-        $id_rol = filter_input(INPUT_POST, 'id_rol', FILTER_VALIDATE_INT);
-        $r_nombre = trim(strip_tags($_POST['r_nombre'] ?? ''));
-        $r_descripcion = trim(strip_tags($_POST['r_descripcion'] ?? ''));
-        if ($id_rol && $r_nombre && $r_descripcion !== false) {
-            $existing = $rolService->buscarPorId($id_rol);
-            if ($existing) {
-                $rolService->modificar($id_rol, $r_nombre, $r_descripcion);
-                echo "";
-                header('Location: ADM_Rol.php');
-                exit();
-            } else {
-                echo "Error: No existe la categoría con ID $id_rol.";
-            }
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
+        
+        if ($id_rol && $r_nombre && $r_descripcion) {
+            try {
+                $resultado = $rolService->modificar($id_rol, $r_nombre, $r_descripcion);
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Rol modificado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo modificar el Rol.";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al modificar el Rol: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            header('Location: ADM_Rol.php');
+            exit();
         }
     }
 }

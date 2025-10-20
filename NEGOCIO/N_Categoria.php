@@ -6,8 +6,13 @@ class N_Categoria {
 
     // Método para adicionar una categoría
     public function adicionar($c_nombre, $c_descripcion) {
-        $NCategoria = new D_Categoria(); 
-        $NCategoria->Adicionar($c_nombre, $c_descripcion);
+        try {
+            $NCategoria = new D_Categoria();
+            $resultado = $NCategoria->Adicionar($c_nombre, $c_descripcion);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar todas las categorías
@@ -35,8 +40,13 @@ public function eliminar($id_categoria) {
 
     // Método para modificar una categoría
     public function modificar($id_categoria, $c_nombre, $c_descripcion) {
-        $NCategoria = new D_Categoria();
-        $NCategoria->modificar($id_categoria, $c_nombre, $c_descripcion);
+        try {
+            $NCategoria = new D_Categoria();
+            $resultado = $NCategoria->modificar($id_categoria, $c_nombre, $c_descripcion);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar una categoría por ID

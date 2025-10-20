@@ -21,7 +21,19 @@ if (isset($_GET['id_RolUsuario'])) {
     if ($id_RolUsuario) {
         // Verifica si se ha solicitado eliminar
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            $rolUsuarioService->eliminar($id_RolUsuario);
+            try {
+            $resultado = $rolUsuarioService->eliminar($id_RolUsuario);
+                if ($resultado['success']) {
+                    $_SESSION['mensaje'] = "Rol_Usuario eliminada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se puede eliminar el Rol_Usuario";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al eliminar Rol_Usuario: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
             header('Location: ADM_RolUsuario.php');
             exit();
 
@@ -62,33 +74,47 @@ $UsuariosDisponibles = $usuarioService->obtenerUsuarioDisponibles($id_Usuario_ac
 // Manejo de creación/actualización vía POST (crear/editar)
 $accion = $_POST['accion'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id_RolUsuario = filter_input(INPUT_POST, 'id_RolUsuario', FILTER_VALIDATE_INT);
+    $id_rol = trim(strip_tags($_POST['id_rol'] ?? ''));
+    $id_usuario = trim(strip_tags($_POST['id_usuario'] ?? ''));
+
     if ($accion === 'Registrar') {
-        $id_rol = trim(strip_tags($_POST['id_rol'] ?? ''));
-        $id_usuario = trim(strip_tags($_POST['id_usuario'] ?? ''));
-        if ($id_rol && $id_usuario) {    
-            $rolUsuarioService->adicionar($id_rol, $id_usuario);
+        if ($id_rol && $id_usuario) {  
+            try {
+            $resultado = $rolUsuarioService->adicionar($id_rol, $id_usuario);
+            if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Rol_Usuario registrado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo registrar el Rol_Usuario. Usuario ya registrado";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al registrar funcionario: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
             header('Location: ADM_RolUsuario.php');
             exit();
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
-        }
+            }
     } elseif ($accion === 'guardar') {
-        $id_RolUsuario = filter_input(INPUT_POST, 'id_RolUsuario', FILTER_VALIDATE_INT);
-        $id_rol = trim(strip_tags($_POST['id_rol'] ?? ''));
-        $id_usuario = trim(strip_tags($_POST['id_usuario'] ?? ''));
-        if ($id_RolUsuario && $id_rol && $id_usuario !== false) {
-            $existing = $rolUsuarioService->buscarPorId($id_RolUsuario);
-            if ($existing) {
-                $rolUsuarioService->modificar($id_RolUsuario, $id_rol, $id_usuario);
+        if ($id_RolUsuario && $id_rol && $id_usuario) {
+            try {
+                $resultado = $rolUsuarioService->modificar($id_RolUsuario, $id_rol, $id_usuario);
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Rol_Usuario modificado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo modificar el Rol_Usuario.";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al modificar Rol_Usuario: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
                 header('Location: ADM_RolUsuario.php');
                 exit();
-            } else {
-                echo "Error: No existe el RolUsuario con ID $id_RolUsuario.";
-            }
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
+            } 
         }
-    }
 }
 
 

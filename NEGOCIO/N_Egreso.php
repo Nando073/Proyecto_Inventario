@@ -5,8 +5,13 @@ class N_Egreso {
 
     // Método para adicionar un egreso
     public function registrarEgresoCompleto($id_funcionario,$e_solicitud, $e_total_cantidad, $detalles) {
-        $NEgreso = new D_Egreso();
-        return $NEgreso->RegistrarEgresoConDetalles($id_funcionario,$e_solicitud, $e_total_cantidad, $detalles);
+        try {
+            $NEgreso = new D_Egreso();
+            $resultado = $NEgreso->RegistrarEgresoConDetalles($id_funcionario,$e_solicitud, $e_total_cantidad, $detalles);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
     
     // Método para buscar todos los egresos

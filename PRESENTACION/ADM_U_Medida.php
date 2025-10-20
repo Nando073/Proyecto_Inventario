@@ -48,31 +48,46 @@ if (isset($_GET['id_medida'])) {
 // Manejo de creación/actualización vía POST
 $accion = $_POST['accion'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id_medida = filter_input(INPUT_POST, 'id_medida', FILTER_VALIDATE_INT);
+    $u_medida = trim(strip_tags($_POST['u_medida'] ?? ''));
+    $u_descripcion = trim(strip_tags($_POST['u_descripcion'] ?? ''));
+
     if ($accion === 'crear') {
-        $u_medida = trim(strip_tags($_POST['u_medida'] ?? ''));
-        $u_descripcion = trim(strip_tags($_POST['u_descripcion'] ?? ''));
-        if ($u_medida && $u_descripcion!== false) {
-            $medidaService->adicionar($u_medida, $u_descripcion);
+        if ($u_medida && $u_descripcion) {
+            try {
+            $resultado = $medidaService->adicionar($u_medida, $u_descripcion);
+                    if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Medida registrado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo registrar la medida. ya registrada.";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al registrar la medida: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
             header('Location: ADM_U_Medida.php');
             exit();
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
+        
         }
     } elseif ($accion === 'guardar') {
-        $id_medida = filter_input(INPUT_POST, 'id_medida', FILTER_VALIDATE_INT);
-        $u_medida = trim(strip_tags($_POST['u_medida'] ?? ''));
-        $u_descripcion = trim(strip_tags($_POST['u_descripcion'] ?? ''));
-        if ($id_medida && $u_medida && $u_descripcion !== false) {
-            $existing = $medidaService->buscarPorId($id_medida);
-            if ($existing) {
-                $medidaService->modificar($id_medida, $u_medida, $u_descripcion);
-                header('Location: ADM_U_Medida.php');
-                exit();
-            } else {
-                echo "Error: No existe la unidad de medida con ID $id_medida.";
-            }
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
+        if ($id_medida && $u_medida && $u_descripcion) {
+            try {
+                $resultado = $medidaService->modificar($id_medida, $u_medida, $u_descripcion);
+                    if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Medida modificada correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo modificar la medida.";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al modificar la medida: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            header('Location: ADM_U_Medida.php');
+            exit();
         }
     }
 }

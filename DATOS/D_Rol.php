@@ -30,6 +30,8 @@ class D_Rol {
             $ps = $this->con->prepare($sql);
             $ps->execute([ $r_nombre, $r_descripcion]);
             echo "rol registrado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -82,6 +84,8 @@ public function Eliminar($id_rol) {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_rol, $r_nombre, $r_descripcion]);
             echo "rol actualizado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return ['success' => $resultado['success']]; // Devuelve 1 o
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();
         }

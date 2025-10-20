@@ -6,8 +6,13 @@ class N_Ingreso {
     // Método para adicionar un ingreso
 
     public function registrarIngresoCompleto($id_proveedor, $total, $detalles) {
-        $NIngreso = new D_Ingreso();
-        return $NIngreso->RegistrarIngresoConDetalles($id_proveedor, $total, $detalles);
+        try {
+            $NIngreso = new D_Ingreso();
+            $resultado = $NIngreso->RegistrarIngresoConDetalles($id_proveedor, $total, $detalles);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
           

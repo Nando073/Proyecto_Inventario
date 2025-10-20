@@ -35,6 +35,9 @@ class D_U_Medida {
             $ps = $this->con->prepare($sql);
             $ps->execute([$u_medida, $u_descripcion]);
             echo "Unidad de Medida registrada correctamente.";
+            // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -90,6 +93,9 @@ public function Eliminar($id_medida) {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_medida, $u_medida, $u_descripcion]);
             echo "Unidad de medida actualizada correctamente.";
+            // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return ['success' => $resultado['success']]; // Devuelve 1 o
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();
         }

@@ -18,7 +18,19 @@ if (isset($_GET['id_usuario'])) {
     $usuario_id = filter_input(INPUT_GET, 'id_usuario', FILTER_VALIDATE_INT);
     if ($usuario_id) {
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-            $usuarioService->eliminar($usuario_id);
+            try {
+                $resultado = $usuarioService->eliminar($usuario_id);
+                 if ($resultado['success']) {
+                    $_SESSION['mensaje'] = "Usuario eliminada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se puede eliminar el Usuario";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al eliminar Usuario: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
             header('Location: ADM_Usuario.php');
             exit();
         } elseif (isset($_GET['action']) && $_GET['action'] === 'activar') {
@@ -64,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_funcionario = filter_input(INPUT_POST, 'id_funcionario', FILTER_VALIDATE_INT);
     $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_STRING);
 
+    $resultado = $usuarioService->buscarPorId($id_usuario);
     if ($usuarioNombre && $id_funcionario) {
-        $existingUser = $usuarioService->buscarPorId($id_usuario);
 
         if ($accion === 'crear') {
             if ($existingUser) {
@@ -73,37 +85,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 if ($clave) {
                     $clave = password_hash($clave, PASSWORD_DEFAULT);
-                    $usuarioService->adicionar($usuarioNombre, $clave, $id_funcionario);
+                    try {
+                    $resultado = $usuarioService->adicionar($usuarioNombre, $clave, $id_funcionario);
+                    if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Usuario registrado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo registrar el Usuario. Nombre de usuario ya registrado ";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al registrar usuario: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
                     header('Location: ADM_Usuario.php');
                     exit();
-                } else {
-                    echo "Error: La clave es obligatoria.";
+                
                 }
             }
         } elseif ($accion === 'guardar') {
-            if ($existingUser) {
+            if ($id_usuario && $usuarioNombre && $id_funcionario) {
+                // Si la clave está vacía, conserva la anterior
                 if (empty($clave)) {
+                    $existingUser = $usuarioService->buscarPorId($id_usuario);
                     $clave = $existingUser['clave'];
                 } else {
                     $clave = password_hash($clave, PASSWORD_DEFAULT);
                 }
 
-                $usuarioService->modificar($id_usuario, $usuarioNombre, $clave, $id_funcionario);
+                try {
+                    $resultado = $usuarioService->modificar($id_usuario, $usuarioNombre, $clave, $id_funcionario);
+                    if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Usuario modificado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo modificar el Usuario.";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al modificar Usuario: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+
                 header('Location: ADM_Usuario.php');
                 exit();
-            } else {
-                echo "Error: El usuario no existe.";
             }
-        } else {
-            echo "Acción no válida.";
         }
-    } else {
-        echo "Todos los campos requeridos deben estar completos.";
-    }
+
+    } 
 }
 
+
 // Obtener listas
-$funcionarios = $usuarioService->obtenerFuncionarios();
+//$funcionarios = $funcionarioService->ObtenerFuncionariosDisponibles();
 $searchTerm = isset($_GET['search']) ? filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) : '';
 
 $usuarios = $usuarioService->ObtenerUsuarios($searchTerm);
@@ -178,7 +212,9 @@ if ($searchTerm) {
                         <div class="form-group mb-3">
                             <label for="clave">Contraseña</label>
                             <div class="input-group">
-                                <input type="password" class="form-control" id="clave" name="clave" value="">
+                               <input type="password" class="form-control" id="clave" name="clave"
+                                pattern="(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}"
+                                title="Debe tener al menos 8 caracteres, una mayúscula y un número">
                                 <button type="button" class="btn btn-outline-secondary" id="togglePassword">
                                     👁
                                 </button>
@@ -320,45 +356,74 @@ if ($searchTerm) {
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const btnCrearUsuario = document.getElementById("btnCrearUsuario"); // botón que abre el modal para crear
-    const btnEditarUsuario = document.querySelectorAll(".btnEditarUsuario"); // botones de editar
     const btnCrear = document.getElementById("btnCrear");
     const btnGuardar = document.getElementById("btnGuardar");
     const form = document.getElementById("formUsuario");
     const idInput = document.getElementById("id_usuario");
+    const passwordInput = document.getElementById("clave");
+    const togglePasswordBtn = document.getElementById("togglePassword");
 
-    // Cuando se presiona "Registrar" o "Crear Usuario"
+    // 🔹 Mostrar/ocultar contraseña
+    togglePasswordBtn.addEventListener("click", function () {
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+        togglePasswordBtn.textContent = isPassword ? "🙈" : "👁";
+    });
+
+    // 🔹 Cuando se presiona "Crear Usuario"
     btnCrearUsuario.addEventListener("click", function () {
-        // Limpiar todos los inputs manualmente
-    form.querySelectorAll("input, select, textarea").forEach(input => {
-        input.value = "";          // limpia texto
-        if (input.type === "checkbox" || input.type === "radio") {
-            input.checked = false; // desmarca check/radio
-        }
-    });
+        // Limpiar el formulario
+        form.querySelectorAll("input, select, textarea").forEach(input => {
+            input.value = "";
+            if (input.type === "checkbox" || input.type === "radio") {
+                input.checked = false;
+            }
+        });
+
         if (idInput) idInput.value = "";
-        btnCrear.style.display = "inline-block"; // mostrar Crear
-        btnGuardar.style.display = "none";        // ocultar Guardar
+
+        // Mostrar/ocultar botones
+        btnCrear.style.display = "inline-block";
+        btnGuardar.style.display = "none";
+
+        // Hacer que la contraseña sea obligatoria
+        passwordInput.required = true;
+        passwordInput.value = ""; // asegúrate de limpiarla
     });
-    
-    // Cuando se presiona "Editar" (suponiendo que tienes botones con clase .btnEditarUsuario)
-    btnEditarUsuario.forEach(function(btn) {
+
+    // 🔹 Cuando se presiona "Editar Usuario"
+    btnGuardar.forEach(function(btn) {
         btn.addEventListener("click", function() {
             const usuarioId = this.dataset.id; // id del usuario a editar
             idInput.value = usuarioId;
-            btnCrear.style.display = "none";        // ocultar Crear
-            btnGuardar.style.display = "inline-block"; // mostrar Guardar
-            // aquí puedes rellenar el formulario con los datos del usuario si quieres
+
+            // Mostrar/ocultar botones
+            btnCrear.style.display = "none";
+            btnGuardar.style.display = "inline-block";
+
+            // La contraseña NO será obligatoria en edición
+            passwordInput.required = false;
+            passwordInput.value = ""; // mantener vacío para no mostrar hash
         });
     });
+    // 🔐 Validación de contraseña segura
+    form.addEventListener("submit", function (event) {
+        if (passwordInput.required || passwordInput.value.trim() !== "") {
+            const password = passwordInput.value.trim();
 
-    // Función para mostrar/ocultar contraseña
-    togglePasswordBtn.addEventListener('click', function () {
-        const type = passwordInput.type === 'password' ? 'text' : 'password';
-        passwordInput.type = type;
-        togglePasswordBtn.textContent = type === 'password' ? '👁' : '🙈';
+            // Expresión regular: mínimo 8 caracteres, 1 mayúscula, 1 número
+            const regex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+            if (!regex.test(password)) {
+                event.preventDefault(); // Detiene el envío
+                alert("La contraseña debe tener al menos 8 caracteres, incluir una mayúscula y un número.");
+                passwordInput.focus();
+            }
+        }
     });
 });
 </script>
+
 
 </body>
 </html>

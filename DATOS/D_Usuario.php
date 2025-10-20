@@ -41,6 +41,8 @@ class D_Usuario {
             $ps = $this->con->prepare($sql);
             $ps->execute([$usuario, $clave, $id_funcionario]);
             echo "Usuario registrado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -66,6 +68,8 @@ class D_Usuario {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_usuario]);
             echo "Usuario eliminado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al eliminar: " . $ex->getMessage();
         }
@@ -90,6 +94,8 @@ public function modificar($id_usuario, $usuario, $clave, $id_funcionario) {
         $ps = $this->con->prepare($sql);
         $ps->execute([$id_usuario, $usuario, $clave, $id_funcionario]);
         echo "Usuario actualizado correctamente.";
+        $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+        return ['success' => $resultado['success']]; // Devuelve 1 o 0
     } catch (PDOException $ex) {
         echo "Error al actualizar: " . $ex->getMessage();
     }
@@ -116,17 +122,6 @@ public function modificar($id_usuario, $usuario, $clave, $id_funcionario) {
             return $ps->fetch(PDO::FETCH_ASSOC); // ← devuelve array asociativo
         } catch (PDOException $ex) {
             echo "Error al buscar usuario: " . $ex->getMessage();
-            return null;
-        }
-    }
-    public function obtenerFuncionario() {
-        $sql = "CALL ObtenerFuncionariosConArea_Cargo()";
-       try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
             return null;
         }
     }

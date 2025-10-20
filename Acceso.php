@@ -73,11 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         <form method="post" autocomplete="off">
             <div class="input-group">
                 <input type="text" id="usuario" name="usuario" placeholder="Usuario" autocomplete="off" required>
-                <span class="icon">📧</span>
+                <span class="icon">👤</span>
             </div>
             <div class="input-group">
                 <input type="password" id="clave" name="clave" placeholder="Contraseña" autocomplete="off" required>
-                <span class="icon">🔒</span>
+                <button type="button" id="togglePassword" class="eye-btn" title="Mostrar contraseña">
+                    👁
+                </button>
             </div>
             <button type="submit" name="login" class="login-btn">INICIAR SESIÓN</button>
             
@@ -93,6 +95,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 <script>
     document.getElementById('usuario').value = '';
     document.getElementById('clave').value = '';
+    const passwordInput = document.getElementById("clave");
+    const togglePassword = document.getElementById("togglePassword");
+
     function toggleMenu() {
         const menu = document.getElementById('menuUsuario');
         menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
@@ -101,6 +106,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
             window.location.reload(true); // recarga completa desde el servidor
         }
+
+        // Flag para saber si la contraseña está visible en móvil
+        let passwordVisibleMobile = false;
+        
+    // Mostrar la contraseña solo mientras se mantiene presionado el clic
+    togglePassword.addEventListener("mousedown", () => {
+        passwordInput.type = "text";
+    });
+
+    togglePassword.addEventListener("mouseup", () => {
+        passwordInput.type = "password";
+    });
+
+    togglePassword.addEventListener("mouseleave", () => {
+        passwordInput.type = "password";
+    });
+    // --- Móvil: hacer click para alternar ---
+    togglePassword.addEventListener("click", () => {
+        if (isTouchDevice()) {
+            passwordVisibleMobile = !passwordVisibleMobile;
+            passwordInput.type = passwordVisibleMobile ? "text" : "password";
+        }
+    });
+
+    // --- Función para detectar touch devices ---
+    function isTouchDevice() {
+        return ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+    }
 });
 </script>
 

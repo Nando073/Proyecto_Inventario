@@ -5,9 +5,14 @@ class N_Proveedor {
 
     // Método para adicionar un proveedor
     public function adicionar( $p_nombre, $nit, $departamento, $p_direccion, $p_celular) {
-        $NProveedor = new D_Proveedor(); 
-        $NProveedor->Adicionar( $p_nombre, $nit, $departamento, $p_direccion, $p_celular);  // Llamar al método de D_Proveedor
-    }
+        try {
+            $NProveedor = new D_Proveedor(); 
+            $resultado = $NProveedor->Adicionar( $p_nombre, $nit, $departamento, $p_direccion, $p_celular);  // Llamar al método de D_Proveedor
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
+            }
 
     // Método para buscar todos los proveedores
     public function obtenerProveedores() {
@@ -26,8 +31,13 @@ class N_Proveedor {
 
     // Método para eliminar un proveedor por ID
     public function eliminar($id_proveedor) {
-        $NProveedor = new D_Proveedor();
-        $NProveedor->Eliminar($id_proveedor);  // Llamar al método Eliminar de D_Proveedor
+        try {
+            $NProveedor = new D_Proveedor();
+            $resultado =$NProveedor->Eliminar($id_proveedor);  // Llamar al método Eliminar de D_Proveedor
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        }catch (Exception $e){
+            throw $e;
+        }
     }
 
     // Método para buscar proveedores por similitud de término
@@ -38,8 +48,14 @@ class N_Proveedor {
 
     // Método para modificar un proveedor
     public function modificar($id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular) {
-        $NProveedor = new D_Proveedor();
-        $NProveedor->modificar($id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular);  // Llamar al método modificar de D_Proveedor
+        try {
+            $NProveedor = new D_Proveedor();
+            $resultado = $NProveedor->modificar($id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular);  // Llamar al método modificar de D_Proveedor
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
+        
     }
 
     // Método para buscar un proveedor por ID

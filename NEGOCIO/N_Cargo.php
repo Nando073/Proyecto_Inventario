@@ -5,8 +5,15 @@ class N_Cargo {
 
     // Método para adicionar descripcion
     public function adicionar( $nombre_c, $descripcion_c) {
-        $NCargo = new D_Cargo(); 
-        $NCargo->Adicionar( $nombre_c, $descripcion_c);  // Llamar al método de D_Cargo
+        try {
+            $NCargo = new D_Cargo();
+            $resultado = $NCargo->Adicionar($nombre_c, $descripcion_c);  // Llamar al método de D_Cargo
+            return ['success' => (bool) $resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+            
+        }
+       
     }
 
     // Método para buscar todos las cargos
@@ -33,8 +40,13 @@ class N_Cargo {
 
     // Método para modificar un area
     public function modificar($id_cargo, $nombre_c, $descripcion_c) {
-        $NCargo = new D_Cargo();
-        $NCargo->modificar($id_cargo, $nombre_c, $descripcion_c);  // Llamar al método modificar de D_Cargo
+        try {
+            $NCargo = new D_Cargo();
+            $resultado = $NCargo->modificar($id_cargo, $nombre_c, $descripcion_c);  // Llamar al método modificar de D_Cargo
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar un area por ID

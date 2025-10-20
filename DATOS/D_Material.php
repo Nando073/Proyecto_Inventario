@@ -45,6 +45,9 @@ class D_Material {
             $ps = $this->con->prepare($sql);
             $ps->execute([$m_nombre,$m_descripcion, $id_categoria, $id_medida]);
             echo "material registrado correctamente.";
+                // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -98,6 +101,9 @@ public function Eliminar($id_material) {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_material, $m_nombre, $m_descripcion, $id_categoria, $id_medida]);
             echo "Material actualizado correctamente.";
+            // Obtener el resultado del procedimiento
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return ['success' => $resultado['success']]; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();
         }

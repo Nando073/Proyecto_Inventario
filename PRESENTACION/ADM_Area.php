@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['mensaje'] = "Área registrada correctamente.";
                     $_SESSION['tipo_mensaje'] = "success";
                 } else {
-                    $_SESSION['mensaje'] = "No se pudo registrar el área.";
+                    $_SESSION['mensaje'] = "No se pudo registrar el área. ya existe.";
                     $_SESSION['tipo_mensaje'] = "danger";
                 }
             } catch (Exception $e) {
@@ -71,12 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             header('Location: ADM_Area.php');
             exit();
-        } else {
-            $_SESSION['mensaje'] = "Todos los campos son obligatorios.";
-            $_SESSION['tipo_mensaje'] = "warning";
-            header('Location: ADM_Area.php');
-            exit();
-        }
+        } 
 
     } elseif ($accion === 'guardar') {
         $id_area = filter_input(INPUT_POST, 'id_area', FILTER_VALIDATE_INT);
@@ -99,11 +94,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['tipo_mensaje'] = "danger";
             }
 
-            header('Location: ADM_Area.php');
-            exit();
-        } else {
-            $_SESSION['mensaje'] = "Todos los campos son obligatorios y válidos.";
-            $_SESSION['tipo_mensaje'] = "warning";
             header('Location: ADM_Area.php');
             exit();
         }

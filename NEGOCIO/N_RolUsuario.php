@@ -5,8 +5,13 @@ class N_RolUsuario {
 
     // Método para adicionar id_rolUsuario
     public function adicionar($id_rol, $id_usuario) {
-        $NRolUsuario = new D_RolUsuario();
-        $NRolUsuario->Adicionar($id_rol, $id_usuario);  // Llamar al método de D_RolUsuario
+        try {
+            $NRolUsuario = new D_RolUsuario();
+            $resultado = $NRolUsuario->Adicionar($id_rol, $id_usuario);  // Llamar al método de D_RolUsuario
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar todos los rolUsuario
@@ -16,8 +21,13 @@ class N_RolUsuario {
     }
     // Método para eliminar un rolUsuario por ID
     public function eliminar($id_RolUsuario) {
+        try {
         $NRolUsuario = new D_RolUsuario();
-        $NRolUsuario->Eliminar($id_RolUsuario);  // Llamar al método Eliminar de D_RolUsuario
+        $resultado = $NRolUsuario->Eliminar($id_RolUsuario);  // Llamar al método Eliminar de D_RolUsuario
+        return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        }catch (Exception $e){
+            throw $e;
+        }
     }
 
     // Método para buscar rolUsuario por similitud de término
@@ -28,8 +38,13 @@ class N_RolUsuario {
 
     // Método para modificar un rolUsuario
     public function modificar($id_RolUsuario, $id_rol, $id_usuario) {
-        $NRolUsuario = new D_RolUsuario();
-        $NRolUsuario->modificar($id_RolUsuario, $id_rol, $id_usuario);  // Llamar al método modificar de D_RolUsuario
+        try {
+            $NRolUsuario = new D_RolUsuario();
+            $resultado = $NRolUsuario->modificar($id_RolUsuario, $id_rol, $id_usuario);  // Llamar al método modificar de D_RolUsuario
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar un rolUsuario por ID

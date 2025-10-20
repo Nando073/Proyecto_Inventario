@@ -6,8 +6,14 @@ class N_Funcionario {
 
     // Método para adicionar funcionario
     public function adicionar($f_nombre, $f_apellido, $f_correo, $area , $id_cargo, $CI, $complemento) {
-        $Nfuncionario = new D_Funcionario(); 
-        $Nfuncionario->Adicionar($f_nombre, $f_apellido, $f_correo, $area , $id_cargo, $CI, $complemento);  // Llamar al método de D_Funcionario
+        try {
+            $Nfuncionario = new D_Funcionario(); 
+            $resultado = $Nfuncionario->Adicionar($f_nombre, $f_apellido, $f_correo, $area , $id_cargo, $CI, $complemento);  // Llamar al método de D_Funcionario
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
+        
     }
     
 
@@ -31,9 +37,15 @@ class N_Funcionario {
 
     // Método para modificar un funcionario
     public function modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento) {
-        $Dfuncionario = new D_Funcionario();
-        $funcionarioExistente = $Dfuncionario->buscarPorId($id_funcionario);
-        $Dfuncionario->modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area,$id_cargo, $CI, $complemento);
+        try {
+            $Dfuncionario = new D_Funcionario();
+            $funcionarioExistente = $Dfuncionario->buscarPorId($id_funcionario);
+            $resultado = $Dfuncionario->modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area,$id_cargo, $CI, $complemento);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
+        
     }
 
     // Método para buscar un funcionario por ID

@@ -5,8 +5,13 @@ class N_Rol {
 
     // Método para adicionar r_descripcion
     public function adicionar( $r_nombre, $r_descripcion) {
-        $NRol = new D_Rol(); 
-        $NRol->Adicionar( $r_nombre, $r_descripcion);  // Llamar al método de D_Rol
+        try {
+            $NRol = new D_Rol(); 
+            $resultado = $NRol->Adicionar( $r_nombre, $r_descripcion);  // Llamar al método de D_Rol
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar todos las areas
@@ -34,8 +39,14 @@ class N_Rol {
 
     // Método para modificar un area
     public function modificar($id_rol, $r_nombre, $r_descripcion) {
-        $NRol = new D_Rol();
-        $NRol->modificar($id_rol, $r_nombre, $r_descripcion);  // Llamar al método modificar de D_Rol
+        try {
+            $NRol = new D_Rol();
+            $resultado = $NRol->modificar($id_rol, $r_nombre, $r_descripcion);  // Llamar al método modificar de D_Rol
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
+        
     }
 
     // Método para buscar un area por ID

@@ -16,9 +16,21 @@ if (isset($_GET['id_proveedor'])) {
     if ($id_proveedor) {
         // Verifica si se ha solicitado eliminar (desactivar)
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
+            try {
             // Llamada al método de negocio para eliminar/desactivar al proveedor
-            $proveedorService->eliminar($id_proveedor);
-            // Redirigir al listado después de eliminar
+            $resultado = $proveedorService->eliminar($id_proveedor);
+            if ($resultado['success']) {
+                    $_SESSION['mensaje'] = "Proveedor eliminada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se puede eliminar al proveedor.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            
+            }catch (Exception $e){
+                $_SESSION['mensaje'] = "Error al eliminar proveedor: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
             header('Location: ADM_Proveedor.php');
             exit();
             
@@ -56,37 +68,48 @@ if (isset($_GET['id_proveedor'])) {
 // Manejo de creación/actualización vía POST
 $accion = $_POST['accion'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id_proveedor = filter_input(INPUT_POST, 'id_proveedor', FILTER_VALIDATE_INT);
+    $p_nombre = trim(strip_tags($_POST['p_nombre'] ?? ''));
+    $nit = trim(strip_tags($_POST['nit'] ?? ''));
+    $departamento = trim(strip_tags($_POST['departamento'] ?? ''));
+    $p_direccion = trim(strip_tags($_POST['p_direccion'] ?? ''));
+    $p_celular = trim(strip_tags($_POST['p_celular'] ?? ''));
+
     if ($accion === 'crear') {
-        $p_nombre = trim(strip_tags($_POST['p_nombre'] ?? ''));
-        $nit = trim(strip_tags($_POST['nit'] ?? ''));
-        $departamento = trim(strip_tags($_POST['departamento'] ?? ''));
-        $p_direccion = trim(strip_tags($_POST['p_direccion'] ?? ''));
-        $p_celular = trim(strip_tags($_POST['p_celular'] ?? ''));
-        if ($p_nombre && $nit && $departamento && $p_direccion && $p_celular !== false) {
-            $proveedorService->adicionar($p_nombre, $nit, $departamento, $p_direccion, $p_celular);
+        if ($p_nombre && $nit && $departamento && $p_direccion && $p_celular) {
+            try {
+                $resultado = $proveedorService->adicionar($p_nombre, $nit, $departamento, $p_direccion, $p_celular);
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Proveedor registrado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo registrar el Proveedor. NIT ya registrado.";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al registrar Proveedor: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
             header('Location: ADM_Proveedor.php');
             exit();
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
         }
     } elseif ($accion === 'guardar') {
-        $id_proveedor = filter_input(INPUT_POST, 'id_proveedor', FILTER_VALIDATE_INT);
-        $p_nombre = trim(strip_tags($_POST['p_nombre'] ?? ''));
-        $nit = trim(strip_tags($_POST['nit'] ?? ''));
-        $departamento = trim(strip_tags($_POST['departamento'] ?? ''));
-        $p_direccion = trim(strip_tags($_POST['p_direccion'] ?? ''));
-        $p_celular = trim(strip_tags($_POST['p_celular'] ?? ''));
-        if ($id_proveedor && $p_nombre && $nit && $departamento && $p_direccion && $p_celular !== false) {
-            $existing = $proveedorService->buscarPorId($id_proveedor);
-            if ($existing) {
-                $proveedorService->modificar($id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular);
-                header('Location: ADM_Proveedor.php');
-                exit();
-            } else {
-                echo "Error: No existe el proveedor con ID $id_proveedor.";
-            }
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
+        if ($id_proveedor && $p_nombre && $nit && $departamento && $p_direccion && $p_celular) {
+            try {
+            $resultado = $proveedorService->modificar($id_proveedor, $p_nombre, $nit, $departamento, $p_direccion, $p_celular);
+            if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Proveedor modificado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo modificar el Proveedor.";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al modificar Proveedor: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+        header('Location: ADM_Proveedor.php');
+        exit();
         }
     }
 }

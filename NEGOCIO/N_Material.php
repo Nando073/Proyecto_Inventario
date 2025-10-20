@@ -5,8 +5,13 @@ class N_Material {
 
     // Método para adicionar m_descripcion
     public function adicionar( $m_nombre, $m_descripcion, $id_categoria,$id_medida) {
-        $NMaterial = new D_Material(); 
-        $NMaterial->Adicionar( $m_nombre, $m_descripcion, $id_categoria, $id_medida);  // Llamar al método de D_Material
+        try {
+            $NMaterial = new D_Material(); 
+            $resultado = $NMaterial->Adicionar( $m_nombre, $m_descripcion, $id_categoria, $id_medida);  // Llamar al método de D_Material
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar todos los materiales
@@ -43,8 +48,13 @@ public function eliminar($id_material) {
 
     // Método para modificar un material
     public function modificar($id_material, $m_nombre, $m_descripcion, $id_categoria, $id_medida) {
-        $NMaterial = new D_Material();
-        $NMaterial->modificar($id_material, $m_nombre, $m_descripcion, $id_categoria, $id_medida);  // Llamar al método modificar de D_Material
+        try {
+            $NMaterial = new D_Material();
+            $resultado = $NMaterial->modificar($id_material, $m_nombre, $m_descripcion, $id_categoria, $id_medida);  // Llamar al método modificar de D_Material
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar un material por ID

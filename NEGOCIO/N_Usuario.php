@@ -6,8 +6,13 @@ class N_Usuario {
 
     // Método para adicionar usuario
     public function adicionar($usuario, $clave, $id_funcionario) {
-        $Nusuario = new D_Usuario();
-        $Nusuario->Adicionar($usuario, $clave, $id_funcionario);
+        try {
+            $Nusuario = new D_Usuario(); 
+            $resultado = $Nusuario->Adicionar($usuario, $clave, $id_funcionario);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar todos los usuarios
@@ -18,8 +23,13 @@ class N_Usuario {
 
     // Método para eliminar un usuario por ID
     public function eliminar($id_usuario) {
+        try {
         $Nusuario = new D_Usuario();
-        $Nusuario->Eliminar($id_usuario);
+        $resultado = $Nusuario->Eliminar($id_usuario);
+        return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        }catch (Exception $e){
+            throw $e;
+        }
     }
 
     // Método para buscar usuarios por similitud de término
@@ -30,19 +40,19 @@ class N_Usuario {
 
     // Método para modificar un usuario
     public function modificar($id_usuario, $usuario, $clave, $id_funcionario) {
-        $Dusuario = new D_Usuario();
-        $Dusuario->modificar($id_usuario, $usuario, $clave, $id_funcionario);
+        try {
+            $Dusuario = new D_Usuario();
+            $resultado = $Dusuario->modificar($id_usuario, $usuario, $clave, $id_funcionario);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // Método para buscar un usuario por ID
     public function buscarPorId($id_usuario) {
         $Nusuario = new D_Usuario();
         return $Nusuario->buscarPorId($id_usuario);
-    }
-
-    public function obtenerFuncionarios() {
-        $Nusuario = new D_Usuario();
-        return $Nusuario->obtenerFuncionario();
     }
     public function activarUsuario($id_usuario) {
         $Nusuario = new D_Usuario();

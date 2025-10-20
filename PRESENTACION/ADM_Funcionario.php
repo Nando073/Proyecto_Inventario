@@ -68,32 +68,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_STRING);
 
     // Validar campos básicos
-    if ($f_nombre && $f_apellido && $f_correo && $area && $id_cargo && $CI && $accion) {
-        $existingFuncionario = $funcionarioService->buscarPorId($id_funcionario);
+    //$resultado = $funcionarioService->buscarPorId($id_funcionario);
+    
+    if ($accion === 'crear') {
+            if ($f_nombre && $f_apellido && $f_correo && $area && $id_cargo && $CI) {
+                try {
+                    $resultado = $funcionarioService->adicionar($f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento);
 
-        if ($accion === 'crear') {
-            if ($existingFuncionario) {
-                echo "Error: El funcionario con el ID $id_funcionario ya existe. No se puede crear.";
-            } else {
-                $funcionarioService->adicionar($f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento);
-                header('Location: ADM_Funcionario.php');
-                exit();
+                    if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Funcionario registrado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo registrar el funcionario. C.I. o Correo ya registrado.";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al registrar funcionario: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+                 header('Location: ADM_Funcionario.php');
+                 exit();
             }
         } elseif ($accion === 'guardar') {
-            if ($existingFuncionario) {
-                $funcionarioService->modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento);
+            if ($f_nombre && $f_apellido && $f_correo && $area && $id_cargo && $CI && $id_funcionario) {
+                try {
+                    $resultado = $funcionarioService->modificar($id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento);
+                    if (isset($resultado['success']) && $resultado['success'] == 1) {
+                        $_SESSION['mensaje'] = "Funcionario modificado correctamente.";
+                        $_SESSION['tipo_mensaje'] = "success";
+                    } else {
+                        $_SESSION['mensaje'] = "No se pudo modificar el funcionario.";
+                        $_SESSION['tipo_mensaje'] = "danger";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['mensaje'] = "Error al modificar funcionario: " . $e->getMessage();
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
                 header('Location: ADM_Funcionario.php');
                 exit();
             } else {
-                echo "Error: El funcionario con el ID $id_funcionario no existe. No se puede modificar.";
+                $_SESSION['mensaje'] = "Error: El funcionario con el ID $id_funcionario no existe. No se puede modificar.";
+                $_SESSION['tipo_mensaje'] = "danger";
             }
-        } else {
-            echo "Error: Acción no válida.";
-        }
-    } else {
-        echo "Error: Todos los campos son necesarios y deben ser válidos.";
-    }
+            
+        } 
 }
+
 
 
 $funcionarios = $funcionarioService->obtenerFuncionarios();

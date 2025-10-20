@@ -34,7 +34,8 @@ class D_Cargo {
         try {
             $ps = $this->con->prepare($sql);
             $ps->execute([ $nombre_c, $descripcion_c]);
-            echo "cargo registrado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -87,6 +88,8 @@ class D_Cargo {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_cargo, $nombre_c, $descripcion_c]);
             echo "cargo actualizado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return ['success' => $resultado['success']]; // Devuelve 1 o
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();
         }

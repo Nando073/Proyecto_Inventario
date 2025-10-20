@@ -34,7 +34,6 @@ class D_Area {
         try {
             $ps = $this->con->prepare($sql);
             $ps->execute([ $a_nombre, $a_descripcion]);
-            echo "material registrado correctamente.";
              // Obtener el resultado del procedimiento
             $resultado = $ps->fetch(PDO::FETCH_ASSOC);
             return $resultado['success']; // Devuelve 1 o 0

@@ -54,28 +54,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $c_descripcion = trim(strip_tags($_POST['c_descripcion'] ?? ''));
         //$c_materiales = filter_input(INPUT_POST, 'c_materiales', FILTER_VALIDATE_INT);
         if ($c_nombre && $c_descripcion!== false) {
-            $categoriaService->adicionar($c_nombre, $c_descripcion);
+            try {
+                $resultado = $categoriaService->adicionar($c_nombre, $c_descripcion);
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Categoría creada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "Error al registrar categoría. ya existe.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al crear categoría: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
             header('Location: ADM_Categoria.php');
             exit();
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
-        }
+        } 
     } elseif ($accion === 'guardar') {
         $id_categoria = filter_input(INPUT_POST, 'id_categoria', FILTER_VALIDATE_INT);
         $c_nombre = trim(strip_tags($_POST['c_nombre'] ?? ''));
         $c_descripcion = trim(strip_tags($_POST['c_descripcion'] ?? ''));
        //$c_materiales = filter_input(INPUT_POST, 'c_materiales', FILTER_VALIDATE_INT);
         if ($id_categoria && $c_nombre && $c_descripcion !== false) {
-            $existing = $categoriaService->buscarPorId($id_categoria);
-            if ($existing) {
-                $categoriaService->modificar($id_categoria, $c_nombre, $c_descripcion);
+            try {
+                $resultado = $categoriaService->modificar($id_categoria, $c_nombre, $c_descripcion);
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Categoría actualizada correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } 
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al actualizar categoría: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
                 header('Location: ADM_Categoria.php');
                 exit();
-            } else {
-                echo "Error: No existe la categoría con ID $id_categoria.";
-            }
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
         }
     }
 }

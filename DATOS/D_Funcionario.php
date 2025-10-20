@@ -60,6 +60,8 @@ class D_Funcionario {
             $ps = $this->con->prepare($sql);
             $ps->execute([$f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento]);
             echo "Funcionario registrado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al registrar: " . $ex->getMessage();
         }
@@ -111,6 +113,8 @@ class D_Funcionario {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_funcionario, $f_nombre, $f_apellido, $f_correo, $area, $id_cargo, $CI, $complemento]);
             echo "Funcionario actualizado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return ['success' => $resultado['success']]; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al actualizar: " . $ex->getMessage();
         }

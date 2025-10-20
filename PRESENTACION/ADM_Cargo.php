@@ -54,29 +54,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($accion === 'crear') {
         $nombre_c = trim(strip_tags($_POST['nombre_c'] ?? ''));
         $descripcion_c = trim(strip_tags($_POST['descripcion_c'] ?? ''));
-        if ($nombre_c && $descripcion_c !== false) {
-            $cargoService->adicionar($nombre_c, $descripcion_c);
+        if ($nombre_c && $descripcion_c) {
+            try {
+                $resultado = $cargoService->adicionar($nombre_c, $descripcion_c);
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Cargo registrado correctamente";
+                    $_SESSION['tipo_mensaje'] = "success";
+                }else{
+                    $_SESSION['mensaje'] = "No se pudo registrar el cargo, ya existe uno con ese nombre.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al registrar el cargo: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
+            
             header('Location: ADM_Cargo.php');
             exit();
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
         }
     } elseif ($accion === 'guardar') {
         $id_cargo = filter_input(INPUT_POST, 'id_cargo', FILTER_VALIDATE_INT);
         $nombre_c = trim(strip_tags($_POST['nombre_c'] ?? ''));
         $descripcion_c = trim(strip_tags($_POST['descripcion_c'] ?? ''));
-        if ($id_cargo && $nombre_c && $p_direccion !== false) {
+        if ($id_cargo && $nombre_c && $descripcion_c !== false) {
             $existing = $cargoService->buscarPorId($id_cargo);
-            if ($existing) {
-                $cargoService->modificar($id_cargo, $nombre_c, $descripcion_c);
-                header('Location: ADM_Cargo.php');
-                exit();
-            } else {
-                echo "Error: No existe el cargo con ID $id_cargo.";
+            try {
+                $resultado = $cargoService->modificar($id_cargo, $nombre_c, $descripcion_c);
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Cargo modificado correctamente";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se pudo modificar el cargo.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al modificar el cargo: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
             }
-        } else {
-            echo "Error: Todos los campos son necesarios y válidos.";
-        }
+
+            header('Location: ADM_Cargo.php');
+            exit();
+        } 
+        
     }
 }
 
