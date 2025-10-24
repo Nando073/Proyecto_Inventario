@@ -17,9 +17,22 @@ if (isset($_GET['id_funcionario'])) {
     if ($funcionario_id) {
         if (isset($_GET['action']) && $_GET['action'] === 'delete') {
             // Eliminado lógico
-            $funcionarioService->eliminar($funcionario_id);
+            try {
+                $resultado = $funcionarioService->eliminar($funcionario_id);
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Funcionario eliminado correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se puede eliminar el Funcionario.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
+            } catch (Exception $e) {
+                $_SESSION['mensaje'] = "Error al eliminar Funcionario: " . $e->getMessage();
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
             header('Location: ADM_Funcionario.php');
             exit();
+        
 
         } elseif (isset($_GET['action']) && $_GET['action'] === 'activar') {
             // Activar funcionario y capturar resultado

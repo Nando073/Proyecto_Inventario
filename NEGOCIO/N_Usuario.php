@@ -86,6 +86,13 @@ public function loguear($usuario, $clave) {
     echo "<script>alert('Usuario o clave incorrectos.');</script>";
     return false;
 }
+
+// Método para buscar usuario por id_funcionario
+public function buscarPorFuncionario($id_funcionario) {
+    $Nusuario = new D_Usuario();
+    return $Nusuario->buscarPorFuncionario($id_funcionario);
+}
+
     
 }
 ?>

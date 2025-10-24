@@ -10,7 +10,7 @@ $egresoService = new N_Egreso();
 $funcionarioService = new N_Funcionario();
 
 // Obtener funcionarios y áreas para el select
-$funcionarios = $funcionarioService->obtenerFuncionarios();
+$funcionarios = $funcionarioService->obtenerFuncionarioD();
 $areas = [];
 foreach ($funcionarios as $f) {
     $areas[$f['area']] = $f['a_nombre'];
@@ -132,15 +132,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Procesar acción
     if ($accion === 'crear') {
         try {
-            $mensaje = $egresoService->registrarEgresoCompleto($id_funcionario, $codigo_solicitud, $totalCantidad, $detallesValidos);
-            echo "<script>
-                alert('¡Egreso registrado correctamente!');
-                window.location.href='Egreso.php';
-            </script>";
-            exit();
+            $resultado = $egresoService->registrarEgresoCompleto($id_funcionario, $codigo_solicitud, $totalCantidad, $detallesValidos);
+            if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Egreso registrado correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se pudo registrar el Egreso.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
         } catch (Exception $e) {
-            echo "<script>alert('Error al registrar: " . htmlspecialchars($e->getMessage()) . "');</script>";
+            echo "Error al registrar Egreso: " . htmlspecialchars($e->getMessage());
         }
+        header('Location: Egreso.php');
+        exit();
     } else {
         echo "<script>alert('Error: Acción no válida.'); window.history.back();</script>";
     }
@@ -213,6 +217,35 @@ if ($searchTerm) {
         margin: 10px;
       }
     }
+    .btn-register{
+    /* Desactivar cualquier cambio al pasar el mouse */
+    transition: none !important;
+    background-color: #0d6efd; /* Mantener color de fondo */
+    color: #fff; /* Mantener color de texto */
+}
+
+.btn-register:hover,
+.btn-register:focus,
+.btn-register:active {
+    background-color: #2963b9ff !important; /* Mantener el mismo color */
+    color: #fff !important; /* Mantener el mismo color */
+    box-shadow: none !important; /* Eliminar sombra de Bootstrap */
+}
+.btn-add{
+    /* Desactivar cualquier cambio al pasar el mouse */
+    transition: none !important;
+    background-color: #4caf50; /* Mantener color de fondo */
+    color: #fff; /* Mantener color de texto */
+}
+
+.btn-add:hover,
+.btn-add:focus,
+.btn-add:active {
+    background-color: #428a44ff !important; /* Mantener el mismo color */
+    color: #fff !important; /* Mantener el mismo color */
+    box-shadow: none !important; /* Eliminar sombra de Bootstrap */
+}
+
   </style>
 </head>
 <body>
@@ -247,7 +280,7 @@ if ($searchTerm) {
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="codigo_solicitud" class="form-label fw-bold">Código de Solicitud:</label>
-                            <input type="text" name="codigo_solicitud" id="codigo_solicitud" class="form-control" required pattern="[a-zA-Z0-9]+">
+                            <input type="number" name="codigo_solicitud" id="codigo_solicitud" class="form-control" required pattern="[a-zA-Z0-9]+">
                         </div>
                     </div>
                     <div id="materiales-container" class="border rounded p-3 bg-light">
@@ -263,17 +296,15 @@ if ($searchTerm) {
                             </div>
                             <div class="col-12 col-md-4 mb-2 mb-md-0">
                                 <label class="form-label">Material</label>
-                                <select name="id_material[]" class="form-control select-material" required disabled>
+                               <select name="id_material[]" class="form-control select-material" required disabled>
                                     <option value="">Seleccione un material</option>
-                                    <?php
-                                        foreach ($materiales as $material) {
-                                            echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                                                            data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                                                    htmlspecialchars($material['m_nombre']) . 
-                                                    " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
-                                                "</option>";
-                                        }
-                                    ?>
+                                    <?php foreach ($materiales as $material): ?>
+                                        <option value="<?php echo htmlspecialchars($material['id_material']); ?>"
+                                                data-unidad="<?php echo htmlspecialchars($material['u_medida']); ?>"
+                                                data-stock="<?php echo htmlspecialchars($material['stock_total']); ?>">
+                                            <?php echo htmlspecialchars($material['m_nombre']); ?> (Stock: <?php echo htmlspecialchars($material['stock_total']); ?>)
+                                        </option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="col-12 col-md-3 mb-2 mb-md-0">
@@ -388,15 +419,13 @@ if ($searchTerm) {
                                 <label class="form-label">Material</label>
                                 <select name="id_material[]" class="form-control select-material" required disabled>
                                     <option value="">Seleccione un material</option>
-                                    <?php
-                                        foreach ($materiales as $material) {
-                                            echo "<option value='" . htmlspecialchars($material['id_material']) . "' 
-                                                            data-unidad='" . htmlspecialchars($material['u_medida']) . "'>" .
-                                                    htmlspecialchars($material['m_nombre']) . 
-                                                    " (Stock: " . htmlspecialchars($material['stock_total']) . ")" .
-                                                "</option>";
-                                        }
-                                    ?>
+                                    <?php foreach ($materiales as $material): ?>
+                                        <option value="<?php echo htmlspecialchars($material['id_material']); ?>"
+                                                data-unidad="<?php echo htmlspecialchars($material['u_medida']); ?>"
+                                                data-stock="<?php echo htmlspecialchars($material['stock_total']); ?>">
+                                            <?php echo htmlspecialchars($material['m_nombre']); ?> (Stock: <?php echo htmlspecialchars($material['stock_total']); ?>)
+                                        </option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="col-12 col-md-3 mb-2 mb-md-0">
@@ -434,6 +463,50 @@ if ($searchTerm) {
     window.funcionariosPorArea = <?php echo json_encode($funcionariosPorArea); ?>;
 </script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formEgreso');
+
+    // Función para validar todas las cantidades
+    function validarCantidades() {
+        let valido = true;
+        const rows = document.querySelectorAll('#materiales-container .parte-row');
+
+        rows.forEach(row => {
+            const materialSelect = row.querySelector('.select-material');
+            const cantidadInput = row.querySelector('.input-cantidad');
+
+            if (!materialSelect || !cantidadInput) return;
+
+            const stock = parseInt(materialSelect.selectedOptions[0]?.dataset.stock || 0);
+            const cantidad = parseInt(cantidadInput.value) || 0;
+
+            if (cantidad > stock) {
+                cantidadInput.classList.add('invalid');
+                valido = false;
+            } else {
+                cantidadInput.classList.remove('invalid');
+            }
+        });
+
+        return valido;
+    }
+
+    // Validación mientras escribe en cantidad
+    document.querySelector('#materiales-container').addEventListener('input', function(e) {
+        if (e.target.classList.contains('input-cantidad')) {
+            validarCantidades();
+        }
+    });
+
+    // Validación al enviar el formulario
+    form.addEventListener('submit', function(e) {
+        if (!validarCantidades()) {
+            alert('Hay cantidades mayores al stock disponible. Corrija los campos resaltados.');
+            e.preventDefault();
+        }
+    });
+});
+
     document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.btn-ver-egreso').forEach(btn => {
     btn.addEventListener('click', function(e) {

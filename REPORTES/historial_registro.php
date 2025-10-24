@@ -53,7 +53,7 @@ foreach ($detalles as $detalle) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historial de Ingresos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="ingreso.css">
+    <link rel="stylesheet" href="ingreso_egreso.css">
 </head>
 <body>
     <div class="container">
@@ -65,6 +65,9 @@ foreach ($detalles as $detalle) {
                 </a>
                 <button class="btn btn-print" onclick="window.print()">
                     <i class="fas fa-print"></i> Imprimir
+                </button>
+                <button type="button" class="btn btn-excel" onclick="window.location.href='EXCEL/ingreso.php'">
+                    <i class="fas fa-file-excel"></i> Exportar a Excel
                 </button>
             </div>
         </div>

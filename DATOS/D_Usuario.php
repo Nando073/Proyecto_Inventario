@@ -144,6 +144,16 @@ public function obtenerUsuarioDisponibles($id_usuario = null) {
             return null;
         }
     }
+    // Devuelve un usuario activo por el id_funcionario
+public function buscarPorFuncionario($id_funcionario) {
+    $sql = "SELECT * FROM usuario WHERE id_funcionario = :id_funcionario AND estado = 1";
+    $stmt = $this->con->prepare($sql);
+    $stmt->bindParam(':id_funcionario', $id_funcionario, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+
 
 
 }

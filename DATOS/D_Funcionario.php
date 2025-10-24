@@ -88,6 +88,8 @@ class D_Funcionario {
             $ps = $this->con->prepare($sql);
             $ps->execute([$id_funcionario]);
             echo "Funcionario eliminado correctamente.";
+            $resultado = $ps->fetch(PDO::FETCH_ASSOC);
+            return $resultado['success']; // Devuelve 1 o 0
         } catch (PDOException $ex) {
             echo "Error al eliminar: " . $ex->getMessage();
         }
@@ -154,6 +156,31 @@ public function ObtenerFuncionariosDisponibles($id_funcionario = null) {
         return null;
     }
 }
+
+ public function ObtenerFuncionarioD() {
+        $sql = "CALL ObtenerFuncionarioD()";
+        try {
+            $ps = $this->con->prepare($sql);
+            $ps->execute();
+            return $ps->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex) {
+            echo "Error al buscar: " . $ex->getMessage();
+            return [];
+        }
+    }
+
+   public function buscarPorCorreo($f_correo) {
+    $sql = "CALL BuscarFuncionarioPorCorreo(?)";
+    try {
+        $ps = $this->con->prepare($sql);
+        $ps->execute([$f_correo]);
+        return $ps->fetch(PDO::FETCH_ASSOC); // 👈 SOLO UN REGISTRO
+    } catch (PDOException $ex) {
+        echo "Error al buscar: " . $ex->getMessage();
+        return null;
+    }
+}
+
     
 }
 ?>

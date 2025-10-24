@@ -61,6 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <link rel="stylesheet" href="style.css?v=<?php echo(rand()); ?>">
+  <!-- libreria de google para validar cuentas -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
 </head>
 <body>
   <div class="container">
@@ -83,10 +86,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             </div>
             <button type="submit" name="login" class="login-btn">INICIAR SESIÓN</button>
             
-            <button type="button" class="google-btn">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
-                Iniciar sesión con Google
-            </button>
+           <!-- boton pa inicir con correro -->
+                 <div id="g_id_onload"
+                    data-client_id="490875069077-r6fbg30cr232d2b3j9undq3evoq5cq25.apps.googleusercontent.com"
+                    data-login_uri="http://localhost/DDE_INVENTARIO/VALIDAR_GOOGLE.php"
+                    data-auto_prompt="false">
+                </div>
+
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-size="large"
+                    data-theme="outline"
+                    data-text="signin_with"
+                    data-shape="rectangular"
+                    data-logo_alignment="left">
+                </div>
+            
         </form>
         <p class="terms">Está de acuerdo con los términos y condiciones</p>
       </div>

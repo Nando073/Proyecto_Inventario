@@ -357,3 +357,14 @@
                 border-bottom: 2px solid #000;
             }
         }
+        .btn-excel {
+            background-color: #1D6F42;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-excel:hover {
+            background-color: #155d36;
+        }

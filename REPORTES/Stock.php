@@ -64,6 +64,9 @@ foreach ($stockPorLote as $fila) {
                 <button type="button" class="btn btn-print" onclick="window.print()">
                     <i class="fas fa-print"></i> Imprimir
                 </button>
+                <button type="button" class="btn btn-excel" onclick="window.location.href='EXCEL/stock.php'">
+                    <i class="fas fa-file-excel"></i> Exportar a Excel
+                </button>
             </div>
         </div>
         

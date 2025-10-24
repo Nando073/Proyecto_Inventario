@@ -123,15 +123,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Si la acción es crear ingreso
     if ($accion === 'crear') {
         try {
-            $ingresoService->registrarIngresoCompleto($id_proveedor, $totalCalculado, $detallesValidos);
-            echo "<script>
-                    alert('¡Ingreso registrado correctamente!');
-                    window.location.href='Ingreso.php';
-                  </script>";
-            exit();
+            $resultado = $ingresoService->registrarIngresoCompleto($id_proveedor, $totalCalculado, $detallesValidos);
+                if (isset($resultado['success']) && $resultado['success'] == 1) {
+                    $_SESSION['mensaje'] = "Ingreso registrado correctamente.";
+                    $_SESSION['tipo_mensaje'] = "success";
+                } else {
+                    $_SESSION['mensaje'] = "No se pudo registrar el Ingreso.";
+                    $_SESSION['tipo_mensaje'] = "danger";
+                }
         } catch (Exception $e) {
             echo "Error al registrar ingreso: " . htmlspecialchars($e->getMessage());
         }
+        header('Location: Ingreso.php');
+        exit();
     } else {
         echo "Acción no válida.";
     }
@@ -172,14 +176,29 @@ if ($searchTerm) {
       background-color: #4caf50;
       color: white;
     }
+    
+    .btn-add:hover,
+    .btn-add:focus,
+    .btn-add:active {
+        background-color: #428a44ff !important; /* Mantener el mismo color */
+        color: #fff !important; /* Mantener el mismo color */
+        box-shadow: none !important; /* Eliminar sombra de Bootstrap */
+    }
     .btn-delete {
       background-color: #c0392b;
       color: white;
     }
     .btn-register {
-      background-color: #2847f1ff;
+      background-color: #0d6efd;
       color: white;
     }
+    .btn-register:hover,
+    .btn-register:focus,
+    .btn-register:active {
+    background-color: #2963b9ff !important; /* Mantener el mismo color */
+    color: #fff !important; /* Mantener el mismo color */
+    box-shadow: none !important; /* Eliminar sombra de Bootstrap */
+}
     .card {
       border-radius: 10px;
       padding: 20px;

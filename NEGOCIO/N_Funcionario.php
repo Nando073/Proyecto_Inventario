@@ -25,8 +25,13 @@ class N_Funcionario {
 
     // Método para eliminar un funcionario por ID
     public function eliminar($id_funcionario) {
-        $Nfuncionario = new D_Funcionario();
-        $Nfuncionario->Eliminar($id_funcionario);
+        try {
+            $Nfuncionario = new D_Funcionario();
+            $resultado = $Nfuncionario->Eliminar($id_funcionario);
+            return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
+        }catch (Exception $e){
+            throw $e;
+        }
     }
 
     // Método para buscar funcionarios por similitud de término
@@ -63,5 +68,16 @@ class N_Funcionario {
         $d = new D_Funcionario();
         return $d->ObtenerFuncionariosDisponibles($id_funcionario);
     }
+
+    public function obtenerFuncionarioD(){
+        $d = new D_Funcionario();
+        return $d->ObtenerFuncionarioD();
+    }
+
+    public function buscarPorCorreo($f_correo) {
+        $d = new D_Funcionario();
+        return $d->buscarPorCorreo($f_correo);
+    }
+
 }
 ?>
