@@ -9,6 +9,15 @@ $egresoService = new N_Egreso();
 
 $funcionarioService = new N_Funcionario();
 
+//session_start(); //verificar si un usuario se a inisiado para obtenre el id
+$id_usuario = $_SESSION['id_usuario'] ?? null;
+
+if (!$id_usuario) {
+    echo "<script>alert('No se pudo identificar al usuario que realiza el egreso.'); window.history.back();</script>";
+    exit();
+}
+
+
 // Obtener funcionarios y áreas para el select
 $funcionarios = $funcionarioService->obtenerFuncionarioD();
 $areas = [];
@@ -55,9 +64,7 @@ if (isset($_GET['id_egreso']) && $_GET['accion'] === 'delete') {
 // Procesar POST para registrar egreso y detalles
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = filter_input(INPUT_POST, 'accion', FILTER_SANITIZE_SPECIAL_CHARS);
-
     $id_funcionario = filter_input(INPUT_POST, 'id_funcionario', FILTER_VALIDATE_INT);
-    $codigo_solicitud = filter_input(INPUT_POST, 'codigo_solicitud', FILTER_SANITIZE_SPECIAL_CHARS);
 
     $area = filter_input(INPUT_POST, 'area', FILTER_VALIDATE_INT);
     $categorias = $_POST['categoria'] ?? [];
@@ -71,10 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if (!$id_funcionario) {
         echo "<script>alert('Debe seleccionar un funcionario.'); window.history.back();</script>";
-        exit();
-    }
-    if (!preg_match('/^[a-zA-Z0-9]+$/', $codigo_solicitud)) {
-        echo "<script>alert('El código de solicitud solo debe contener letras y números.'); window.history.back();</script>";
         exit();
     }
 
@@ -132,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Procesar acción
     if ($accion === 'crear') {
         try {
-            $resultado = $egresoService->registrarEgresoCompleto($id_funcionario, $codigo_solicitud, $totalCantidad, $detallesValidos);
+            $resultado = $egresoService->registrarEgresoCompleto($id_funcionario, $totalCantidad, $id_usuario, $detallesValidos);
             if (isset($resultado['success']) && $resultado['success'] == 1) {
                     $_SESSION['mensaje'] = "Egreso registrado correctamente.";
                     $_SESSION['tipo_mensaje'] = "success";
@@ -278,10 +281,10 @@ if ($searchTerm) {
                                 <option value="">Seleccione un funcionario</option>
                             </select>
                         </div>
-                        <div class="col-12 col-md-4">
+                        <!-- <div class="col-12 col-md-4">
                             <label for="codigo_solicitud" class="form-label fw-bold">Código de Solicitud:</label>
                             <input type="number" name="codigo_solicitud" id="codigo_solicitud" class="form-control" required pattern="[a-zA-Z0-9]+">
-                        </div>
+                        </div> -->
                     </div>
                     <div id="materiales-container" class="border rounded p-3 bg-light">
                         <div class="parte-row row align-items-end mb-2 border bg-primary bg-opacity-10 p-4 rounded">
@@ -296,7 +299,7 @@ if ($searchTerm) {
                             </div>
                             <div class="col-12 col-md-4 mb-2 mb-md-0">
                                 <label class="form-label">Material</label>
-                               <select name="id_material[]" class="form-control select-material" required disabled>
+                               <select name="id_material[]" class="form-control select-material" required>
                                     <option value="">Seleccione un material</option>
                                     <?php foreach ($materiales as $material): ?>
                                         <option value="<?php echo htmlspecialchars($material['id_material']); ?>"
@@ -307,7 +310,7 @@ if ($searchTerm) {
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="col-12 col-md-3 mb-2 mb-md-0">
+                            <div class="col-12 col-md-4 mb-2 mb-md-0">
                                 <label class="form-label">Cantidad</label>
                                 <div class="input-group">
                                     <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
@@ -417,7 +420,7 @@ if ($searchTerm) {
                             </div>
                             <div class="col-12 col-md-4 mb-2 mb-md-0">
                                 <label class="form-label">Material</label>
-                                <select name="id_material[]" class="form-control select-material" required disabled>
+                                <select name="id_material[]" class="form-control select-material" required>
                                     <option value="">Seleccione un material</option>
                                     <?php foreach ($materiales as $material): ?>
                                         <option value="<?php echo htmlspecialchars($material['id_material']); ?>"
@@ -428,7 +431,7 @@ if ($searchTerm) {
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="col-12 col-md-3 mb-2 mb-md-0">
+                            <div class="col-12 col-md-4 mb-2 mb-md-0">
                                 <label class="form-label">Cantidad</label>
                                 <div class="input-group">
                                     <input name="cantidad[]" placeholder="Cantidad" class="form-control input-cantidad" required pattern="[0-9]+">
@@ -463,83 +466,75 @@ if ($searchTerm) {
     window.funcionariosPorArea = <?php echo json_encode($funcionariosPorArea); ?>;
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('formEgreso');
-
-    // Función para validar todas las cantidades
-    function validarCantidades() {
-        let valido = true;
-        const rows = document.querySelectorAll('#materiales-container .parte-row');
-
-        rows.forEach(row => {
-            const materialSelect = row.querySelector('.select-material');
-            const cantidadInput = row.querySelector('.input-cantidad');
-
-            if (!materialSelect || !cantidadInput) return;
-
-            const stock = parseInt(materialSelect.selectedOptions[0]?.dataset.stock || 0);
-            const cantidad = parseInt(cantidadInput.value) || 0;
-
-            if (cantidad > stock) {
-                cantidadInput.classList.add('invalid');
-                valido = false;
-            } else {
-                cantidadInput.classList.remove('invalid');
-            }
-        });
-
-        return valido;
-    }
-
-    // Validación mientras escribe en cantidad
-    document.querySelector('#materiales-container').addEventListener('input', function(e) {
-        if (e.target.classList.contains('input-cantidad')) {
-            validarCantidades();
-        }
-    });
-
-    // Validación al enviar el formulario
-    form.addEventListener('submit', function(e) {
-        if (!validarCantidades()) {
-            alert('Hay cantidades mayores al stock disponible. Corrija los campos resaltados.');
-            e.preventDefault();
-        }
-    });
-});
-
-    document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.btn-ver-egreso').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const idEgreso = this.getAttribute('data-id');
-      const modalBody = document.getElementById('detalleEgresoBody');
-      modalBody.innerHTML = "<div class='text-center'><span class='spinner-border'></span> Cargando...</div>";
-      const modal = new bootstrap.Modal(document.getElementById('detalleEgresoModal'));
-      modal.show();
-
-      fetch('detalle_egreso.php?id=' + idEgreso)
-        .then(response => response.text())
-        .then(html => {
-          modalBody.innerHTML = html;
-        })
-        .catch(() => {
-          modalBody.innerHTML = "<div class='alert alert-danger'>Error al cargar el detalle.</div>";
-        });
-    });
-  });
-});
-    document.addEventListener('DOMContentLoaded', () => {
-    // Variables globales para categorías y materiales
+document.addEventListener('DOMContentLoaded', () => {
+    // Variables globales
     const materialesPorCategoria = window.materialesPorCategoria || {};
     const funcionariosPorArea = window.funcionariosPorArea || {};
-
+    const form = document.getElementById('formEgreso');
     const btnAgregar = document.getElementById('btnAgregar');
     const partesContainer = document.getElementById('materiales-container');
     const totalInput = document.getElementById('totalGeneral');
     const selectArea = document.getElementById('selectArea');
     const selectFuncionario = document.getElementById('selectFuncionario');
 
-    // --- Área y funcionario ---
+    // --- 🔹 Validar cantidad contra stock ---
+    function validarCantidades() {
+        let valido = true;
+        const filas = partesContainer.querySelectorAll('.parte-row');
+
+        filas.forEach(row => {
+            const materialSelect = row.querySelector('.select-material');
+            const cantidadInput = row.querySelector('.input-cantidad');
+            if (!materialSelect || !cantidadInput) return;
+
+            // Si no hay material seleccionado, no valida
+            if (!materialSelect.value) {
+                cantidadInput.classList.remove('is-invalid');
+                return;
+            }
+
+            const stock = Number(materialSelect.selectedOptions[0]?.dataset.stock || 0);
+            const cantidad = Number(cantidadInput.value.trim()) || 0;
+
+            if (cantidad > stock) {
+                cantidadInput.classList.add('is-invalid');
+                valido = false;
+            } else {
+                cantidadInput.classList.remove('is-invalid');
+            }
+        });
+
+        return valido;
+    }
+
+    // --- 🔹 Actualizar total general ---
+    function calcularTotal() {
+        let total = 0;
+        partesContainer.querySelectorAll('input[name="cantidad[]"]').forEach(input => {
+            const val = parseInt(input.value);
+            if (!isNaN(val)) total += val;
+        });
+        totalInput.value = total;
+    }
+
+    // --- 🔹 Validación solo números ---
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('input-cantidad')) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            if (e.target.value.length > 1 && e.target.value.startsWith('0')) {
+                e.target.value = e.target.value.replace(/^0+/, '');
+            } else if (e.target.value === '0') {
+                e.target.value = '';
+            }
+            validarCantidades();
+            calcularTotal();
+        }
+        if (e.target.id === 'codigo_solicitud') {
+            e.target.value = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+        }
+    });
+
+    // --- 🔹 Área → funcionario ---
     selectArea.addEventListener('change', function() {
         const areaId = this.value;
         selectFuncionario.innerHTML = '<option value="">Seleccione un funcionario</option>';
@@ -555,34 +550,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- Validación solo números en cantidad y código ---
-    document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('input-cantidad')) {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        }
-        if (e.target.id === 'codigo_solicitud') {
-            e.target.value = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
-        }
-    });
-
-    // --- Calcular total cantidad ---
-    function calcularTotal() {
-        let total = 0;
-        partesContainer.querySelectorAll('input[name="cantidad[]"]').forEach(input => {
-            const val = parseInt(input.value);
-            if (!isNaN(val)) total += val;
-        });
-        totalInput.value = total;
-    }
-
-    // --- Obtener materiales ya seleccionados ---
+    // --- 🔹 Obtener materiales ya seleccionados ---
     function materialesSeleccionados() {
         return Array.from(partesContainer.querySelectorAll('.select-material'))
             .map(sel => sel.value)
             .filter(v => v !== "");
     }
 
-    // --- Actualizar unidad de medida ---
+    // --- 🔹 Actualizar unidad de medida ---
     function actualizarUnidadMedida(selectMaterial) {
         const unidad = selectMaterial.selectedOptions[0]?.getAttribute('data-unidad') || '--';
         const row = selectMaterial.closest('.parte-row');
@@ -590,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (unidadSpan) unidadSpan.textContent = unidad;
     }
 
-    // --- Actualizar materiales por categoría y filtrar duplicados ---
+    // --- 🔹 Actualizar materiales por categoría ---
     function actualizarMaterialesPorCategoria(row) {
         const selectCategoria = row.querySelector('.select-categoria');
         const selectMaterial = row.querySelector('.select-material');
@@ -600,7 +575,6 @@ document.addEventListener('DOMContentLoaded', function() {
             selectMaterial.innerHTML = '<option value="">Seleccione un material</option>';
             selectMaterial.disabled = true;
 
-            // Resetear unidad de medida
             const unidadSpan = row.querySelector('.unidad-medida');
             if (unidadSpan) unidadSpan.textContent = '--';
 
@@ -612,6 +586,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         option.value = mat.id_material;
                         option.textContent = `${mat.m_nombre} (Stock: ${mat.stock_total})`;
                         option.setAttribute('data-unidad', mat.u_medida || '--');
+                        option.setAttribute('data-stock', mat.stock_total || 0);
                         selectMaterial.appendChild(option);
                     }
                 });
@@ -619,20 +594,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Al cambiar material, muestra unidad
         selectMaterial.addEventListener('change', function() {
             actualizarUnidadMedida(this);
-            // Actualiza todos los selects para filtrar duplicados
+            validarCantidades();
             actualizarTodosLosMateriales();
         });
 
-        // Inicializar unidad si ya hay un valor seleccionado
         if (selectMaterial.value) {
             actualizarUnidadMedida(selectMaterial);
         }
     }
 
-    // --- Actualiza todos los selects de materiales para filtrar duplicados ---
+    // --- 🔹 Actualizar todos los selects de materiales (evitar duplicados) ---
     function actualizarTodosLosMateriales() {
         partesContainer.querySelectorAll('.parte-row').forEach(row => {
             const selectCategoria = row.querySelector('.select-categoria');
@@ -647,6 +620,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         option.value = mat.id_material;
                         option.textContent = `${mat.m_nombre} (Stock: ${mat.stock_total})`;
                         option.setAttribute('data-unidad', mat.u_medida || '--');
+                        option.setAttribute('data-stock', mat.stock_total || 0);
                         selectMaterial.appendChild(option);
                     }
                 });
@@ -655,15 +629,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- Añadir nueva fila ---
+    // --- 🔹 Agregar fila ---
     function agregarFila() {
         const template = document.getElementById('parte-template').cloneNode(true);
         template.classList.remove('d-none');
         template.removeAttribute('id');
 
         template.querySelector('.select-categoria').value = '';
-        template.querySelector('.select-material').innerHTML = '<option value="">Seleccione un material</option>';
-        template.querySelector('.select-material').disabled = true;
+        const selectMat = template.querySelector('.select-material');
+        selectMat.innerHTML = '<option value="">Seleccione un material</option>';
+        selectMat.disabled = true;
         template.querySelector('.input-cantidad').value = '';
         template.querySelector('.unidad-medida').textContent = '--';
 
@@ -678,7 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
         partesContainer.appendChild(template);
     }
 
-    // --- Inicializar filas existentes ---
+    // --- 🔹 Inicializar filas existentes ---
     partesContainer.querySelectorAll('.parte-row').forEach(row => {
         actualizarMaterialesPorCategoria(row);
         row.querySelector('.remove-parte').addEventListener('click', () => {
@@ -687,8 +662,6 @@ document.addEventListener('DOMContentLoaded', function() {
             actualizarTodosLosMateriales();
         });
         row.querySelector('input[name="cantidad[]"]').addEventListener('input', calcularTotal);
-
-        // Inicializar unidad de medida para filas existentes
         const selectMaterial = row.querySelector('.select-material');
         if (selectMaterial && selectMaterial.value) {
             actualizarUnidadMedida(selectMaterial);
@@ -697,36 +670,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     btnAgregar.addEventListener('click', agregarFila);
 
-    // --- Abrir modal y limpiar formulario ---
-    document.getElementById("btnCrearEgreso").addEventListener("click", function () {
-        const form = document.getElementById("formEgreso");
-        form.reset();
-        // Eliminar filas adicionales
-        partesContainer.querySelectorAll('.parte-row:not(:first-child)').forEach(row => row.remove());
-        // Limpiar selects y total
-        partesContainer.querySelectorAll('.select-material').forEach(sel => {
-            sel.innerHTML = '<option value="">Seleccione un material</option>';
-            sel.disabled = true;
-        });
-        totalInput.value = '';
-        // Resetear unidades de medida
-        partesContainer.querySelectorAll('.unidad-medida').forEach(span => span.textContent = '--');
-        // Limpiar funcionarios
-        selectFuncionario.innerHTML = '<option value="">Seleccione un funcionario</option>';
-        selectFuncionario.disabled = true;
+    // --- 🔹 Validar antes de enviar ---
+    form.addEventListener('submit', function(e) {
+        if (!validarCantidades()) {
+            alert('⚠️ Hay cantidades mayores al stock disponible. Corrige los campos resaltados.');
+            e.preventDefault();
+        }
     });
 
-    // --- Evento global para cambio de materiales (por si acaso) ---
-    document.addEventListener("change", function (e) {
-        if (e.target.classList.contains("select-material")) {
-            actualizarUnidadMedida(e.target);
-            actualizarTodosLosMateriales();
-        }
-        if (e.target.classList.contains("select-categoria")) {
-            actualizarTodosLosMateriales();
-        }
+    // --- 🔹 Modal detalle egreso ---
+    document.querySelectorAll('.btn-ver-egreso').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const idEgreso = this.getAttribute('data-id');
+            const modalBody = document.getElementById('detalleEgresoBody');
+            modalBody.innerHTML = "<div class='text-center'><span class='spinner-border'></span> Cargando...</div>";
+            const modal = new bootstrap.Modal(document.getElementById('detalleEgresoModal'));
+            modal.show();
+
+            fetch('detalle_egreso.php?id=' + idEgreso)
+                .then(response => response.text())
+                .then(html => modalBody.innerHTML = html)
+                .catch(() => modalBody.innerHTML = "<div class='alert alert-danger'>Error al cargar el detalle.</div>");
+        });
     });
 });
+</script>
+<script>
+function imprimirModal(id) {
+    var contenido = document.getElementById(id).innerHTML;
+    
+    var ventana = window.open('', '', 'width=800,height=600');
+    ventana.document.write('<html><head><title>Imprimir Ingreso</title>');
+    ventana.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">');
+    ventana.document.write('</head><body>');
+    ventana.document.write(contenido);
+    ventana.document.write('</body></html>');
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+    ventana.close();
+}
 </script>
 </body>
 </html>

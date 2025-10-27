@@ -9,6 +9,14 @@ $ingresoService = new N_Ingreso();
 $materialService = new N_Material();
 $provService = new N_Proveedor();
 
+//session_start(); //verificar si un usuario se a inisiado para obtenre el id
+$id_usuario = $_SESSION['id_usuario'] ?? null;
+
+if (!$id_usuario) {
+    echo "<script>alert('No se pudo identificar al usuario que realiza el ingreso.'); window.history.back();</script>";
+    exit();
+}
+
 // Cargar materiales y proveedores
 $materiales = $materialService->obtenerMateriales();
 $proveedores = $provService->obtenerProveedoresActivos();
@@ -123,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Si la acción es crear ingreso
     if ($accion === 'crear') {
         try {
-            $resultado = $ingresoService->registrarIngresoCompleto($id_proveedor, $totalCalculado, $detallesValidos);
+            $resultado = $ingresoService->registrarIngresoCompleto($id_proveedor, $totalCalculado, $id_usuario, $detallesValidos);
                 if (isset($resultado['success']) && $resultado['success'] == 1) {
                     $_SESSION['mensaje'] = "Ingreso registrado correctamente.";
                     $_SESSION['tipo_mensaje'] = "success";
@@ -289,7 +297,7 @@ if ($searchTerm) {
                         <!-- Precio -->
                         <div class="col-12 col-md-2 mt-3">
                           <label class="form-label">Precio</label>
-                          <input type="number" step="0.01" name="precio[]" placeholder="Precio" class="form-control" required>
+                          <input type="float" step="0.01" name="precio[]" placeholder="Precio" class="form-control" required>
                         </div>
 
                         <!-- Cantidad -->
@@ -425,7 +433,7 @@ if ($searchTerm) {
             </div>
             <div class="col-12 col-md-2 mt-3">
               <label class="form-label">Precio</label>
-              <input type="number" step="0.01" name="precio[]" placeholder="Precio" class="form-control" required>
+              <input type="float" step="0.01" name="precio[]" placeholder="Precio" class="form-control" required>
             </div>
             <div class="col-12 col-md-4 mt-3">
               <label class="form-label">Cantidad</label>
@@ -466,6 +474,7 @@ if ($searchTerm) {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
   // ----------- Modal Ver Detalle de Ingreso (AJAX) -----------
   document.querySelectorAll('.btn-ver-ingreso').forEach(btn => {
     btn.addEventListener('click', function(e) {
@@ -488,12 +497,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ----------- Modal Crear Ingreso (limpieza de formulario) -----------
-  document.getElementById("btnCrearIngreso").addEventListener("click", function () {
-    const form = document.getElementById("formIngreso");
-    form.querySelectorAll("input, textarea").forEach(input => input.value = "");
-    const idInput = document.getElementById("id_material");
-    if (idInput) idInput.remove();
-  });
+  const btnCrearIngreso = document.getElementById("btnCrearIngreso");
+  if (btnCrearIngreso) {
+    btnCrearIngreso.addEventListener("click", () => {
+      const form = document.getElementById("formIngreso");
+      form.querySelectorAll("input, textarea").forEach(input => input.value = "");
+      const idInput = document.getElementById("id_material");
+      if (idInput) idInput.remove();
+    });
+  }
 
   // ----------- Lógica de materiales dinámicos -----------
   const btnAgregar = document.getElementById('btnAgregar');
@@ -532,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Deshabilitar material al inicio
     materialSelect.disabled = true;
 
-    // Cuando cambia la categoría, habilita y filtra los materiales
+    // --- Evento: cambio de categoría ---
     categoriaSelect.addEventListener('change', () => {
       const categoria = categoriaSelect.value;
       materialSelect.disabled = (categoria === "");
@@ -541,8 +553,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       materialSelect.querySelectorAll('option').forEach(opt => {
         const pertenece = opt.getAttribute('data-categoria');
-        const seleccionado = materialesSeleccionados();
-        if (opt.value === "" || (pertenece === categoria && !seleccionado.includes(opt.value))) {
+        const seleccionados = materialesSeleccionados();
+        if (opt.value === "" || (pertenece === categoria && !seleccionados.includes(opt.value))) {
           opt.hidden = false;
         } else {
           opt.hidden = true;
@@ -550,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Al elegir material → muestra unidad
+    // --- Evento: cambio de material ---
     materialSelect.addEventListener('change', () => {
       if (!categoriaSelect.value) {
         alert("Debe seleccionar una categoría antes del material.");
@@ -562,21 +574,20 @@ document.addEventListener('DOMContentLoaded', () => {
       unidad.textContent = unidadText;
     });
 
-    // Precio y cantidad recalculan subtotal y total
+    // --- Eventos: recalcular totales ---
     [precio, cantidad].forEach(inp => inp.addEventListener('input', calcularTotales));
 
-    // Botón eliminar
+    // --- Botón eliminar fila ---
     row.querySelector('.remove-parte').addEventListener('click', () => {
       row.remove();
       calcularTotales();
-      // Si no queda ninguna fila, agrega una nueva desde el template
       if (container.querySelectorAll('.parte-row').length === 0) {
         agregarFila();
       }
     });
   }
 
-  // Añadir nueva fila desde el template oculto
+  // --- Agregar nueva fila desde template ---
   function agregarFila() {
     if (!parteTemplate) return;
     const templateRow = parteTemplate.querySelector('.parte-row');
@@ -594,10 +605,10 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarFila(container.firstElementChild);
   }
 
-  // Evento para añadir fila
-  btnAgregar.addEventListener('click', agregarFila);
+  // --- Botón agregar fila ---
+  if (btnAgregar) btnAgregar.addEventListener('click', agregarFila);
 
-  // ----------- Evento de cambio para materiales (unidad de medida) -----------
+  // --- Evento global de cambio de material (unidad de medida) ---
   document.addEventListener("change", function (e) {
     if (e.target.classList.contains("material-select")) {
       const unidad = e.target.selectedOptions[0].getAttribute("data-unidad") || "--";
@@ -605,8 +616,51 @@ document.addEventListener('DOMContentLoaded', () => {
       row.querySelector(".unidad-medida").textContent = unidad;
     }
   });
+
+  // --- Validaciones de entrada ---
+  document.addEventListener('input', function(e) {
+
+    // 🔹 Solo números en campo cantidad
+    if (e.target.name === 'cantidad[]') {
+      e.target.value = e.target.value.replace(/[^0-9]/g, '');
+      if (e.target.value.startsWith('0') && e.target.value.length > 1) {
+        e.target.value = e.target.value.replace(/^0+/, '');
+      }
+    }
+
+    // 🔹 Validar precio (sin negativos, solo números y punto)
+    if (e.target.name === 'precio[]') {
+      e.target.value = e.target.value.replace(/[^0-9.]/g, ''); // eliminar cualquier carácter no permitido
+      if (e.target.value.startsWith('.')) {
+        e.target.value = ''; // evitar que empiece con un punto
+      }
+      const parts = e.target.value.split('.');
+      if (parts.length > 2) {
+        e.target.value = parts[0] + '.' + parts[1]; // solo un punto decimal
+      }
+      if (e.target.value.includes('-')) {
+        e.target.value = e.target.value.replace('-', ''); // quitar signos negativos
+      }
+    }
+  });
+
 });
 </script>
-
+<script>
+function imprimirModal(id) {
+    var contenido = document.getElementById(id).innerHTML;
+    
+    var ventana = window.open('', '', 'width=800,height=600');
+    ventana.document.write('<html><head><title>Imprimir Ingreso</title>');
+    ventana.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">');
+    ventana.document.write('</head><body>');
+    ventana.document.write(contenido);
+    ventana.document.write('</body></html>');
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+    ventana.close();
+}
+</script>
 </body>
 </html>

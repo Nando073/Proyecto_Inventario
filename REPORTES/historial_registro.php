@@ -66,9 +66,9 @@ foreach ($detalles as $detalle) {
                 <button class="btn btn-print" onclick="window.print()">
                     <i class="fas fa-print"></i> Imprimir
                 </button>
-                <button type="button" class="btn btn-excel" onclick="window.location.href='EXCEL/ingreso.php'">
+                 <button type="button" class="btn btn-excel" onclick="window.location.href='EXCEL/ingreso.php'">
                     <i class="fas fa-file-excel"></i> Exportar a Excel
-                </button>
+                </button> 
             </div>
         </div>
         
@@ -89,7 +89,7 @@ foreach ($detalles as $detalle) {
                     </div>
                     
                     <div class="form-group">
-                        <label for="fecha_inicio"><i class="far fa-calendar-alt"></i> Fecha desde</label>
+                      <label for="fecha_inicio"><i class="far fa-calendar-alt"></i> Fecha desde</label>
                         <input type="date" id="fecha_inicio" name="fecha_inicio" class="search-input" 
                                value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>">
                     </div>
@@ -130,6 +130,11 @@ foreach ($detalles as $detalle) {
                         <div class="info-item">
                             <span class="info-label"><i class="far fa-calendar-alt"></i> Fecha</span>
                             <span class="info-value"><?php echo htmlspecialchars($detalles[0]['i_fecha']); ?></span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label"><i class="fas fa-user"></i> Funcionario</span>
+                            <span class="info-value"><?php echo htmlspecialchars($detalles[0]['funcionario_nombre']); ?></span>
                         </div>
                         
                         <div class="info-item">

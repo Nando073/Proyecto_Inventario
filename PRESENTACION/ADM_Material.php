@@ -136,19 +136,23 @@ if ($searchTerm) {
 <?php include '../DEMO/index.php'; ?>
 
 <main>
-    <div class="card mb-4 mx-auto" style="max-width: 540px;">
-        <div class="row g-0">
-            <div class="col-md-5">
-                <img src="../IMG/material.jpg" class="img-fluid rounded-start w-100 h-auto">
-            </div>
-            <div class="col-md-7">
-                <div class="card-body">
-                    <h4 class="card-title h5 h4-md">MATERIALES</h4>
-                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
-                </div>
-            </div>
-        </div>
+   <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4 mx-auto" style="max-width: 520px;">
+  <div class="row g-0 align-items-center">
+    <!-- Imagen -->
+    <div class="col-5">
+      <img src="../IMG/material.jpg" alt="Materiales" class="img-fluid h-100 object-fit-cover">
     </div>
+
+    <!-- Contenido -->
+    <div class="col-7 bg-light">
+      <div class="card-body d-flex flex-column justify-content-center h-100 text-center p-3">
+        <h4 class="card-title fw-bold" style="color: #e67e22;">Control de Materiales</h4>
+        <p class="card-text text-secondary mb-0">Gestiona los materiales disponibles y su información detallada.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <!-- Modal -->
     <div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">

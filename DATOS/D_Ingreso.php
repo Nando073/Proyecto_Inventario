@@ -9,10 +9,11 @@ class D_Ingreso {
     private $i_subtotal;
     private $id_proveedor;
     private $total;
+    private $id_usuario;
     private $con;
 
     // Constructor
-    public function __construct($id_ingreso = 0, $id_i_detalle = null, $i_precio = null, $id_material = null, $id_Ncategoria = null, $i_cantidad = null, $i_subtotal = null, $id_proveedor = null, $total = null) {
+    public function __construct($id_ingreso = 0, $id_i_detalle = null, $i_precio = null, $id_material = null, $id_Ncategoria = null, $i_cantidad = null, $i_subtotal = null, $id_proveedor = null, $total = null, $id_usuario = null) {
         $this->id_ingreso = $id_ingreso;
         $this->id_i_detalle = $id_i_detalle;
         $this->id_material = $id_material;
@@ -22,6 +23,7 @@ class D_Ingreso {
         $this->i_subtotal = $i_subtotal;
         $this->id_proveedor = $id_proveedor;
         $this->total = $total;
+        $this->id_usuario = $id_usuario;
         $this->con = (new D_coneccion())->Conectar(); // Inicializar conexión
     }
 
@@ -53,16 +55,19 @@ class D_Ingreso {
     public function getTotal() { return $this->total; }
     public function setTotal($total) { $this->total = $total; }
 
+    public function getId_usuario() { return $this->id_usuario; }
+    public function setId_usuario($id_usuario) { $this->id_usuario = $id_usuario; }
+
     // Método para adicionar un igreso
-    public function RegistrarIngresoConDetalles($id_proveedor, $total, $detalles) {
+    public function RegistrarIngresoConDetalles($id_proveedor, $total, $id_usuario, $detalles) {
         try {
             // Iniciar la transacción
             $this->con->beginTransaction();
     
             // 1. Llamar al procedimiento AdicionarIngreso
-            $stmtIngreso = $this->con->prepare("CALL AdicionarIngreso(?, ?)");
-            $stmtIngreso->execute([$id_proveedor, $total]);
-    
+            $stmtIngreso = $this->con->prepare("CALL AdicionarIngreso(?, ?, ?)");
+            $stmtIngreso->execute([$id_proveedor, $total, $id_usuario]);
+
             // 2. Obtener el ID generado por el INSERT (gracias al SELECT en el procedimiento)
             $resultado = $stmtIngreso->fetch(PDO::FETCH_ASSOC);
             if (!$resultado || !isset($resultado['id'])) {
@@ -161,6 +166,5 @@ class D_Ingreso {
                 return [];
             }
         }
-}
-
+    }
 ?>

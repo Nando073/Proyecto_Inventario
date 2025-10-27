@@ -7,13 +7,13 @@ class D_Egreso {
     private $e_cantidad;
     private $e_total_cantidad;
     private $id_funcionario;
-    private $e_solicitud;
+    private $id_usuario;
     private $con;
 
     // Constructor
 
 
-    public function __construct($id_egreso = null, $id_e_detalle = null, $id_material_e = null, $id_categoria_e = null, $e_cantidad = null, $e_total_cantidad = null, $id_funcionario = null, $e_solicitud = null) {
+    public function __construct($id_egreso = null, $id_e_detalle = null, $id_material_e = null, $id_categoria_e = null, $e_cantidad = null, $e_total_cantidad = null, $id_funcionario = null, $id_usuario = null) {
         $this->id_egreso = $id_egreso;
         $this->id_e_detalle = $id_e_detalle;
         $this->id_material_e = $id_material_e;
@@ -21,7 +21,7 @@ class D_Egreso {
         $this->e_cantidad = $e_cantidad;
         $this->e_total_cantidad = $e_total_cantidad;
         $this->id_funcionario = $id_funcionario;
-        $this->e_solicitud = $e_solicitud;
+        $this->id_usuario = $id_usuario;
         $this->con = (new D_coneccion())->Conectar(); // Inicializar conexión
     }
 
@@ -47,19 +47,19 @@ class D_Egreso {
     public function getId_funcionario() { return $this->id_funcionario; }
     public function setId_funcionario($id_funcionario) { $this->id_funcionario = $id_funcionario; }
 
-    public function getE_solicitud() { return $this->e_solicitud; }
-    public function setE_solicitud($e_solicitud) { $this->e_solicitud = $e_solicitud; }
+    public function getId_usuario() { return $this->id_usuario; }
+    public function setId_usuario($id_usuario) { $this->id_usuario = $id_usuario; }
 
 
     // Método para adicionar un egreso
-    public function RegistrarEgresoConDetalles($id_funcionario, $e_solicitud, $e_total_cantidad, $detalles) {
+    public function RegistrarEgresoConDetalles($id_funcionario, $e_total_cantidad, $id_usuario, $detalles) {
         try {
             // Iniciar la transacción
             $this->con->beginTransaction();
     
             // 1. Llamar al procedimiento Adicionaregreso
             $stmtEgreso = $this->con->prepare("CALL AdicionarEgreso(?, ?, ?)");
-            $stmtEgreso->execute([$id_funcionario, $e_solicitud, $e_total_cantidad]);
+            $stmtEgreso->execute([$id_funcionario, $e_total_cantidad, $id_usuario]);
     
             // 2. Obtener el ID generado por el INSERT (gracias al SELECT en el procedimiento)
             $resultado = $stmtEgreso->fetch(PDO::FETCH_ASSOC);

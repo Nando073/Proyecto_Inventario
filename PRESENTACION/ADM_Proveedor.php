@@ -155,19 +155,23 @@ foreach ($proveedores as &$proveedorItem) {
 <?php include '../DEMO/index.php'; ?>
 
 <main>
-    <div class="card mb-4 mx-auto" style="max-width: 540px;">
-        <div class="row g-0">
-            <div class="col-5 col-md-5">
-                <img src="../IMG/medida.jpeg" class="img-fluid rounded-start w-100 h-auto">
-            </div>
-            <div class="col-7 col-md-7">
-                <div class="card-body">
-                    <h4 class="card-title h5 h4-md">PROVEEDORES</h4>
-                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
-                </div>
-            </div>
-        </div>
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4 mx-auto" style="max-width: 520px;">
+  <div class="row g-0 align-items-center">
+    <!-- Imagen -->
+    <div class="col-5">
+      <img src="../IMG/proveedor.png" alt="Proveedores" class="img-fluid h-100 object-fit-cover">
     </div>
+
+    <!-- Contenido -->
+    <div class="col-7 bg-light">
+      <div class="card-body d-flex flex-column justify-content-center h-100 text-center p-3">
+        <h4 class="card-title fw-bold" style="color: #3498db;">Gestión de Proveedores</h4>
+        <p class="card-text text-secondary mb-0">Administra los proveedores y su información de contacto de forma eficiente.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <!-- Modal -->
     <div class="modal fade" id="proveedorModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">

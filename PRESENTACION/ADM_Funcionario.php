@@ -172,19 +172,23 @@ foreach ($funcionarios as &$funcionariO) {
 
     <main>
     <!-- Modifica tu tarjeta principal -->
-    <div class="card mb-4 mx-auto" style="max-width: 540px;">
-        <div class="row g-0">
-            <div class="col-5 col-md-5">
-                <img src="../IMG/img.png" class="img-fluid rounded-start w-100 h-auto">
-            </div>
-            <div class="col-7 col-md-7">
-                <div class="card-body">
-                    <h4 class="card-title h5 h4-md">FUNCIONARIOS</h4>
-                    <h3 class="card-text h6 h3-md"><small class="text-body-secondary">CRUD</small></h3>
-                </div>
-            </div>
-        </div>
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4 mx-auto" style="max-width: 520px;">
+  <div class="row g-0 align-items-center">
+    <!-- Imagen -->
+    <div class="col-5">
+      <img src="../IMG/funcionario.jpg" alt="Funcionarios" class="img-fluid h-100 object-fit-cover">
     </div>
+
+    <!-- Contenido -->
+    <div class="col-7 bg-light">
+      <div class="card-body d-flex flex-column justify-content-center h-100 text-center p-3">
+        <h4 class="card-title fw-bold" style="color: #3498db;">Gestión de Funcionarios</h4>
+        <p class="card-text text-secondary mb-0">Administra el registro y control del personal de la institución.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
     
 
         <!-- Formulario para crear o editar -->

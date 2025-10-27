@@ -27,35 +27,69 @@ if (empty($egresoDetalles)) {
 // Usamos el primer detalle para los datos generales
 $egreso = $egresoDetalles[0];
 ?>
-<h5>Fecha: <?php echo htmlspecialchars($egreso['e_fecha']); ?></h5>
-<h5>Area: <?php echo htmlspecialchars($egreso['a_nombre']); ?></h5>
-<h5>Funcionario: <?php echo htmlspecialchars($egreso['funcionario_nombre']); ?></h5>
-<h5>Código Solicitud: <?php echo htmlspecialchars($egreso['e_solicitud']); ?></h5>
+<div id="contenido-modal" class="p-4">
+    <!-- Información general -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <strong>Fecha:</strong>
+            <p class="mb-0"><?php echo htmlspecialchars($egreso['e_fecha']); ?></p>
+        </div>
+        <div class="col-md-4">
+            <strong>Registrado por:</strong>
+            <p class="mb-0"><?php echo htmlspecialchars($egreso['usuario_registro']); ?></p>
+        </div>
+        <div class="col-md-4">
+            <strong>Funcionario Solicitante:</strong>
+            <p class="mb-0"><?php echo htmlspecialchars($egreso['funcionario_nombre']); ?></p>
+        </div>
+    </div>
 
-<table class="table table-bordered mt-2">
-    <thead>
-        <tr>
-            <th>Material</th>
-            <th>Categoría</th>
-            <th>Cantidad</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php $totalEgreso = 0; ?>
-        <?php foreach ($egresoDetalles as $detalle): 
-            $totalEgreso += $detalle['e_stock'];
-        ?>
-        <tr>
-            <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
-            <td><?php echo htmlspecialchars($detalle['categoria_nombre']); ?></td>
-            <td><?php echo htmlspecialchars($detalle['e_stock'] . " - " . $detalle['u_medida']); ?></td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-    <tfoot>
-        <tr>
-            <th colspan="2">Total del Egreso</th>
-            <th><?php echo number_format($totalEgreso, 2); ?></th>
-        </tr>
-    </tfoot>
-</table>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <strong>Área:</strong>
+            <p class="mb-0"><?php echo htmlspecialchars($egreso['a_nombre']); ?></p>
+        </div>
+        <div class="col-md-4">
+            <strong>Código Solicitud:</strong>
+            <p class="mb-0"><?php echo htmlspecialchars($egreso['e_solicitud']); ?></p>
+        </div>
+    </div>
+
+    <!-- Tabla de materiales -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Material</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $totalEgreso = 0; ?>
+                <?php foreach ($egresoDetalles as $detalle): 
+                    $totalEgreso += $detalle['e_stock'];
+                ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
+                    <td><?php echo htmlspecialchars($detalle['categoria_nombre']); ?></td>
+                    <td><?php echo htmlspecialchars($detalle['e_stock'] . " - " . $detalle['u_medida']); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <tfoot class="table-light fw-bold">
+                <tr>
+                    <th colspan="2" class="text-end">Total del Egreso</th>
+                    <th><?php echo number_format($totalEgreso, 2); ?></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Botón de imprimir -->
+    <div class="mt-4">
+        <button class="btn btn-success btn-print" onclick="imprimirModal('contenido-modal')">
+            <i class="fas fa-print me-2"></i> Imprimir
+        </button>
+    </div>
+</div>

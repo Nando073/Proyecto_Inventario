@@ -131,6 +131,11 @@ foreach ($detalles as $detalle) {
                             <span class="info-value"><?php echo htmlspecialchars($detalles[0]['e_fecha']); ?></span>
                         </div>
 
+                        <div class="info-item">
+                            <span class="info-label"><i class="fas fa-user"></i> Requerido por</span>
+                            <span class="info-value"><?php echo htmlspecialchars($detalles[0]['usuario_registro']); ?></span>
+                        </div>
+
                          <div class="info-item">
                             <span class="info-label"><i class="fas fa-cubes"></i> Área</span>
                             <span class="info-value"><?php echo htmlspecialchars($detalles[0]['a_nombre']); ?></span>

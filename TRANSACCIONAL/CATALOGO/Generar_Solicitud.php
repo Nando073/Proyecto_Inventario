@@ -319,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_solicitud'])) 
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary btn-responsive" data-bs-dismiss="modal">Cerrar</button>
-              <button type="submit" class="btn btn-primary btn-responsive">Generar Egreso</button>
+              <button type="submit" class="btn btn-primary btn-responsive">Enviar Solicitud</button>
             </div>
           </form>
         </div>

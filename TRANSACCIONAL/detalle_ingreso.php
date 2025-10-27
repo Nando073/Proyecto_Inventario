@@ -26,35 +26,60 @@ if (empty($ingresoDetalles)) {
 
 $ingreso = $ingresoDetalles[0];
 ?>
-<h5>Fecha: <?php echo htmlspecialchars($ingreso['i_fecha']); ?></h5>
-<h5>Proveedor: <?php echo htmlspecialchars($ingreso['proveedor_nombre']); ?></h5>
+<div id="contenido-modal" class="p-4">
+    <!-- Información general -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <strong>Fecha:</strong>
+            <p class="mb-0"><?php echo htmlspecialchars($ingreso['i_fecha']); ?></p>
+        </div>
+        <div class="col-md-4">
+            <strong>Funcionario:</strong>
+            <p class="mb-0"><?php echo htmlspecialchars($ingreso['funcionario_nombre']); ?></p>
+        </div>
+        <div class="col-md-4">
+            <strong>Proveedor:</strong>
+            <p class="mb-0"><?php echo htmlspecialchars($ingreso['proveedor_nombre']); ?></p>
+        </div>
+    </div>
 
-<table class="table table-bordered mt-2">
-    <thead>
-        <tr>
-            <th>Material</th>
-            <th>Precio</th>
-            <th>Cantidad</th>
-            <th>Sub Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php $totalIngreso = 0; ?>
-        <?php foreach ($ingresoDetalles as $detalle): 
-            $totalIngreso += $detalle['sub_total'];
-        ?>
-        <tr>
-            <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
-            <td><?php echo htmlspecialchars($detalle['precio']); ?> Bs.</td>
-            <td><?php echo htmlspecialchars($detalle['cantidad'] . " - " . $detalle['u_medida']); ?></td>
-            <td><?php echo htmlspecialchars($detalle['sub_total']); ?> Bs.</td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-    <tfoot>
-        <tr>
-            <th colspan="3">Total del Ingreso</th>
-            <th><?php echo number_format($totalIngreso, 2); ?> Bs.</th>
-        </tr>
-    </tfoot>
-</table>
+    <!-- Tabla de materiales -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Material</th>
+                    <th>Precio (Bs.)</th>
+                    <th>Cantidad</th>
+                    <th>Sub Total (Bs.)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $totalIngreso = 0; ?>
+                <?php foreach ($ingresoDetalles as $detalle): 
+                    $totalIngreso += $detalle['sub_total'];
+                ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($detalle['material_nombre']); ?></td>
+                    <td><?php echo htmlspecialchars(number_format($detalle['precio'],2)); ?></td>
+                    <td><?php echo htmlspecialchars($detalle['cantidad'] . " - " . $detalle['u_medida']); ?></td>
+                    <td><?php echo htmlspecialchars(number_format($detalle['sub_total'],2)); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <tfoot class="table-light fw-bold">
+                <tr>
+                    <th colspan="3" class="text-end">Total del Ingreso</th>
+                    <th><?php echo number_format($totalIngreso, 2); ?> Bs.</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Botón de imprimir -->
+    <div class="mt-4">
+        <button class="btn btn-success btn-print" onclick="imprimirModal('contenido-modal')">
+            <i class="fas fa-print me-2"></i> Imprimir
+        </button>
+    </div>
+</div>
