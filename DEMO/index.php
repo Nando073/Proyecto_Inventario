@@ -1,6 +1,24 @@
 <?php
 include '../Seguridad.php';
 
+// Obtener el conteo de solicitudes aprobadas para el indicador
+$conteoSolicitudesAprobadas = 0;
+if (count(array_intersect(['Administrador', 'Operador'], $_SESSION['rol_asignado'])) > 0) {
+    require_once __DIR__ . '/../NEGOCIO/SOLICITUDES_N/N_Solicitudes.php';
+    try {
+        $solicitudService = new N_Solicitud();
+        $solicitudesAprobadas = $solicitudService->obtenerSolicitudesAprobadas();
+        // Agrupar por id_solicitud para contar solicitudes únicas
+        $solicitudesUnicas = [];
+        foreach ($solicitudesAprobadas as $s) {
+            $solicitudesUnicas[$s['id_solicitud']] = true;
+        }
+        $conteoSolicitudesAprobadas = count($solicitudesUnicas);
+    } catch (Exception $e) {
+        $conteoSolicitudesAprobadas = 0;
+    }
+}
+
 // Detectar si es móvil (simple)
 $isMobile = false;
 if (isset($_SERVER['HTTP_USER_AGENT'])) {
@@ -28,7 +46,8 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
         
         <nav class="menu">
             <div class="perfil" id="perfilUsuario">
-                <a><span id="nombreUsuario"><?php echo mb_strtoupper(htmlspecialchars($nombreUsuario), 'UTF-8'); ?></span></a>
+                <img src="../IMG/logout.png" width="20" alt="Usuario">
+                <span id="nombreUsuario"><?php echo mb_strtoupper(htmlspecialchars($nombreUsuario), 'UTF-8'); ?></span>
                 <div class="menu-usuario" id="menuUsuario">
                     <a href="../logout.php" title="Cerrar sesión">
                         <img src="../IMG/logout.png" width="20" alt="Cerrar sesión">
@@ -53,7 +72,7 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
             <?php endif; ?>
             <?php if (count(array_intersect(['Administrador', 'Operador'], $_SESSION['rol_asignado'])) > 0): ?>
             <details>
-            <summary>ADMINISTRAR PARAMETRIZACION</summary>
+            <summary>PARAMETRIZACION</summary>
                 <ul>
                     <?php if (in_array('Administrador', $_SESSION['rol_asignado'])): ?>
                         <li><a href="../PRESENTACION/ADM_Area.php">Administrar Area</a></li>
@@ -64,6 +83,8 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
                     <li><a href="../PRESENTACION/ADM_U_Medida.php">Administrar Unidad de Medida</a></li>
                     <li><a href="../PRESENTACION/ADM_Material.php">Administrar Material</a></li>
                     <li><a href="../PRESENTACION/ADM_Proveedor.php">Administrar Proveedor</a></li>
+                    <li><a href="../PRESENTACION/ADM_Distrito.php">Administrar Distrito</a></li>
+                    <li><a href="../PRESENTACION/ADM_Distrital.php">Administrar Distrital</a></li>
                 </ul>
             </details>
             <?php endif; ?>
@@ -72,8 +93,18 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
                 <summary>TRANSACCIONAL</summary>
                 <ul>
                     <li><a href="../TRANSACCIONAL/Ingreso.php">INGRESO</a></li>
-                    <li><a href="../TRANSACCIONAL/Egreso.php">EGRESO</a></li>
-                    <li><a href="../TRANSACCIONAL/CATALOGO/Generar_Solicitud.php">GENERAR SOLICITUD</a></li>
+                    <li class="position-relative">
+                        <a href="../TRANSACCIONAL/Egreso.php" class="d-flex justify-content-between align-items-center">
+                            <span>EGRESO</span>
+                            <?php if ($conteoSolicitudesAprobadas > 0): ?>
+                                <span class="badge bg-danger rounded-pill" style="font-size: 0.7rem; padding: 3px 7px;">
+                                    <?php echo $conteoSolicitudesAprobadas; ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                    <!-- <li><a href="../TRANSACCIONAL/Egreso_Solicitud.php">Egreso_Solicitud</a></li> -->
+                    <li><a href="../TRANSACCIONAL/CATALOGO/Generar_Solicitud.php">SOLICITUDES</a></li>
                 </ul>
             </details>
             <?php endif; ?>

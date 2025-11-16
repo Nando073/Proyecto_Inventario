@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once '../Seguridad.php';
 require_once '../NEGOCIO/N_Egreso.php';
 
@@ -71,7 +71,7 @@ foreach ($detalles as $detalle) {
                 </button>
             </div>
         </div>
-        
+
         <!-- Panel de búsqueda -->
         <div class="search-panel">
             <form method="get">
@@ -81,25 +81,25 @@ foreach ($detalles as $detalle) {
                         <input type="text" id="area" name="area" class="search-input"
                             placeholder="Ej: Administración..." value="<?php echo htmlspecialchars($_GET['area'] ?? ''); ?>">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="funcionario"><i class="fas fa-user"></i> Funcionario</label>
                         <input type="text" id="funcionario" name="funcionario" class="search-input"
                             placeholder="Ej: Juan Pérez..." value="<?php echo htmlspecialchars($_GET['funcionario'] ?? ''); ?>">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="fecha_inicio"><i class="far fa-calendar-alt"></i> Fecha desde</label>
-                        <input type="date" id="fecha_inicio" name="fecha_inicio" class="search-input" 
+                        <input type="date" id="fecha_inicio" name="fecha_inicio" class="search-input"
                                value="<?php echo htmlspecialchars($_GET['fecha_inicio'] ?? ''); ?>">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="fecha_fin"><i class="far fa-calendar-alt"></i> Fecha hasta</label>
-                        <input type="date" id="fecha_fin" name="fecha_fin" class="search-input" 
+                        <input type="date" id="fecha_fin" name="fecha_fin" class="search-input"
                                value="<?php echo htmlspecialchars($_GET['fecha_fin'] ?? ''); ?>">
                     </div>
-                    
+
                     <div class="form-group">
                         <label><button type="button" onclick="window.location.href='historial_egreso.php'"><i class="fas fa-arrows-rotate"></i></button></label>
                         <button type="submit" class="btn btn-search">
@@ -108,17 +108,17 @@ foreach ($detalles as $detalle) {
                     </div>
                 </div>
             </form>
-            
+
             <?php if (!empty($errores)): ?>
                 <div class="errores">
                     <?php foreach ($errores as $e) echo "<div><i class='fas fa-exclamation-circle'></i> $e</div>"; ?>
                 </div>
             <?php endif; ?>
         </div>
-        
+
         <!-- Lista de egresos -->
         <?php if (!empty($egresosAgrupados)): ?>
-            <?php foreach ($egresosAgrupados as $id_egreso => $detalles): 
+            <?php foreach ($egresosAgrupados as $id_egreso => $detalles):
                 $totalEgreso = 0;
                 foreach ($detalles as $detalle) {
                     $totalEgreso += $detalle['e_stock'];
@@ -132,26 +132,31 @@ foreach ($detalles as $detalle) {
                         </div>
 
                         <div class="info-item">
-                            <span class="info-label"><i class="fas fa-user"></i> Requerido por</span>
-                            <span class="info-value"><?php echo htmlspecialchars($detalles[0]['usuario_registro']); ?></span>
+                            <span class="info-label"><i class="fas fa-user"></i> Registrado por</span>
+                            <span class="info-value"><?php echo htmlspecialchars($detalles[0]['funcionario_registro']); ?></span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label"><i class="fas fa-user"></i> Aprobado por</span>
+                            <span class="info-value"><?php echo htmlspecialchars($detalles[0]['funcionario_aprobar']); ?></span>
                         </div>
 
                          <div class="info-item">
                             <span class="info-label"><i class="fas fa-cubes"></i> Área</span>
                             <span class="info-value"><?php echo htmlspecialchars($detalles[0]['a_nombre']); ?></span>
                         </div>
-                        
+
                         <div class="info-item">
                             <span class="info-label"><i class="fas fa-user"></i> Funcionario</span>
-                            <span class="info-value"><?php echo htmlspecialchars($detalles[0]['funcionario_nombre']); ?></span>
+                            <span class="info-value"><?php echo htmlspecialchars($detalles[0]['funcionario_solicitante']); ?></span>
                         </div>
-                        
+
                         <div class="info-item">
                             <span class="info-label"><i class="fas fa-receipt"></i> Código Solicitud</span>
                             <span class="info-value"><?php echo htmlspecialchars($detalles[0]['e_solicitud']); ?></span>
                         </div>
                     </div>
-                    
+
                     <div class="table-container">
                         <table>
                             <thead>
@@ -191,18 +196,18 @@ foreach ($detalles as $detalle) {
         document.addEventListener('DOMContentLoaded', function() {
             const fechaInicio = document.getElementById('fecha_inicio');
             const fechaFin = document.getElementById('fecha_fin');
-            
+
             if(fechaInicio && fechaFin) {
                 fechaInicio.addEventListener('change', function() {
                     fechaFin.min = this.value;
                 });
-                
+
                 fechaFin.addEventListener('change', function() {
                     fechaInicio.max = this.value;
                 });
             }
         });
-        
+
         <?php if (isset($_GET['msg'])): ?>
             alert('<?php echo htmlspecialchars($_GET['msg']); ?>');
         <?php endif; ?>

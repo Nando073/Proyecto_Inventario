@@ -187,12 +187,15 @@ foreach ($proveedores as &$proveedorItem) {
 
                         <div class="form-group">
                             <label for="p_nombre">Nombre</label>
-                            <input type="text" class="form-control" id="p_nombre" name="p_nombre" value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['p_nombre']) : ''; ?>" required>
+                            <input type="text" class="form-control" id="p_nombre" name="p_nombre" value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['p_nombre']) : ''; ?>" required oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+                            onkeypress="return soloLetras(event)">
                         </div>
 
                         <div class="form-group">
                             <label for="nit">NIT</label>
-                            <input type="number" class="form-control" id="nit" name="nit" value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['nit']) : ''; ?>" required>
+                            <input type="text" class="form-control" id="nit" name="nit"
+                                value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['nit']) : ''; ?>" required>
+                            <small id="mensajeNIT" class="text-danger"></small>
                         </div>
 
                         <div class="form-group">
@@ -219,7 +222,9 @@ foreach ($proveedores as &$proveedorItem) {
 
                         <div class="form-group">
                             <label for="p_celular">Celular</label>
-                            <input type="number" class="form-control" id="p_celular" name="p_celular" value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['p_celular']) : ''; ?>" required>
+                            <input type="text" class="form-control" id="p_celular" name="p_celular"
+                                value="<?php echo isset($proveedor) ? htmlspecialchars($proveedor['p_celular']) : ''; ?>" required>
+                            <small id="mensajeCelular" class="text-danger"></small>
                         </div>
 
                         <div class="mt-3">
@@ -344,7 +349,7 @@ foreach ($proveedores as &$proveedorItem) {
 document.getElementById("btnCrearProveedor").addEventListener("click", function () {
     const form = document.getElementById("formMaterial");
 
-    // Limpiar todos los inputs
+    // Limpiar todos los inputs y textareas
     form.querySelectorAll("input, textarea").forEach(input => {
         input.value = "";
     });
@@ -361,7 +366,80 @@ document.getElementById("btnCrearProveedor").addEventListener("click", function 
     const btnCrear = form.querySelector('button[name="accion"][value="crear"]');
     if (btnCrear) btnCrear.style.display = "inline-block";
 });
+
+// 🔹 Validación NIT
+function validarNIT(input) {
+    const mensaje = document.getElementById('mensajeNIT');
+
+    // Solo números
+    input.value = input.value.replace(/[^0-9]/g, '');
+
+    // Evitar ceros iniciales
+    if (input.value.startsWith('0')) {
+        input.value = input.value.replace(/^0+/, '');
+    }
+
+    // Limitar a 11 dígitos
+    if (input.value.length > 11) {
+        input.value = input.value.slice(0, 11);
+        mensaje.textContent = "Solo se permiten hasta 11 dígitos.";
+        mensaje.className = "text-danger";
+    } else {
+        mensaje.textContent = "";
+    }
+}
+
+function validarCelular(input) {
+    const mensaje = document.getElementById('mensajeCelular');
+
+    // Eliminar todo lo que no sea número
+    input.value = input.value.replace(/[^0-9]/g, '');
+
+    // Evitar ceros iniciales
+    if (input.value.startsWith('0')) {
+        input.value = input.value.replace(/^0+/, '');
+    }
+
+    // Limitar a 8 dígitos
+    if (input.value.length > 8) {
+        input.value = input.value.slice(0, 8);
+        mensaje.textContent = "El número de celular debe tener máximo 8 dígitos.";
+        mensaje.className = "text-danger";
+        return;
+    }
+
+    // Validar primer dígito
+    if (input.value.length > 0 && !['6','7'].includes(input.value.charAt(0))) {
+        mensaje.textContent = "⚠️ El número de celular debe comenzar con 6 o 7.";
+        mensaje.className = "text-warning";
+    } else if (input.value.length === 8) {
+        mensaje.textContent = "✔️ Número de celular válido.";
+        mensaje.className = "text-success";
+    } else {
+        mensaje.textContent = "";
+    }
+}
+
+
+// 🔹 Vincular validaciones al DOM
+document.addEventListener('DOMContentLoaded', function () {
+    const nitInput = document.getElementById('nit');
+    const celularInput = document.getElementById('p_celular');
+
+    if (nitInput) {
+        nitInput.addEventListener('input', function() {
+            validarNIT(this);
+        });
+    }
+
+    if (celularInput) {
+        celularInput.addEventListener('input', function() {
+            validarCelular(this);
+        });
+    }
+});
 </script>
+
 
 </body>
 </html>

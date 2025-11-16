@@ -29,29 +29,35 @@ $egreso = $egresoDetalles[0];
 ?>
 <div id="contenido-modal" class="p-4">
     <!-- Información general -->
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <strong>Fecha:</strong>
-            <p class="mb-0"><?php echo htmlspecialchars($egreso['e_fecha']); ?></p>
+    <div class="info-section">
+        <div class="row mb-3">
+            <div class="col-md-4 info-item">
+                <strong>Fecha:</strong>
+                <p class="mb-0"><?php echo htmlspecialchars($egreso['e_fecha']); ?></p>
+            </div>
+            <div class="col-md-4 info-item">
+                <strong>Registrado por:</strong>
+                <p class="mb-0"><?php echo htmlspecialchars($egreso['funcionario_registro']); ?></p>
+            </div>
+            <div class="col-md-4 info-item">
+                <strong>Aprobado por:</strong>
+                <p class="mb-0"><?php echo htmlspecialchars($egreso['funcionario_aprobar']); ?></p>
+            </div>
         </div>
-        <div class="col-md-4">
-            <strong>Registrado por:</strong>
-            <p class="mb-0"><?php echo htmlspecialchars($egreso['usuario_registro']); ?></p>
-        </div>
-        <div class="col-md-4">
-            <strong>Funcionario Solicitante:</strong>
-            <p class="mb-0"><?php echo htmlspecialchars($egreso['funcionario_nombre']); ?></p>
-        </div>
-    </div>
 
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <strong>Área:</strong>
-            <p class="mb-0"><?php echo htmlspecialchars($egreso['a_nombre']); ?></p>
-        </div>
-        <div class="col-md-4">
-            <strong>Código Solicitud:</strong>
-            <p class="mb-0"><?php echo htmlspecialchars($egreso['e_solicitud']); ?></p>
+        <div class="row mb-3">
+            <div class="col-md-4 info-item">
+                <strong>Funcionario Solicitante:</strong>
+                <p class="mb-0"><?php echo htmlspecialchars($egreso['funcionario_solicitante']); ?></p>
+            </div>
+            <div class="col-md-4 info-item">
+                <strong>Área:</strong>
+                <p class="mb-0"><?php echo htmlspecialchars($egreso['a_nombre']); ?></p>
+            </div>
+            <div class="col-md-4 info-item">
+                <strong>Código Solicitud:</strong>
+                <p class="mb-0"><?php echo htmlspecialchars($egreso['e_solicitud']); ?></p>
+            </div>
         </div>
     </div>
 
@@ -87,9 +93,9 @@ $egreso = $egresoDetalles[0];
     </div>
 
     <!-- Botón de imprimir -->
-    <div class="mt-4">
+    <div class="mt-4 text-center">
         <button class="btn btn-success btn-print" onclick="imprimirModal('contenido-modal')">
-            <i class="fas fa-print me-2"></i> Imprimir
+            <i class="fas fa-print me-2"></i> 🖨️ Imprimir Reporte
         </button>
     </div>
 </div>

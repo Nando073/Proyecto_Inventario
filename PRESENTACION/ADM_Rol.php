@@ -151,12 +151,14 @@ if ($searchTerm) {
 
                         <div class="form-group">
                             <label for="r_nombre">Nombre</label>
-                            <input type="text" class="form-control" id="r_nombre" name="r_nombre" value="<?php echo isset($rol) ? htmlspecialchars($rol['r_nombre']) : ''; ?>" required>
+                            <input type="text" class="form-control" id="r_nombre" name="r_nombre" value="<?php echo isset($rol) ? htmlspecialchars($rol['r_nombre']) : ''; ?>" required oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+                            onkeypress="return soloLetras(event)">
                         </div>
 
                         <div class="form-group">
                             <label for="r_descripcion">Descripción</label>
-                            <textarea class="form-control" id="r_descripcion" name="r_descripcion" required><?php echo isset($rol) ? htmlspecialchars($rol['r_descripcion']) : ''; ?></textarea>
+                            <textarea class="form-control" id="r_descripcion" name="r_descripcion" required oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+                            onkeypress="return soloLetras(event)"><?php echo isset($rol) ? htmlspecialchars($rol['r_descripcion']) : ''; ?></textarea>
                         </div>
 
                         <div class="mt-3">

@@ -58,13 +58,33 @@ a {
 .perfil {
     display: flex;
     align-items: center;
-    justify-content: right;
+    justify-content: flex-end;
     position: relative;
+    cursor: pointer;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    gap: 10px;
+}
+
+.perfil:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .perfil img {
-    width: 35px;
+    width: 25px;
     height: auto;
+    flex-shrink: 0;
+}
+
+#nombreUsuario {
+    color: #F2F2F2;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
 }
 
 .menu-usuario {
@@ -307,15 +327,31 @@ select[multiple] {
     
     #nombreUsuario {
         font-size: 0.9rem;
-        pointer-events: painted;
     }
     
-    /* Perfil debe ser visible y clickeable en móvil */
+    /* Perfil en móvil - mostrar nombre */
     .perfil {
         cursor: pointer;
         padding: 5px 10px;
         background-color: rgba(255, 255, 255, 0.1);
         border-radius: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .perfil img {
+        width: 25px;
+        flex-shrink: 0;
+    }
+    
+    #nombreUsuario {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+        color: #F2F2F2;
     }
     
     /* Menú usuario en móvil */
@@ -412,12 +448,17 @@ select[multiple] {
         margin-left: 10px;
     }
     
+    .perfil {
+        padding: 3px 8px;
+    }
+    
     .perfil img {
         width: 20px;
     }
     
     #nombreUsuario {
-        display: none;
+        font-size: 0.75rem;
+        max-width: 80px;
     }
     
     aside {

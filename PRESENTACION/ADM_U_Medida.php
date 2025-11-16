@@ -147,12 +147,14 @@ if ($searchTerm) {
 
                         <div class="form-group">
                             <label for="u_medida">Unidad de Medida</label>
-                            <input type="text" class="form-control" id="u_medida" name="u_medida" value="<?php echo isset($medida) ? htmlspecialchars($medida['u_medida']) : ''; ?>" required>
+                            <input type="text" class="form-control" id="u_medida" name="u_medida" value="<?php echo isset($medida) ? htmlspecialchars($medida['u_medida']) : ''; ?>" required oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+                            onkeypress="return soloLetras(event)">
                         </div>
 
                         <div class="form-group">
                             <label for="u_descripcion">Descripción</label>
-                            <textarea class="form-control" id="u_descripcion" name="u_descripcion" required><?php echo isset($medida) ? htmlspecialchars($medida['u_descripcion']) : ''; ?></textarea>
+                            <textarea class="form-control" id="u_descripcion" name="u_descripcion" required oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+                            onkeypress="return soloLetras(event)"><?php echo isset($medida) ? htmlspecialchars($medida['u_descripcion']) : ''; ?></textarea>
                         </div>
                         <div class="mt-3">
                             <button type="submit" name="accion" value="crear" class="btn btn-primary" style="<?php echo isset($medida) ? 'display:none;' : ''; ?>">Crear Unidad de medida</button>

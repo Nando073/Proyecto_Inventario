@@ -2,6 +2,143 @@
 require_once __DIR__ . '/../../../Seguridad.php';
 require_once __DIR__ . '/../../../NEGOCIO/SOLICITUDES_N/N_Solicitudes.php';
 
+// =================== APROBAR SOLICITUD ===================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'aprobar') {
+    error_log("=== INICIO PROCESO APROBACIÓN ===");
+    error_log("POST params: " . print_r($_POST, true));
+    
+    $id_solicitud = filter_input(INPUT_POST, 'id_solicitud', FILTER_VALIDATE_INT);
+    $id_usuario = $_SESSION['id_usuario'] ?? null;
+    $materiales = $_POST['materiales'] ?? []; // Array: materiales[0][id], materiales[0][cantidad]
+    $detalle = trim($_POST['detalle'] ?? 'Solicitud aprobada');
+    
+    error_log("ID Solicitud: " . $id_solicitud);
+    error_log("ID Usuario: " . $id_usuario);
+    error_log("Detalle: " . $detalle);
+    error_log("Materiales recibidos: " . print_r($materiales, true));
+    
+    if (!$id_usuario) {
+        error_log("ERROR: No hay id_usuario en sesión");
+        $_SESSION['mensaje'] = "No se pudo identificar al usuario.";
+        $_SESSION['tipo_mensaje'] = "danger";
+        header('Location: Solicitud_espera.php');
+        exit();
+    }
+    
+    if (!$id_solicitud) {
+        error_log("ERROR: ID de solicitud no válido");
+        $_SESSION['mensaje'] = "ID de solicitud no válido.";
+        $_SESSION['tipo_mensaje'] = "danger";
+        header('Location: Solicitud_espera.php');
+        exit();
+    }
+    
+    // Armar array de detalles para el procedimiento (igual que Generar_Solicitud.php)
+    $detalles_solicitud = [];
+    foreach ($materiales as $mat) {
+        $id_material = isset($mat['id']) ? intval($mat['id']) : 0;
+        $cantidad = isset($mat['cantidad']) ? intval($mat['cantidad']) : 0;
+        if ($id_material > 0 && $cantidad > 0) {
+            $detalles_solicitud[] = [
+                'id_material' => $id_material,
+                'cantidad' => $cantidad
+            ];
+        }
+    }
+    
+    if (empty($detalles_solicitud)) {
+        error_log("ERROR: No hay materiales válidos");
+        $_SESSION['mensaje'] = "Debe incluir al menos un material válido.";
+        $_SESSION['tipo_mensaje'] = "danger";
+        header('Location: Solicitud_espera.php');
+        exit();
+    }
+    
+    error_log("Detalles procesados: " . print_r($detalles_solicitud, true));
+    
+    try {
+        error_log("Llamando a aprobarSolicitudConDetalles...");
+        $solicitudService = new N_Solicitud();
+        $solicitudService->aprobarSolicitudConDetalles($id_solicitud, $id_usuario, $detalle, $detalles_solicitud);
+        
+        error_log("EXITO: Solicitud aprobada");
+        $_SESSION['mensaje'] = "¡Solicitud aprobada correctamente!";
+        $_SESSION['tipo_mensaje'] = "success";
+        header('Location: Solicitud_espera.php');
+        exit();
+        
+    } catch (Exception $e) {
+        error_log("EXCEPCION: " . $e->getMessage());
+        $_SESSION['mensaje'] = "Error al aprobar solicitud: " . $e->getMessage();
+        $_SESSION['tipo_mensaje'] = "danger";
+        header('Location: Solicitud_espera.php');
+        exit();
+    }
+}
+
+// =================== RECHAZAR (ELIMINAR) SOLICITUD ===================
+if (isset($_GET['id_solicitud']) && isset($_GET['accion']) && $_GET['accion'] === 'rechazar') {
+    // Log para debugging
+    error_log("=== INICIO PROCESO RECHAZO ===");
+    error_log("GET params: " . print_r($_GET, true));
+    
+    $id_solicitud_eliminar = filter_input(INPUT_GET, 'id_solicitud', FILTER_VALIDATE_INT);
+    $comentario = isset($_GET['comentario']) ? trim($_GET['comentario']) : 'Solicitud rechazada';
+    
+    error_log("ID Solicitud: " . $id_solicitud_eliminar);
+    error_log("Comentario: " . $comentario);
+    
+    // Obtener el ID del usuario que realiza la acción
+    $id_usuario = $_SESSION['id_usuario'] ?? null;
+    error_log("ID Usuario de sesión: " . $id_usuario);
+    
+    if (!$id_usuario) {
+        error_log("ERROR: No hay id_usuario en sesión");
+        $_SESSION['mensaje'] = "No se pudo identificar al usuario.";
+        $_SESSION['tipo_mensaje'] = "danger";
+        header('Location: Solicitud_espera.php');
+        exit();
+    }
+
+    if ($id_solicitud_eliminar) {
+        try {
+            error_log("Intentando rechazar solicitud...");
+            $solicitudService = new N_Solicitud();
+            // Llamar al método eliminarSolicitud pasando id_usuario y comentario
+            $resultado = $solicitudService->eliminarSolicitud($id_solicitud_eliminar, $id_usuario, $comentario);
+            
+            error_log("Resultado: " . print_r($resultado, true));
+
+            // Verificar el resultado
+            if (isset($resultado['success']) && $resultado['success']) {
+                error_log("EXITO: Solicitud rechazada");
+                $_SESSION['mensaje'] = "Solicitud rechazada correctamente.";
+                $_SESSION['tipo_mensaje'] = "success";
+            } else {
+                error_log("ERROR: No se pudo rechazar");
+                $_SESSION['mensaje'] = "No se pudo rechazar la solicitud.";
+                $_SESSION['tipo_mensaje'] = "danger";
+            }
+
+            header('Location: Solicitud_espera.php');
+            exit();
+
+        } catch (Exception $e) {
+            error_log("EXCEPCION: " . $e->getMessage());
+            $_SESSION['mensaje'] = "Error al rechazar solicitud: " . $e->getMessage();
+            $_SESSION['tipo_mensaje'] = "danger";
+            header('Location: Solicitud_espera.php');
+            exit();
+        }
+    } else {
+        error_log("ERROR: ID de solicitud no válido");
+        $_SESSION['mensaje'] = "ID de solicitud no válido.";
+        $_SESSION['tipo_mensaje'] = "danger";
+        header('Location: Solicitud_espera.php');
+        exit();
+    }
+}
+
 $id_solicitud = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id_solicitud <= 0) {
     echo "<div class='alert alert-danger'>ID de solicitud no válido.</div>";
@@ -10,6 +147,13 @@ if ($id_solicitud <= 0) {
 
 $solicitudService = new N_Solicitud();
 $solicitudDetalles = $solicitudService->obtenerDetallesSolicitudes($id_solicitud);
+
+// Debug: Verificar estructura de datos
+if (!empty($solicitudDetalles)) {
+    error_log("=== ESTRUCTURA DE DATOS ===");
+    error_log("Primer detalle completo: " . print_r($solicitudDetalles[0], true));
+    error_log("Campos disponibles: " . implode(', ', array_keys($solicitudDetalles[0])));
+}
 
 if (empty($solicitudDetalles)) {
     echo "<div class='alert alert-warning'>No se encontraron detalles para esta solicitud.</div>";
@@ -32,6 +176,10 @@ $solicitud = $solicitudDetalles[0];
     .material-item:hover {
         background-color: #e9ecef;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .material-item.material-removido {
+        opacity: 0;
+        transform: scale(0.8);
     }
     .material-number {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -78,6 +226,13 @@ $solicitud = $solicitudDetalles[0];
         border-radius: 8px;
         margin-bottom: 20px;
     }
+    .quitar-material {
+        transition: all 0.3s ease;
+    }
+    .quitar-material:hover {
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
 </style>
 
 
@@ -96,27 +251,42 @@ $solicitud = $solicitudDetalles[0];
 </h6>
 
 <form id="formMateriales">
-    <?php foreach ($solicitudDetalles as $index => $detalle): ?>
-    <div class="material-item">
+    <?php foreach ($solicitudDetalles as $index => $detalle): 
+        // Determinar qué campo usar para el ID del material
+        $material_id = isset($detalle['id_material']) ? $detalle['id_material'] : (isset($detalle['id']) ? $detalle['id'] : '');
+        $material_nombre = isset($detalle['material']) ? $detalle['material'] : (isset($detalle['m_nombre']) ? $detalle['m_nombre'] : '');
+        
+        // DEBUG: Ver qué campos existen
+        error_log("Material #$index: id_material=" . ($detalle['id_material'] ?? 'NO EXISTE') . 
+                  ", id=" . ($detalle['id'] ?? 'NO EXISTE') . 
+                  ", material=" . ($detalle['material'] ?? 'NO EXISTE') . 
+                  ", m_nombre=" . ($detalle['m_nombre'] ?? 'NO EXISTE'));
+        error_log("Usando: material_id='$material_id', material_nombre='$material_nombre'");
+    ?>
+    <div class="material-item" id="material-item-<?php echo $index; ?>" data-material-id="<?php echo htmlspecialchars($material_id); ?>">
         <div class="row align-items-center">
             <!-- Información del material -->
             <div class="col">
                 <div class="row g-3">
                     <!-- Categoría -->
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label-custom">Categoría</label>
                         <input type="text" 
                                class="form-control input-readonly" 
-                               value="<?php echo htmlspecialchars($detalle['categoria']); ?>" 
+                               value="<?php echo htmlspecialchars($detalle['categoria'] ?? ''); ?>" 
                                readonly>
                     </div>
                     
                     <!-- Material -->
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <label class="form-label-custom">Material</label>
+                        <input type="hidden" 
+                               class="material-id-input"
+                               name="material_id_<?php echo $index; ?>" 
+                               value="<?php echo htmlspecialchars($material_id); ?>">
                         <input type="text" 
-                               class="form-control input-readonly" 
-                               value="<?php echo htmlspecialchars($detalle['material']); ?>" 
+                               class="form-control input-readonly material-nombre" 
+                               value="<?php echo htmlspecialchars($material_nombre); ?>" 
                                readonly>
                     </div>
                     
@@ -129,10 +299,22 @@ $solicitud = $solicitudDetalles[0];
                         <input type="number" 
                                class="form-control cantidad-input" 
                                name="cantidad_<?php echo $index; ?>" 
-                               value="<?php echo htmlspecialchars($detalle['cantidad']); ?>"
+                               data-index="<?php echo $index; ?>"
+                               value="<?php echo htmlspecialchars($detalle['cantidad'] ?? ''); ?>"
                                min="1"
                                step="1">
-                               <span class="input-group-text"><?php echo htmlspecialchars($detalle['medida']); ?></span>
+                        <span class="input-group-text"><?php echo htmlspecialchars($detalle['medida'] ?? $detalle['u_medida'] ?? ''); ?></span>
+                    </div>
+                    
+                    <!-- Botón eliminar -->
+                    <div class="col-md-2 text-center">
+                        <label class="form-label-custom d-block">&nbsp;</label>
+                        <button type="button" 
+                                class="btn btn-danger btn-sm quitar-material" 
+                                data-index="<?php echo $index; ?>"
+                                title="Quitar este material">
+                            <i class="bi bi-x-circle"></i> Quitar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -158,96 +340,12 @@ $solicitud = $solicitudDetalles[0];
 <div class="mt-4 d-flex gap-2 justify-content-end">
     <button type="button" 
             class="btn btn-danger btn-custom" 
-            onclick="cambiarEstadoModal(<?php echo $id_solicitud; ?>, 3)">
+            onclick="rechazarSolicitud(<?php echo $id_solicitud; ?>)">
         <i class="bi bi-x-circle"></i> Rechazar Solicitud
     </button>
     <button type="button" 
             class="btn btn-success btn-custom" 
-            onclick="cambiarEstadoModal(<?php echo $id_solicitud; ?>, 2)">
+            onclick="aprobarSolicitud(<?php echo $id_solicitud; ?>)">
         <i class="bi bi-check-circle"></i> Aprobar Solicitud
     </button>
 </div>
-
-<script>
-function cambiarEstadoModal(idSolicitud, estado) {
-    const comentario = document.getElementById('comentarioSupervisor').value;
-    const estadoTexto = estado === 2 ? 'aprobar' : 'rechazar';
-    
-    // Recopilar las cantidades editadas
-    const cantidades = [];
-    const formMateriales = document.getElementById('formMateriales');
-    const inputs = formMateriales.querySelectorAll('input[name^="cantidad_"]');
-    
-    inputs.forEach(input => {
-        const cantidad = parseInt(input.value);
-        if (cantidad <= 0 || isNaN(cantidad)) {
-            alert('Por favor, ingrese cantidades válidas (mayores a 0)');
-            input.focus();
-            throw new Error('Cantidad inválida');
-        }
-        cantidades.push(cantidad);
-    });
-    
-    if (confirm('¿Está seguro de ' + estadoTexto + ' esta solicitud?')) {
-        // Mostrar indicador de carga
-        const btnRechazar = document.querySelector('.btn-danger');
-        const btnAprobar = document.querySelector('.btn-success');
-        btnRechazar.disabled = true;
-        btnAprobar.disabled = true;
-        btnRechazar.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
-        btnAprobar.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
-        
-        fetch('../../TRANSACCIONAL/cambiar_estado_solicitud.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `id_solicitud=${idSolicitud}&estado=${estado}&comentario=${encodeURIComponent(comentario)}&cantidades=${JSON.stringify(cantidades)}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Estado actualizado correctamente');
-                window.location.reload();
-            } else {
-                alert('Error: ' + data.message);
-                // Restaurar botones
-                btnRechazar.disabled = false;
-                btnAprobar.disabled = false;
-                btnRechazar.innerHTML = '<i class="bi bi-x-circle"></i> Rechazar Solicitud';
-                btnAprobar.innerHTML = '<i class="bi bi-check-circle"></i> Aprobar Solicitud';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al actualizar el estado');
-            // Restaurar botones
-            btnRechazar.disabled = false;
-            btnAprobar.disabled = false;
-            btnRechazar.innerHTML = '<i class="bi bi-x-circle"></i> Rechazar Solicitud';
-            btnAprobar.innerHTML = '<i class="bi bi-check-circle"></i> Aprobar Solicitud';
-        });
-    }
-}
-
-// Validar cantidades en tiempo real
-document.addEventListener('DOMContentLoaded', function() {
-    const inputsCantidad = document.querySelectorAll('.cantidad-input');
-    inputsCantidad.forEach(input => {
-        input.addEventListener('input', function() {
-            if (this.value < 1) {
-                this.style.borderColor = '#dc3545';
-            } else {
-                this.style.borderColor = '#667eea';
-            }
-        });
-        
-        // Evitar valores decimales
-        input.addEventListener('keypress', function(e) {
-            if (e.key === '.' || e.key === ',') {
-                e.preventDefault();
-            }
-        });
-    });
-});
-</script>

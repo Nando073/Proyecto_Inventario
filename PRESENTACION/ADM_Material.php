@@ -1,9 +1,9 @@
 <?php
-require_once '../Seguridad.php';
+require_once __DIR__ . '/../Seguridad.php';
 verificarAcceso(['Administrador', 'Operador', 'Supervisor']);
-require_once '../NEGOCIO/N_Material.php';
-require_once '../NEGOCIO/N_Categoria.php';
-require_once '../NEGOCIO/N_U_Medida.php';
+require_once __DIR__ . '/../NEGOCIO/N_Material.php';
+require_once __DIR__ . '/../NEGOCIO/N_Categoria.php';
+require_once __DIR__ . '/../NEGOCIO/N_U_Medida.php';
 //require_once '../NEGOCIO/N_Egreso.php';
 
 $materialService = new N_Material();
@@ -168,16 +168,18 @@ if ($searchTerm) {
 
                         <div class="form-group">
                             <label for="m_nombre">Nombre</label>
-                            <input type="text" class="form-control" id="m_nombre" name="m_nombre" value="<?php echo isset($material) ? htmlspecialchars($material['m_nombre']) : ''; ?>" required>
+                            <input type="text" class="form-control" id="m_nombre" name="m_nombre" value="<?php echo isset($material) ? htmlspecialchars($material['m_nombre']) : ''; ?>" required oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+                            onkeypress="return soloLetras(event)">
                         </div>
 
                         <div class="form-group">
                             <label for="m_descripcion">Descripción</label>
-                            <textarea class="form-control" id="m_descripcion" name="m_descripcion" required><?php echo isset($material) ? htmlspecialchars($material['m_descripcion']) : ''; ?></textarea>
+                            <textarea class="form-control" id="m_descripcion" name="m_descripcion" required oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+                            onkeypress="return soloLetras(event)"><?php echo isset($material) ? htmlspecialchars($material['m_descripcion']) : ''; ?></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label for="id_categoria">ID Categoría</label>
+                            <label for="id_categoria">Categoría</label>
                             <select name="id_categoria" id="id_categoria" class="form-control" required>
                                 <option value="">Seleccione una categoria</option>
                                 <?php

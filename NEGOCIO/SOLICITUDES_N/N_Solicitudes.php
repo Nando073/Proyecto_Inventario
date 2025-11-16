@@ -9,6 +9,12 @@ class N_Solicitud {
         $NSolicitud->RegistrarSolicitudConDetalles( $id_usuario, $detalle, $detalles_solicitud);  // Llamar al método de D_Solicitud
     }
 
+    // Método para aprobar una solicitud con sus detalles
+    public function aprobarSolicitudConDetalles($id_solicitud, $id_usuario, $detalle, $detalles_solicitud) {
+        $NSolicitud = new D_Solicitud();
+        $NSolicitud->AprobarSolicitudConDetalles($id_solicitud, $id_usuario, $detalle, $detalles_solicitud);
+    }
+
     // Método para obtener todas las solicitudes con sus detalles
     public function obtenerSolicitudesCabecera() {
         $NSolicitud = new D_Solicitud();
@@ -34,14 +40,20 @@ class N_Solicitud {
 
 
     // Método para eliminar un área por ID
-    public function eliminarSolicitud($id_solicitud) {
+    public function eliminarSolicitud($id_solicitud, $id_usuario, $comentario) {
         try {
             $NSolicitud = new D_Solicitud();
-            $resultado = $NSolicitud->EliminarSolicitud($id_solicitud);
+            $resultado = $NSolicitud->EliminarSolicitud($id_solicitud, $id_usuario, $comentario);
             return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
         } catch (Exception $e) {
             throw $e;
         }
+    }
+
+    // Método para obtener todas las solicitudes aprobadas
+    public function obtenerSolicitudesAprobadas() {
+        $NSolicitud = new D_Solicitud();
+        return $NSolicitud->ObtenerSolicitudesAprobadas();
     }
 
 

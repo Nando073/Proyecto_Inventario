@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config.php';
 session_start();
 require_once 'NEGOCIO/N_Usuario.php';
 $usuarioService = new N_Usuario();
@@ -45,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             $paginaInicio = 'TRANSACCIONAL/CATALOGO/Generar_Solicitud.php';
         }
 
-        header("Location: $paginaInicio");
+        header("Location: " . url($paginaInicio));
         exit();
 
     } else {
@@ -60,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <link rel="stylesheet" href="style.css?v=<?php echo(rand()); ?>">
+  <link rel="stylesheet" href="<?php echo url('style.css?v=' . rand()); ?>">
   <!-- libreria de google para validar cuentas -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -69,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
   <div class="container">
     <div class="login-box">
       <div class="image-section">
-        <img src="IMG/log.webp" alt="Imagen login">
+        <img src="<?php echo url('IMG/log.webp'); ?>" alt="Imagen login">
       </div>
       <div class="form-section">
         <h2>Iniciar Sesión</h2>

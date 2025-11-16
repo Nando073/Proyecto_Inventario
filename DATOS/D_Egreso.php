@@ -50,16 +50,17 @@ class D_Egreso {
     public function getId_usuario() { return $this->id_usuario; }
     public function setId_usuario($id_usuario) { $this->id_usuario = $id_usuario; }
 
-
-    // Método para adicionar un egreso
-    public function RegistrarEgresoConDetalles($id_funcionario, $e_total_cantidad, $id_usuario, $detalles) {
+   
+    // Método para adicionar un egreso desde solicitud aprobada
+    public function RegistrarEgresoConDetalles($id_solicitud, $cod_solicitud, $id_funcionario, $e_total_cantidad, $id_usuario, $detalles) {
         try {
             // Iniciar la transacción
             $this->con->beginTransaction();
     
-            // 1. Llamar al procedimiento Adicionaregreso
-            $stmtEgreso = $this->con->prepare("CALL AdicionarEgreso(?, ?, ?)");
-            $stmtEgreso->execute([$id_funcionario, $e_total_cantidad, $id_usuario]);
+            // 1. Llamar al procedimiento AdicionarEgreso
+            // El SP espera: id_funcionario, e_total_cantidad, id_usuario, cod_solicitud, id_solicitud
+            $stmtEgreso = $this->con->prepare("CALL AdicionarEgreso(?, ?, ?, ?, ?)");
+            $stmtEgreso->execute([$id_funcionario, $e_total_cantidad, $id_usuario, $cod_solicitud, $id_solicitud]);
     
             // 2. Obtener el ID generado por el INSERT (gracias al SELECT en el procedimiento)
             $resultado = $stmtEgreso->fetch(PDO::FETCH_ASSOC);
@@ -81,13 +82,22 @@ class D_Egreso {
                 ]);
                 $stmtDetalle->closeCursor(); // Liberar cada cursor para evitar errores
             }
+            
+            // 4. Llamar al procedimiento para actualizar el estado de la solicitud
+            // NOTA: Verifica que el SP FinalizarSolicitud inserte en estado_solicitud, NO en solicitud
+            $stmtEstado = $this->con->prepare("CALL FinalizarSolicitud(?, ?, ?, ?)");
+            $stmtEstado->execute([
+                $id_solicitud,   // id_solicitud
+                $id_usuario,     // id_usuario que registra
+                4,               // estado final = Enviado (4)
+                'Egreso registrado correctamente' // comentario
+            ]);
+            $stmtEstado->closeCursor();
     
-            // 4. Confirmar la transacción
+            // 5. Confirmar la transacción
             $this->con->commit();
     
-            return "Ingreso y detalles registrados correctamente.";
-            $resultado = $sp->fetch(PDO::FETCH_ASSOC);
-            return $resultado['success']; // Devuelve 1 o 0
+            return 1; // Éxito
     
         } catch (PDOException $ex) {
             $this->con->rollBack(); // Revertir en caso de error

@@ -1,8 +1,8 @@
 <?php
-require_once '../Seguridad.php';
+require_once __DIR__ . '/../Seguridad.php';
 verificarAcceso(['Administrador']);
-require_once '../NEGOCIO/N_Usuario.php';
-require_once '../NEGOCIO/N_Funcionario.php';
+require_once __DIR__ . '/../NEGOCIO/N_Usuario.php';
+require_once __DIR__ . '/../NEGOCIO/N_Funcionario.php';
 
 $usuarioService = new N_Usuario();
 $funcionarioService = new N_Funcionario();
@@ -168,13 +168,13 @@ if ($searchTerm) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="../DEMO/styles.css?v=<?php echo(rand()); ?>"/> 
-    <script src="../DEMO/contrarer.js" defer></script>
+    <link rel="stylesheet" href="<?php echo url('DEMO/styles.css?v=' . rand()); ?>"/> 
+    <script src="<?php echo url('DEMO/contrarer.js'); ?>" defer></script>
     <title>Administrar Usuarios</title>
 
 </head>
 <body>
-<?php include '../DEMO/index.php'; ?>
+<?php include __DIR__ . '/../DEMO/index.php'; ?>
 
 <main>
     <!-- Tarjeta Responsiva -->
@@ -182,7 +182,7 @@ if ($searchTerm) {
   <div class="row g-0 align-items-center">
     <!-- Imagen -->
     <div class="col-5">
-      <img src="../IMG/usuario.png" alt="Usuarios" class="img-fluid h-100 object-fit-cover">
+      <img src="<?php echo url('IMG/usuario.png'); ?>" alt="Usuarios" class="img-fluid h-100 object-fit-cover">
     </div>
 
     <!-- Contenido -->
@@ -210,7 +210,9 @@ if ($searchTerm) {
                         
                         <div class="form-group mb-3">
                             <label for="usuario">Nombre de usuario</label>
-                            <input type="text" class="form-control" id="usuario" name="usuario" value="<?php echo isset($usuario) ? htmlspecialchars($usuario['usuario']) : ''; ?>" required>
+                            <input type="text" class="form-control" id="usuario" name="usuario" value="<?php echo isset($usuario) ? htmlspecialchars($usuario['usuario']) : ''; ?>" required
+                            oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+                            onkeypress="return soloLetras(event)">
                         </div>
                         
                         <div class="form-group mb-3">

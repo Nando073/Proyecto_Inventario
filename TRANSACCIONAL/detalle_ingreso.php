@@ -28,18 +28,20 @@ $ingreso = $ingresoDetalles[0];
 ?>
 <div id="contenido-modal" class="p-4">
     <!-- Información general -->
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <strong>Fecha:</strong>
-            <p class="mb-0"><?php echo htmlspecialchars($ingreso['i_fecha']); ?></p>
-        </div>
-        <div class="col-md-4">
-            <strong>Funcionario:</strong>
-            <p class="mb-0"><?php echo htmlspecialchars($ingreso['funcionario_nombre']); ?></p>
-        </div>
-        <div class="col-md-4">
-            <strong>Proveedor:</strong>
-            <p class="mb-0"><?php echo htmlspecialchars($ingreso['proveedor_nombre']); ?></p>
+    <div class="info-section">
+        <div class="row mb-3">
+            <div class="col-md-4 info-item">
+                <strong>Fecha:</strong>
+                <p class="mb-0"><?php echo htmlspecialchars($ingreso['i_fecha']); ?></p>
+            </div>
+            <div class="col-md-4 info-item">
+                <strong>Funcionario:</strong>
+                <p class="mb-0"><?php echo htmlspecialchars($ingreso['funcionario_nombre']); ?></p>
+            </div>
+            <div class="col-md-4 info-item">
+                <strong>Proveedor:</strong>
+                <p class="mb-0"><?php echo htmlspecialchars($ingreso['proveedor_nombre']); ?></p>
+            </div>
         </div>
     </div>
 
@@ -77,9 +79,9 @@ $ingreso = $ingresoDetalles[0];
     </div>
 
     <!-- Botón de imprimir -->
-    <div class="mt-4">
+    <div class="mt-4 text-center">
         <button class="btn btn-success btn-print" onclick="imprimirModal('contenido-modal')">
-            <i class="fas fa-print me-2"></i> Imprimir
+            <i class="fas fa-print me-2"></i> 🖨️ Imprimir Reporte
         </button>
     </div>
 </div>

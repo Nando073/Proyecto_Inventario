@@ -33,7 +33,7 @@ foreach ($detalles as $detalle) {
     echo "<tr>";
     echo "<td>" . htmlspecialchars($detalle['e_fecha']) . "</td>";
     echo "<td>" . htmlspecialchars($detalle['a_nombre']) . "</td>";
-    echo "<td>" . htmlspecialchars($detalle['funcionario_nombre']) . "</td>";
+    echo "<td>" . htmlspecialchars($detalle['funcionario_solicitante']) . "</td>";
     echo "<td>" . htmlspecialchars($detalle['e_solicitud']) . "</td>";
     echo "<td>" . htmlspecialchars($detalle['material_nombre']) . "</td>";
     echo "<td>" . htmlspecialchars($detalle['categoria_nombre']) . "</td>";

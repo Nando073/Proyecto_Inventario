@@ -1,4 +1,7 @@
 <?php
+// Incluir configuración de rutas
+require_once __DIR__ . '/config.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -11,7 +14,7 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 // 👤 Verificar que haya sesión iniciada
 if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_completo'])) {
-    header("Location: ../Acceso.php");
+    header("Location: " . url('Acceso.php'));
     exit();
 }
 
@@ -20,7 +23,7 @@ $rolesPermitidos = ['Administrador','Funcionario','Supervisor','Operador'];
 
 // Verificar que tenga al menos un rol válido
 if (!isset($_SESSION['rol_asignado']) || count(array_intersect($rolesPermitidos, $_SESSION['rol_asignado'])) === 0) {
-    header("Location: ../acceso_denegado.php");
+    header("Location: " . url('acceso_denegado.php'));
     exit();
 }
 
@@ -41,7 +44,7 @@ if (!function_exists('tieneRol')) {
 if (!function_exists('verificarAcceso')) {
     function verificarAcceso($rolesPermitidos) {
         if (!tieneRol($rolesPermitidos)) {
-            header("Location: ../acceso_denegado.php");
+            header("Location: " . url('acceso_denegado.php'));
             exit();
         }
     }

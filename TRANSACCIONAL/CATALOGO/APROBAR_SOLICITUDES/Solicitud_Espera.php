@@ -8,44 +8,6 @@ $solicitudService = new N_Solicitud();
 
 // Obtener todas las solicitudes (solo cabeceras, sin duplicados)
 $solicitudes = $solicitudService->obtenerSolicitudesCabecera();
-
-// header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $idSolicitud = isset($_POST['id_solicitud']) ? intval($_POST['id_solicitud']) : 0;
-    $estado = isset($_POST['estado']) ? intval($_POST['estado']) : 0;
-    $comentario = isset($_POST['comentario']) ? trim($_POST['comentario']) : '';
-    
-    if ($idSolicitud <= 0 || !in_array($estado, [2, 3])) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Parámetros inválidos'
-        ]);
-        exit;
-    }
-    
-    $nSolicitud = new N_Solicitud();
-    $resultado = $nSolicitud->cambiarEstadoSolicitud($idSolicitud, $estado, $comentario);
-    
-    if ($resultado) {
-        echo json_encode([
-            'success' => true,
-            'message' => 'Estado actualizado correctamente'
-        ]);
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Error al actualizar el estado'
-        ]);
-    }
-// } else {
-//     echo json_encode([
-//         'success' => false,
-//         'message' => 'Método no permitido'
-//     ]);
-// }
-    exit;
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -72,103 +34,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
       </style>
 </head>
-<?php /* HEADER NO SE MODIFICA */ ?>
-<header>
-  <nav class="navbar fixed-top shadow" style="background-color: #41b488ff;">
-    <div class="container-fluid">
-      <div class="d-flex align-items-center w-100">
-        
-        <!-- Logo -->
-        <a class="navbar-brand me-3 flex-shrink-0" href="#">
-          <img src="../../../IMG/LOGODDE.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
-          <span class="d-none d-sm-inline">D.D.E.</span>
-        </a>
-
-        <!-- Menú hamburguesa -->
-        <?php if (count(array_intersect(['Administrador', 'Operador'], $_SESSION['rol_asignado'])) > 0): ?>
-          <div class="dropdown me-3 flex-shrink-0">
-            <button class="menu-back-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-list"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-custom">
-              <?php if (count(array_intersect(['Administrador'], $_SESSION['rol_asignado'])) > 0): ?>
-                <li><a class="dropdown-item" href="../../../PRESENTACION/ADM_Usuario.php"><i class="bi bi-people"></i> Administrar Usuarios</a></li>
-              <?php endif; ?>
-              <li><a class="dropdown-item" href="../../../PRESENTACION/ADM_Material.php"><i class="bi bi-box-seam"></i> Administrar Materiales</a></li>
-              <li><a class="dropdown-item" href="../../../TRANSACCIONAL/Ingreso.php"><i class="bi bi-download"></i> Ingreso de Materiales</a></li>
-              <li><a class="dropdown-item" href="../../../REPORTES/Stock.php"><i class="bi bi-graph-up"></i> Reportes de Stock</a></li>
-            </ul>
-          </div>
-        <?php endif; ?>
-
-        <!-- Búsqueda -->
-        <form class="d-flex search-container me-3 flex-grow-1" role="search">
-          <input class="form-control form-control-sm" type="search" placeholder="Buscar material..." aria-label="Search">
-          <button class="btn btn-outline-light btn-sm ms-2 flex-shrink-0" type="submit">
-            <i class="bi bi-search"></i>
-            <span class="ms-1 d-none d-md-inline">Buscar</span>
-          </button>
-        </form>
-
-        <!-- Carrito y usuario -->
-        <div class="d-flex align-items-center flex-shrink-0 ms-auto">
-          <!-- Carrito -->
-          <a href="../Generar_solicitud.php" class="btn cart-btn me-3 position-relative btn-sm">
-            <i class="bi bi-cart"></i> 
-            <span class="d-none d-md-inline ms-1">Generar Solicitud</span>
-          </a>
-
-          <!-- Usuario -->
-          <div class="dropdown">
-            <a class="d-flex align-items-center text-decoration-none dropdown-toggle p-2 rounded user-container" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <div class="user-avatar">
-                <?php 
-                $iniciales = '';
-                $nombres = explode(' ', htmlspecialchars($nombreUsuario));
-                if (count($nombres) > 0) {
-                  $iniciales = strtoupper(substr($nombres[0], 0, 1));
-                  if (count($nombres) > 1) {
-                    $iniciales .= strtoupper(substr($nombres[1], 0, 1));
-                  }
-                }
-                echo $iniciales;
-                ?>
-              </div>
-              <span class="user-name ms-2">
-                <?php 
-                $nombreDisplay = htmlspecialchars($nombreUsuario);
-                if (strlen($nombreDisplay) > 20) {
-                  $nombreDisplay = substr($nombreDisplay, 0, 18) . '...';
-                }
-                echo $nombreDisplay;
-                ?>
-              </span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li class="user-info border-bottom">
-                <div class="user-avatar bg-primary">
-                  <?php echo $iniciales; ?>
-                </div>
-                <div>
-                  <div class="fw-bold"><?php echo htmlspecialchars($nombreUsuario); ?></div>
-                  <small class="text-muted">Usuario</small>
-                </div>
-              </li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="../ESTADO_SOLICITUDES/Estado_solicitud.php"><i class="bi bi-box-arrow-right"></i> Estado de Solicitud</a></li>
-              <li><a class="dropdown-item" href="../../../logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
-</header>
-
-
+<body class="container bg-light">
+<?php include __DIR__ . '/../Cabecera.php';?>
 <div class="container py-3">
+    <!-- Mostrar mensajes de éxito/error -->
+    <?php if (isset($_SESSION['mensaje'])): ?>
+        <div class="alert alert-<?php echo $_SESSION['tipo_mensaje']; ?> alert-dismissible fade show" role="alert">
+            <?php 
+                echo htmlspecialchars($_SESSION['mensaje']); 
+                unset($_SESSION['mensaje']);
+                unset($_SESSION['tipo_mensaje']);
+            ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-clipboard-check"></i> Estado de Solicitudes</h2>
+        <h2><i class="bi bi-clipboard-check"></i> Solicitudes Pendientes</h2>
         <span class="badge bg-primary fs-6">Total: <?php echo count($solicitudes); ?> Pendientes</span>
     </div>
     
@@ -187,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="card-header bg-custom-teal text-white text-center">
                         <h5 class="mb-0">
                             <i class="bi bi-file-earmark-text"></i>
-                            Solicitud #<?php echo str_pad($sol['id_solicitud'], 4, '0', STR_PAD_LEFT); ?>
+                            Solicitud #<?php echo str_pad($sol['cod_solicitud'], 4, '0', STR_PAD_LEFT); ?>
                         </h5>
                     </div>
                     <div class="card-body mx-2">
@@ -242,6 +124,312 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
+// Funciones globales para los botones del modal
+function rechazarSolicitud(idSolicitud) {
+    console.log('Función rechazarSolicitud llamada con ID:', idSolicitud);
+    
+    const comentarioElement = document.getElementById('comentarioSupervisor');
+    if (!comentarioElement) {
+        alert('Error: No se encontró el campo de comentario');
+        console.error('Elemento comentarioSupervisor no encontrado');
+        return;
+    }
+    
+    const comentario = comentarioElement.value.trim();
+    console.log('Comentario capturado:', comentario);
+    
+    if (!comentario) {
+        alert('Por favor, ingrese un comentario explicando el motivo del rechazo.');
+        comentarioElement.focus();
+        comentarioElement.style.borderColor = '#dc3545';
+        return;
+    }
+    
+    if (confirm('¿Está seguro de rechazar esta solicitud?')) {
+        // Construir la URL
+        const url = `detalle_espera.php?id_solicitud=${idSolicitud}&accion=rechazar&comentario=${encodeURIComponent(comentario)}`;
+        console.log('Redirigiendo a:', url);
+        
+        // Redirigir
+        window.location.href = url;
+    } else {
+        console.log('Rechazo cancelado por el usuario');
+    }
+}
+
+// Función para rechazar solicitud
+function rechazarSolicitud(idSolicitud) {
+    console.log('Función rechazarSolicitud llamada con ID:', idSolicitud);
+    
+    const comentarioElement = document.getElementById('comentarioSupervisor');
+    if (!comentarioElement) {
+        alert('Error: No se encontró el campo de comentario');
+        console.error('Elemento comentarioSupervisor no encontrado');
+        return;
+    }
+    
+    const comentario = comentarioElement.value.trim();
+    console.log('Comentario capturado:', comentario);
+    
+    if (!comentario) {
+        alert('Por favor, ingrese un comentario explicando el motivo del rechazo.');
+        comentarioElement.focus();
+        comentarioElement.style.borderColor = '#dc3545';
+        return;
+    }
+    
+    if (confirm('¿Está seguro de rechazar esta solicitud?')) {
+        // Construir la URL
+        const url = `detalle_espera.php?id_solicitud=${idSolicitud}&accion=rechazar&comentario=${encodeURIComponent(comentario)}`;
+        console.log('Redirigiendo a:', url);
+        
+        // Redirigir
+        window.location.href = url;
+    } else {
+        console.log('Rechazo cancelado por el usuario');
+    }
+}
+
+// Función para aprobar solicitud
+function aprobarSolicitud(idSolicitud) {
+    console.log('=== INICIO APROBACIÓN ===' );
+    console.log('ID Solicitud:', idSolicitud);
+    
+    const comentarioElement = document.getElementById('comentarioSupervisor');
+    if (!comentarioElement) {
+        alert('Error: No se encontró el campo de comentario');
+        return;
+    }
+    
+    const comentario = comentarioElement.value.trim() || 'Solicitud aprobada';
+    console.log('Comentario:', comentario);
+    
+    // Recopilar solo los materiales que NO fueron removidos
+    const formMateriales = document.getElementById('formMateriales');
+    const materialesItems = formMateriales.querySelectorAll('.material-item');
+    const materiales = [];
+    
+    let cantidadValida = true;
+    let materialesActivos = 0;
+    
+    materialesItems.forEach(item => {
+        // Ignorar materiales ocultos o removidos
+        if (item.style.display === 'none' || item.classList.contains('material-removido')) {
+            console.log('Material removido, ignorando:', item.id);
+            return;
+        }
+        
+        materialesActivos++;
+        
+        // Intentar obtener el ID del material de diferentes formas
+        let idMaterial = item.getAttribute('data-material-id');
+        console.log('DEBUG - Item:', item.id, 'data-material-id:', idMaterial);
+        
+        // Si está vacío, buscar en el input hidden
+        if (!idMaterial || idMaterial === '') {
+            const index = item.id.replace('material-item-', '');
+            const hiddenInput = item.querySelector('.material-id-input');
+            if (hiddenInput) {
+                idMaterial = hiddenInput.value;
+                console.log('DEBUG - ID obtenido del input hidden:', idMaterial);
+            }
+        }
+        
+        const inputCantidad = item.querySelector('.cantidad-input');
+        
+        if (!inputCantidad) {
+            console.error('No se encontró input de cantidad');
+            return;
+        }
+        
+        const cantidad = parseInt(inputCantidad.value);
+        
+        if (cantidad <= 0 || isNaN(cantidad)) {
+            alert('Por favor, ingrese cantidades válidas (mayores a 0)');
+            inputCantidad.focus();
+            inputCantidad.style.borderColor = '#dc3545';
+            cantidadValida = false;
+            return;
+        }
+        
+        // Validar que el ID no esté vacío
+        if (!idMaterial || idMaterial === '') {
+            console.error('ERROR: ID de material vacío para el item', item.id);
+            alert('Error: No se pudo obtener el ID del material. Revisa el error_log.');
+            cantidadValida = false;
+            return;
+        }
+        
+        materiales.push({
+            id: idMaterial,
+            cantidad: cantidad
+        });
+        
+        console.log('Material agregado:', {id: idMaterial, cantidad: cantidad});
+    });
+    
+    if (!cantidadValida) {
+        return;
+    }
+    
+    // Validar que haya al menos un material
+    if (materialesActivos === 0 || materiales.length === 0) {
+        alert('Debe haber al menos un material en la solicitud para aprobar.');
+        return;
+    }
+    
+    console.log('Total de materiales a aprobar:', materiales.length);
+    console.log('Materiales:', materiales);
+    
+    if (confirm('¿Está seguro de aprobar esta solicitud con ' + materialesActivos + ' material(es)?')) {
+        // Mostrar indicador de carga
+        const btnAprobar = document.querySelector('.btn-success');
+        const btnRechazar = document.querySelector('.btn-danger');
+        btnAprobar.disabled = true;
+        btnRechazar.disabled = true;
+        btnAprobar.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+        
+        // Crear formulario dinámico para enviar datos (igual que Generar_Solicitud.php)
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'detalle_espera.php';
+        
+        // Campo oculto para acción
+        const inputAccion = document.createElement('input');
+        inputAccion.type = 'hidden';
+        inputAccion.name = 'accion';
+        inputAccion.value = 'aprobar';
+        form.appendChild(inputAccion);
+        
+        // Campo oculto para ID de solicitud
+        const inputIdSolicitud = document.createElement('input');
+        inputIdSolicitud.type = 'hidden';
+        inputIdSolicitud.name = 'id_solicitud';
+        inputIdSolicitud.value = idSolicitud;
+        form.appendChild(inputIdSolicitud);
+        
+        // Campo para comentario (detalle)
+        const inputDetalle = document.createElement('input');
+        inputDetalle.type = 'hidden';
+        inputDetalle.name = 'detalle';
+        inputDetalle.value = comentario;
+        form.appendChild(inputDetalle);
+        
+        // Agregar materiales al formulario (igual que Generar_Solicitud.php)
+        // Formato: materiales[0][id] y materiales[0][cantidad]
+        materiales.forEach((material, index) => {
+            const inputIdMaterial = document.createElement('input');
+            inputIdMaterial.type = 'hidden';
+            inputIdMaterial.name = `materiales[${index}][id]`;
+            inputIdMaterial.value = material.id;
+            form.appendChild(inputIdMaterial);
+            
+            const inputCantidad = document.createElement('input');
+            inputCantidad.type = 'hidden';
+            inputCantidad.name = `materiales[${index}][cantidad]`;
+            inputCantidad.value = material.cantidad;
+            form.appendChild(inputCantidad);
+        });
+        
+        // Agregar formulario al body y enviarlo
+        document.body.appendChild(form);
+        console.log('Enviando formulario...');
+        form.submit();
+    } else {
+        console.log('Aprobación cancelada por el usuario');
+    }
+}
+
+// Función para inicializar eventos del modal
+function inicializarEventosModal() {
+    console.log('Inicializando eventos del modal...');
+    
+    // Event listeners para validar cantidades
+    const inputsCantidad = document.querySelectorAll('.cantidad-input');
+    inputsCantidad.forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value < 1) {
+                this.style.borderColor = '#dc3545';
+            } else {
+                this.style.borderColor = '#667eea';
+            }
+        });
+        
+        // Evitar valores decimales
+        input.addEventListener('keypress', function(e) {
+            if (e.key === '.' || e.key === ',') {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    // Funcionalidad para quitar materiales
+    document.querySelectorAll('.quitar-material').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const index = this.getAttribute('data-index');
+            const materialItem = document.getElementById('material-item-' + index);
+            
+            if (!materialItem) {
+                console.error('No se encontró el elemento material-item-' + index);
+                return;
+            }
+            
+            const nombreMaterial = materialItem.querySelector('.material-nombre').value;
+            
+            if (confirm('¿Está seguro de quitar "' + nombreMaterial + '" de la solicitud?')) {
+                // Ocultar el elemento con animación
+                materialItem.style.transition = 'all 0.3s ease';
+                materialItem.style.opacity = '0';
+                materialItem.style.transform = 'scale(0.8)';
+                
+                setTimeout(() => {
+                    materialItem.style.display = 'none';
+                    materialItem.classList.add('material-removido');
+                }, 300);
+            }
+        });
+    });
+    
+    console.log('Eventos del modal inicializados correctamente');
+}
+
+function cambiarEstadoModal(idSolicitud, estado) {
+    const comentario = document.getElementById('comentarioSupervisor').value;
+    
+    // Solo para aprobar (estado 2)
+    if (estado !== 2) {
+        return;
+    }
+    
+    // Recopilar las cantidades editadas
+    const cantidades = [];
+    const formMateriales = document.getElementById('formMateriales');
+    const inputs = formMateriales.querySelectorAll('input[name^="cantidad_"]');
+    
+    inputs.forEach(input => {
+        const cantidad = parseInt(input.value);
+        if (cantidad <= 0 || isNaN(cantidad)) {
+            alert('Por favor, ingrese cantidades válidas (mayores a 0)');
+            input.focus();
+            throw new Error('Cantidad inválida');
+        }
+        cantidades.push(cantidad);
+    });
+    
+    if (confirm('¿Está seguro de aprobar esta solicitud?')) {
+        // Mostrar indicador de carga
+        const btnAprobar = document.querySelector('.btn-success');
+        btnAprobar.disabled = true;
+        btnAprobar.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+        
+        // Aquí puedes implementar la lógica de aprobar con AJAX o formulario
+        alert('Funcionalidad de aprobar en desarrollo');
+        btnAprobar.disabled = false;
+        btnAprobar.innerHTML = '<i class="bi bi-check-circle"></i> Aprobar Solicitud';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.ver-detalle').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -269,6 +457,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(html => {
                     modalBody.innerHTML = html;
+                    
+                    // Inicializar event listeners después de cargar el contenido
+                    inicializarEventosModal();
                 })
                 .catch(error => {
                     console.error('Error:', error);

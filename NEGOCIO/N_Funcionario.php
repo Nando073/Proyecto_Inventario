@@ -69,10 +69,10 @@ class N_Funcionario {
         return $d->ObtenerFuncionariosDisponibles($id_funcionario);
     }
 
-    public function obtenerFuncionarioD(){
-        $d = new D_Funcionario();
-        return $d->ObtenerFuncionarioD();
-    }
+    // public function obtenerFuncionarioD(){
+    //     $d = new D_Funcionario();
+    //     return $d->ObtenerFuncionarioD();
+    // }
 
     public function buscarPorCorreo($f_correo) {
         $d = new D_Funcionario();

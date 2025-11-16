@@ -623,10 +623,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🔹 Solo números en campo cantidad
     if (e.target.name === 'cantidad[]') {
       e.target.value = e.target.value.replace(/[^0-9]/g, '');
-      if (e.target.value.startsWith('0') && e.target.value.length > 1) {
-        e.target.value = e.target.value.replace(/^0+/, '');
-      }
-    }
+            if (e.target.value.length > 1 && e.target.value.startsWith('0')) {
+                e.target.value = e.target.value.replace(/^0+/, '');
+            } else if (e.target.value === '0') {
+                e.target.value = '';
+            }
+        }
 
     // 🔹 Validar precio (sin negativos, solo números y punto)
     if (e.target.name === 'precio[]') {
@@ -650,16 +652,41 @@ document.addEventListener('DOMContentLoaded', () => {
 function imprimirModal(id) {
     var contenido = document.getElementById(id).innerHTML;
     
-    var ventana = window.open('', '', 'width=800,height=600');
-    ventana.document.write('<html><head><title>Imprimir Ingreso</title>');
+    var ventana = window.open('', '', 'width=900,height=700');
+    ventana.document.write('<html><head><title>Detalle de Ingreso</title>');
     ventana.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">');
+    ventana.document.write('<style>');
+    ventana.document.write('@media print {');
+    ventana.document.write('  body { margin: 20px; font-family: Arial, sans-serif; }');
+    ventana.document.write('  .btn-print { display: none !important; }');
+    ventana.document.write('}');
+    ventana.document.write('body { padding: 30px; background: white; }');
+    ventana.document.write('h2 { color: #2c3e50; text-align: center; margin-bottom: 30px; font-weight: bold; }');
+    ventana.document.write('.info-section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #dee2e6; }');
+    ventana.document.write('.info-row { display: flex; justify-content: space-between; margin-bottom: 15px; }');
+    ventana.document.write('.info-item { flex: 1; }');
+    ventana.document.write('.info-item strong { color: #495057; display: block; margin-bottom: 5px; font-size: 12px; text-transform: uppercase; }');
+    ventana.document.write('.info-item p { color: #212529; margin: 0; font-size: 14px; font-weight: 500; }');
+    ventana.document.write('table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }');
+    ventana.document.write('thead { background: #343a40; color: white; }');
+    ventana.document.write('th { padding: 12px; text-align: left; font-weight: 600; }');
+    ventana.document.write('td { padding: 10px; border-bottom: 1px solid #dee2e6; }');
+    ventana.document.write('tbody tr:hover { background: #f8f9fa; }');
+    ventana.document.write('tfoot { background: #e9ecef; font-weight: bold; }');
+    ventana.document.write('tfoot th { padding: 12px; color: #212529; }');
+    ventana.document.write('.btn-print { margin-top: 20px; }');
+    ventana.document.write('</style>');
     ventana.document.write('</head><body>');
+    ventana.document.write('<h2> DETALLE DE INGRESO </h2>');
     ventana.document.write(contenido);
     ventana.document.write('</body></html>');
     ventana.document.close();
     ventana.focus();
-    ventana.print();
-    ventana.close();
+    
+    setTimeout(function() {
+        ventana.print();
+        ventana.close();
+    }, 250);
 }
 </script>
 </body>

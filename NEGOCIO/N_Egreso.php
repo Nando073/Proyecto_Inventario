@@ -3,11 +3,11 @@ require_once __DIR__ . '/../DATOS/D_Egreso.php';
 require_once __DIR__ . '/../DATOS/D_Conepcion.php';
 class N_Egreso {
 
-    // Método para adicionar un egreso
-    public function registrarEgresoCompleto($id_funcionario, $e_total_cantidad, $id_usuario, $detalles) {
+    // Método para adicionar un egreso completo con detalles
+    public function registrarEgresoCompleto($id_solicitud, $cod_solicitud, $id_funcionario, $e_total_cantidad, $id_usuario, $detalles) {
         try {
             $NEgreso = new D_Egreso();
-            $resultado = $NEgreso->RegistrarEgresoConDetalles($id_funcionario, $e_total_cantidad, $id_usuario, $detalles);
+            $resultado = $NEgreso->RegistrarEgresoConDetalles($id_solicitud, $cod_solicitud, $id_funcionario, $e_total_cantidad, $id_usuario, $detalles);
             return ['success' => (bool)$resultado]; // Convierte 1/0 a true/false
         } catch (Exception $e) {
             throw $e;

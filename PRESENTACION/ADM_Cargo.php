@@ -1,7 +1,7 @@
 <?php
-require_once '../Seguridad.php';
+require_once __DIR__ . '/../Seguridad.php';
 verificarAcceso(['Administrador']);
-require_once '../NEGOCIO/N_Cargo.php';
+require_once __DIR__ . '/../NEGOCIO/N_Cargo.php';
 $cargoService = new N_Cargo();
 
 
@@ -154,12 +154,14 @@ if ($searchTerm) {
 
                         <div class="form-group">
                             <label for="nombre_c">Nombre</label>
-                            <input type="text" class="form-control" id="nombre_c" name="nombre_c" value="<?php echo isset($cargo) ? htmlspecialchars($cargo['nombre_c']) : ''; ?>" required>
+                            <input type="text" class="form-control" id="nombre_c" name="nombre_c" value="<?php echo isset($cargo) ? htmlspecialchars($cargo['nombre_c']) : ''; ?>" required oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+        onkeypress="return soloLetras(event)">
                         </div>
 
                         <div class="form-group">
                             <label for="descripcion_c">Descripción</label>
-                            <textarea class="form-control" id="descripcion_c" name="descripcion_c" required><?php echo isset($cargo) ? htmlspecialchars($cargo['descripcion_c']) : ''; ?></textarea>
+                            <textarea class="form-control" id="descripcion_c" name="descripcion_c" required oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')"
+        onkeypress="return soloLetras(event)"><?php echo isset($cargo) ? htmlspecialchars($cargo['descripcion_c']) : ''; ?></textarea>
                         </div>
 
                         <div class="mt-3">

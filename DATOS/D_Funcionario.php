@@ -157,17 +157,17 @@ public function ObtenerFuncionariosDisponibles($id_funcionario = null) {
     }
 }
 
- public function ObtenerFuncionarioD() {
-        $sql = "CALL ObtenerFuncionarioD()";
-        try {
-            $ps = $this->con->prepare($sql);
-            $ps->execute();
-            return $ps->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $ex) {
-            echo "Error al buscar: " . $ex->getMessage();
-            return [];
-        }
-    }
+//  public function ObtenerFuncionarioD() {
+//         $sql = "CALL ObtenerFuncionarioD()";
+//         try {
+//             $ps = $this->con->prepare($sql);
+//             $ps->execute();
+//             return $ps->fetchAll(PDO::FETCH_ASSOC);
+//         } catch (PDOException $ex) {
+//             echo "Error al buscar: " . $ex->getMessage();
+//             return [];
+//         }
+//     }
 
    public function buscarPorCorreo($f_correo) {
     $sql = "CALL BuscarFuncionarioPorCorreo(?)";
